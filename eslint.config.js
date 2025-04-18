@@ -21,4 +21,17 @@ export default defineConfig([
 
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
+
+  // 加入 Prettier config 與 plugin
+  {
+    plugins: {
+      prettier: prettierPlugin,
+    },
+    rules: {
+      'prettier/prettier': 'error', // 會把 Prettier 的錯誤視為 ESLint 錯誤
+    },
+  },
+
+  // 禁用與 Prettier 重複的 ESLint 規則
+  prettierConfig,
 ])
