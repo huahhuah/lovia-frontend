@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
+import ProjectDetailView from "../views/ProjectDetailView.vue";
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -17,6 +18,11 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import("../views/TestView.vue"),
     },
+    {
+      path: "/projects/:id",
+      name: "ProjectDetail",
+      component: ProjectDetailView,
+    }
   ],
 });
 
