@@ -41,10 +41,9 @@
 
 /* Navbar 背景透明＋內部間距細緻調整 */
 .custom-navbar {
-  background-color: rgba(254, 254, 254, 0.85);
+  background-color: rgba(255, 248, 249, 0.4); /* 改為 rgba，只讓背景透明 */
   padding-top: 10px;
   padding-bottom: 10px;
-  backdrop-filter: blur(2px); /* 加一點模糊感讓字好閱讀 */
 }
 
 /* 搜尋框微調 */
@@ -58,7 +57,7 @@
 
 .form-control {
   border: none;
-  background-color: rgba(255, 255, 255, 0.6); /* 可自行調整顏色 */
+  background-color: rgba(255, 255, 255, 0.5); /* 可自行調整顏色 */
 }
 
 .nav-link {
