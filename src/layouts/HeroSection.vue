@@ -5,8 +5,7 @@
       <div class="carousel-inner">
         <div class="carousel-item active position-relative">
           <img src="/homepageS1-Frame 509.png" class="d-block w-100 hero-img" alt="Hero Image">
-          <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-start">
-            <!-- headline 疊在底圖上，不需要額外白底容器 -->
+           <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-start">
             <div class="hero-stack position-relative">
               <img src="/homepageS1-Frame 489.png" alt="背景底圖" class="img-fluid hero-subheadline position-absolute">
               <img src="/homepageS1-headline.png" alt="匯聚希望，改變世界" class="img-fluid hero-headline position-relative">

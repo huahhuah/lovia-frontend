@@ -117,10 +117,13 @@ const handleLogout = () => {
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
 
 .custom-navbar {
-  background-color: rgba(254, 254, 254, 0.85);
+  background-color: rgba(255, 248, 249, 0.4); /* 改為 rgba，只讓背景透明 */
   padding-top: 10px;
   padding-bottom: 10px;
+<<<<<<< HEAD
   backdrop-filter: blur(2px);
+=======
+>>>>>>> acaa048 (Section2-4與footer切版)
 }
 
 .search-form .input-group {
@@ -133,7 +136,11 @@ const handleLogout = () => {
 
 .form-control {
   border: none;
+<<<<<<< HEAD
   background-color: rgba(255, 255, 255, 0.6);
+=======
+  background-color: rgba(255, 255, 255, 0.5); /* 可自行調整顏色 */
+>>>>>>> acaa048 (Section2-4與footer切版)
 }
 
 .nav-link {
@@ -149,8 +156,12 @@ const handleLogout = () => {
   font-size: 16px;
   padding: 6px 16px;
 }
+<<<<<<< HEAD
 
 .dropdown-menu {
   min-width: 160px;
 }
 </style>
+=======
+</style>
+>>>>>>> acaa048 (Section2-4與footer切版)
