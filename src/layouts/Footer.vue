@@ -45,14 +45,24 @@
       </div>
 
       <!-- 著作權 -->
+<<<<<<< HEAD
       <div class="text-center mt-4 small text-muted">© Copyright 2025 北十有限公司</div>
+=======
+      <div class="text-center mt-4 small text-muted">
+        © Copyright 2025 北十有限公司
+      </div>
+>>>>>>> origin/main
     </div>
   </footer>
 </template>
 
 <style scoped>
 .footer {
+<<<<<<< HEAD
   background-color: #ffd2cf;
+=======
+  background-color: #FFD2CF;
+>>>>>>> origin/main
 }
 
 /* ✅ 新增集中內容用的容器最大寬度 */
