@@ -1,4 +1,4 @@
-<template>
+<template v-if="!isLoading">
   <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
     <div class="container">
       <!-- Logo -->
@@ -27,7 +27,7 @@
               <input
                 class="form-control rounded-pill border-start-0"
                 type="search"
-                placeholder="搜尋產品 / 專案 / 團隊"
+                placeholder="搜尋產品 / 專案 / 团队"
               />
             </div>
           </form>
@@ -36,7 +36,7 @@
         </div>
       </div>
 
-      <!-- 右側區域：登入/註冊 或 使用者頭像 -->
+      <!-- 右側登入狀態顯示區 -->
       <div class="d-flex align-items-center ms-auto gap-3">
         <template v-if="user">
           <div class="dropdown">
@@ -52,22 +52,22 @@
                 class="rounded-circle"
                 width="36"
                 height="36"
-                style="object-fit: cover;"
+                style="object-fit: cover"
               />
               <span class="fw-semibold">{{ user.username }}</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><a class="dropdown-item" href="#">個人資料</a></li>
-              <li><a class="dropdown-item" href="#">我的專案</a></li>
               <li><hr class="dropdown-divider" /></li>
               <li><a class="dropdown-item text-danger" @click="handleLogout">登出</a></li>
             </ul>
           </div>
         </template>
-
         <template v-else>
           <router-link to="/login" class="nav-link text-dark">登入</router-link>
-          <router-link to="/register" class="btn btn-dark rounded-pill px-3 custom-register">註冊</router-link>
+          <router-link to="/register" class="btn btn-dark rounded-pill px-3 custom-register"
+            >註冊</router-link
+          >
         </template>
       </div>
     </div>
@@ -75,55 +75,55 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
-import { useUserStore } from '@/stores/auth';
-import { useRouter } from 'vue-router';
-import defaultAvatar from '@/assets/images/default-avatar.png';
-import axios from 'axios';
+import { computed, ref, onMounted } from 'vue'
+import { useUserStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
+import defaultAvatar from '@/assets/images/default-avatar.png'
+import axios from 'axios'
 
-const userStore = useUserStore();
-const router = useRouter();
+const userStore = useUserStore()
+const router = useRouter()
 
-// 透過 computed 取得 user 狀態（這行是你畫面上用的 user）
-const user = computed(() => userStore.user);
+const user = computed(() => userStore.user)
+const isLoading = ref(true)
+const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
 
 const checkLoginStatus = async () => {
-  if (!userStore.token) return;
+  if (!userStore.token) {
+    isLoading.value = false
+    return
+  }
 
   try {
-    const res = await axios.post('http://localhost:8080/api/v1/users/status', null, {
-      headers: { Authorization: `Bearer ${userStore.token}` }
-    });
-    userStore.setUser(res.data.user);
+    const res = await axios.post(`${baseUrl}/api/v1/users/status`, null, {
+      headers: { Authorization: `Bearer ${userStore.token}` },
+    })
+    userStore.setUser(res.data.user)
   } catch (err) {
-    userStore.clear();
+    userStore.clear()
+  } finally {
+    isLoading.value = false
   }
-};
+}
 
-onMounted(() => {
-  checkLoginStatus();
-  console.log('userStore.user in navbar:', userStore.user);
-});
+onMounted(async () => {
+  await checkLoginStatus()
+})
 
 const handleLogout = () => {
-  userStore.clear();
-  router.push('/');
-};
+  userStore.clear()
+  router.push('/')
+}
 </script>
-
-
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
 
 .custom-navbar {
-  background-color: rgba(255, 248, 249, 0.4); /* 改為 rgba，只讓背景透明 */
+  background-color: rgba(255, 248, 249, 0.4);
   padding-top: 10px;
   padding-bottom: 10px;
-<<<<<<< HEAD
   backdrop-filter: blur(2px);
-=======
->>>>>>> acaa048 (Section2-4與footer切版)
 }
 
 .search-form .input-group {
@@ -136,11 +136,7 @@ const handleLogout = () => {
 
 .form-control {
   border: none;
-<<<<<<< HEAD
   background-color: rgba(255, 255, 255, 0.6);
-=======
-  background-color: rgba(255, 255, 255, 0.5); /* 可自行調整顏色 */
->>>>>>> acaa048 (Section2-4與footer切版)
 }
 
 .nav-link {
@@ -156,12 +152,8 @@ const handleLogout = () => {
   font-size: 16px;
   padding: 6px 16px;
 }
-<<<<<<< HEAD
 
 .dropdown-menu {
   min-width: 160px;
 }
 </style>
-=======
-</style>
->>>>>>> acaa048 (Section2-4與footer切版)
