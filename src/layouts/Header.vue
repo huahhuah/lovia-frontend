@@ -1,18 +1,12 @@
 <template v-if="!isLoading">
   <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
     <div class="container">
-<<<<<<< HEAD
       <!-- Logo -->
       <router-link to="/" class="navbar-brand me-auto">
         <img src="/homepageS1-logo.png" alt="Lovia Logo" width="80" />
       </router-link>
 
       <!-- 漢堡選單 -->
-=======
-      <a class="navbar-brand me-auto" href="#">
-        <img src="/homepageS1-logo.png" alt="Lovia Logo" width="80" />
-      </a>
->>>>>>> origin/main
       <button
         class="navbar-toggler"
         type="button"
@@ -33,12 +27,8 @@
               <input
                 class="form-control rounded-pill border-start-0"
                 type="search"
-<<<<<<< HEAD
-                placeholder="搜尋產品 / 專案 / 团队"
-=======
                 placeholder="搜尋產品 / 專案 / 團隊"
                 aria-label="Search"
->>>>>>> origin/main
               />
             </div>
           </form>
@@ -47,11 +37,7 @@
         </div>
       </div>
 
-<<<<<<< HEAD
-      <!-- 右側登入狀態顯示區 -->
-=======
       <!-- 右側區域：登入/註冊 或 使用者頭像 -->
->>>>>>> origin/main
       <div class="d-flex align-items-center ms-auto gap-3">
         <template v-if="user">
           <div class="dropdown">
@@ -73,19 +59,11 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><a class="dropdown-item" href="#">個人資料</a></li>
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
               <li><hr class="dropdown-divider" /></li>
               <li><a class="dropdown-item text-danger" @click="handleLogout">登出</a></li>
             </ul>
           </div>
         </template>
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
         <template v-else>
           <router-link to="/login" class="nav-link text-dark">登入</router-link>
           <router-link to="/register" class="btn btn-dark rounded-pill px-3 custom-register"
