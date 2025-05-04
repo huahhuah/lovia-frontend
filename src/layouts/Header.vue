@@ -1,18 +1,12 @@
 <template v-if="!isLoading">
   <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
     <div class="container">
-<<<<<<< HEAD
       <!-- Logo -->
       <router-link to="/" class="navbar-brand me-auto">
         <img src="/homepageS1-logo.png" alt="Lovia Logo" width="80" />
       </router-link>
 
       <!-- 漢堡選單 -->
-=======
-      <a class="navbar-brand me-auto" href="#">
-        <img src="/homepageS1-logo.png" alt="Lovia Logo" width="80" />
-      </a>
->>>>>>> origin/main
       <button
         class="navbar-toggler"
         type="button"
@@ -33,12 +27,8 @@
               <input
                 class="form-control rounded-pill border-start-0"
                 type="search"
-<<<<<<< HEAD
-                placeholder="搜尋產品 / 專案 / 团队"
-=======
                 placeholder="搜尋產品 / 專案 / 團隊"
                 aria-label="Search"
->>>>>>> origin/main
               />
             </div>
           </form>
@@ -47,11 +37,7 @@
         </div>
       </div>
 
-<<<<<<< HEAD
       <!-- 右側登入狀態顯示區 -->
-=======
-      <!-- 右側區域：登入/註冊 或 使用者頭像 -->
->>>>>>> origin/main
       <div class="d-flex align-items-center ms-auto gap-3">
         <template v-if="user">
           <div class="dropdown">
@@ -73,19 +59,11 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><a class="dropdown-item" href="#">個人資料</a></li>
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
               <li><hr class="dropdown-divider" /></li>
               <li><a class="dropdown-item text-danger" @click="handleLogout">登出</a></li>
             </ul>
           </div>
         </template>
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
         <template v-else>
           <router-link to="/login" class="nav-link text-dark">登入</router-link>
           <router-link to="/register" class="btn btn-dark rounded-pill px-3 custom-register"
@@ -98,11 +76,7 @@
 </template>
 
 <script setup>
-<<<<<<< HEAD
 import { computed, ref, onMounted } from 'vue'
-=======
-import { computed, onMounted } from 'vue'
->>>>>>> origin/main
 import { useUserStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import defaultAvatar from '@/assets/images/default-avatar.png'
@@ -111,7 +85,6 @@ import axios from 'axios'
 const userStore = useUserStore()
 const router = useRouter()
 
-<<<<<<< HEAD
 const user = computed(() => userStore.user)
 const isLoading = ref(true)
 const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
@@ -124,22 +97,11 @@ const checkLoginStatus = async () => {
 
   try {
     const res = await axios.post(`${baseUrl}/api/v1/users/status`, null, {
-=======
-// 透過 computed 取得 user 狀態（這行是你畫面上用的 user）
-const user = computed(() => userStore.user)
-
-const checkLoginStatus = async () => {
-  if (!userStore.token) return
-
-  try {
-    const res = await axios.post('http://localhost:8080/api/v1/users/status', null, {
->>>>>>> origin/main
       headers: { Authorization: `Bearer ${userStore.token}` },
     })
     userStore.setUser(res.data.user)
   } catch (err) {
     userStore.clear()
-<<<<<<< HEAD
   } finally {
     isLoading.value = false
   }
@@ -147,14 +109,6 @@ const checkLoginStatus = async () => {
 
 onMounted(async () => {
   await checkLoginStatus()
-=======
-  }
-}
-
-onMounted(() => {
-  checkLoginStatus()
-  console.log('userStore.user in navbar:', userStore.user)
->>>>>>> origin/main
 })
 
 const handleLogout = () => {
@@ -167,16 +121,9 @@ const handleLogout = () => {
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
 
 .custom-navbar {
-<<<<<<< HEAD
-  background-color: rgba(255, 248, 249, 0.4);
-  padding-top: 10px;
-  padding-bottom: 10px;
-  backdrop-filter: blur(2px);
-=======
   background-color: rgba(255, 248, 249, 0.4); /* 改為 rgba，只讓背景透明 */
   padding-top: 10px;
   padding-bottom: 10px;
->>>>>>> origin/main
 }
 
 .search-form .input-group {
@@ -189,11 +136,7 @@ const handleLogout = () => {
 
 .form-control {
   border: none;
-<<<<<<< HEAD
-  background-color: rgba(255, 255, 255, 0.6);
-=======
   background-color: rgba(255, 255, 255, 0.5); /* 可自行調整顏色 */
->>>>>>> origin/main
 }
 
 .nav-link {
