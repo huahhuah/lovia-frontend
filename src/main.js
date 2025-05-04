@@ -13,11 +13,14 @@ import router from "./router";
 import "bootstrap/dist/css/bootstrap.min.css";
 // （選用）引入 Bootstrap 的 JS，如有需要
 import "bootstrap";
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
 
 const app = createApp(App);
+const pinia = createPinia();
 
-app.use(createPinia());
 app.use(router);
+app.use(pinia)
 app.use(VueAxios, axios);
 
 app.mount("#app");
