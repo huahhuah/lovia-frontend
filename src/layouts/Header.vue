@@ -98,11 +98,7 @@
 </template>
 
 <script setup>
-<<<<<<< HEAD
 import { computed, ref, onMounted } from 'vue'
-=======
-import { computed, onMounted } from 'vue'
->>>>>>> origin/main
 import { useUserStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import defaultAvatar from '@/assets/images/default-avatar.png'
@@ -111,7 +107,6 @@ import axios from 'axios'
 const userStore = useUserStore()
 const router = useRouter()
 
-<<<<<<< HEAD
 const user = computed(() => userStore.user)
 const isLoading = ref(true)
 const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
@@ -124,22 +119,11 @@ const checkLoginStatus = async () => {
 
   try {
     const res = await axios.post(`${baseUrl}/api/v1/users/status`, null, {
-=======
-// 透過 computed 取得 user 狀態（這行是你畫面上用的 user）
-const user = computed(() => userStore.user)
-
-const checkLoginStatus = async () => {
-  if (!userStore.token) return
-
-  try {
-    const res = await axios.post('http://localhost:8080/api/v1/users/status', null, {
->>>>>>> origin/main
       headers: { Authorization: `Bearer ${userStore.token}` },
     })
     userStore.setUser(res.data.user)
   } catch (err) {
     userStore.clear()
-<<<<<<< HEAD
   } finally {
     isLoading.value = false
   }
@@ -147,14 +131,6 @@ const checkLoginStatus = async () => {
 
 onMounted(async () => {
   await checkLoginStatus()
-=======
-  }
-}
-
-onMounted(() => {
-  checkLoginStatus()
-  console.log('userStore.user in navbar:', userStore.user)
->>>>>>> origin/main
 })
 
 const handleLogout = () => {
@@ -167,16 +143,9 @@ const handleLogout = () => {
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
 
 .custom-navbar {
-<<<<<<< HEAD
-  background-color: rgba(255, 248, 249, 0.4);
-  padding-top: 10px;
-  padding-bottom: 10px;
-  backdrop-filter: blur(2px);
-=======
   background-color: rgba(255, 248, 249, 0.4); /* 改為 rgba，只讓背景透明 */
   padding-top: 10px;
   padding-bottom: 10px;
->>>>>>> origin/main
 }
 
 .search-form .input-group {
@@ -189,11 +158,7 @@ const handleLogout = () => {
 
 .form-control {
   border: none;
-<<<<<<< HEAD
-  background-color: rgba(255, 255, 255, 0.6);
-=======
   background-color: rgba(255, 255, 255, 0.5); /* 可自行調整顏色 */
->>>>>>> origin/main
 }
 
 .nav-link {
