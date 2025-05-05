@@ -1,5 +1,8 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+
+import { createRouter, createWebHashHistory } from "vue-router";
+import HomeView from "../views/HomeView.vue";
+import ProjectDetailView from "../views/ProjectDetailView.vue";
+
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -19,6 +22,11 @@ const router = createRouter({
       name: 'register',
       component: () => import('../views/RegisterForm.vue'),
     },
+    {
+      path: "/projects/:id",
+      name: "ProjectDetail",
+      component: () => import('../views/ProjectDetailView.vue'),
+    }
   ],
 })
 
