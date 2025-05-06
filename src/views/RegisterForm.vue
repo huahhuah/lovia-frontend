@@ -98,7 +98,7 @@
               </div>
             </div>
 
-            <!-- 勾選條款 -->
+            <!-- 條款勾選 -->
             <div class="form-check mb-3">
               <input
                 class="form-check-input"
@@ -136,17 +136,43 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      ref="modalRef"
+      tabindex="-1"
+      aria-labelledby="feedbackModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="feedbackModalLabel">提示</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            {{ modalMessage }}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { Modal } from 'bootstrap'
 
 const router = useRouter()
 const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
-
 const form = reactive({
   email: '',
   username: '',
@@ -157,18 +183,32 @@ const form = reactive({
 
 const showPassword = ref(false)
 const showConfirm = ref(false)
-
 const togglePassword = () => (showPassword.value = !showPassword.value)
 const toggleConfirm = () => (showConfirm.value = !showConfirm.value)
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,16}$/
-
 const isEmailValid = computed(() => emailPattern.test(form.email))
 const isPasswordValid = computed(() => passwordPattern.test(form.password))
 const passwordMismatch = computed(
   () => form.password && form.confirmPassword && form.password !== form.confirmPassword
 )
+
+//Modal 控制
+const modalRef = ref(null)
+const modalMessage = ref('')
+const modalType = ref('success') // 'success' or 'danger'
+let modalInstance = null
+
+onMounted(() => {
+  modalInstance = new Modal(modalRef.value)
+})
+
+function showModal(msg, type = 'danger') {
+  modalMessage.value = msg
+  modalType.value = type
+  modalInstance?.show()
+}
 
 async function handleRegister() {
   if (!isEmailValid.value || !isPasswordValid.value || passwordMismatch.value || !form.agree) return
@@ -180,10 +220,17 @@ async function handleRegister() {
       password: form.password,
     }
     await axios.post(`${baseUrl}/api/v1/users/signup`, payload)
-    alert('註冊成功！')
-    router.push('/login')
+    //modalMessage.value = '註冊成功！即將跳轉登入頁'
+    showModal('註冊成功！', '即將跳轉登入頁')
+    setTimeout(() => {
+      modalInstance.hide() //關閉 Modal
+      const backdrop = document.querySelector('.modal-backdrop')
+      if (backdrop) backdrop.remove() //清除殘留遮罩
+      router.push('/login')
+    }, 1500)
   } catch (err) {
-    alert(err.response?.data?.message || '註冊失敗，請稍後再試')
+    modalMessage.value = err.response?.data?.message || '註冊失敗，請稍後再試'
+    modalInstance.show()
   }
 }
 </script>

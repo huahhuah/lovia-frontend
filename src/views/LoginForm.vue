@@ -34,7 +34,7 @@
               />
             </div>
 
-            <!-- 密碼輸入 + 顯示隱藏密碼 -->
+            <!-- 密碼 -->
             <div class="mb-3">
               <label for="password" class="form-label">密碼</label>
               <div class="position-relative">
@@ -83,14 +83,47 @@
         </div>
       </div>
     </div>
+
+    <!-- ✅ Modal 登入提示框 -->
+    <div
+      class="modal fade"
+      id="loginModal"
+      tabindex="-1"
+      aria-labelledby="loginModalLabel"
+      aria-hidden="true"
+      ref="modalRef"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header" :class="modalType === 'success' ? 'bg-success' : 'bg-danger'">
+            <h5 class="modal-title text-white" id="loginModalLabel">
+              {{ modalType === 'success' ? '登入成功' : '登入失敗' }}
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            {{ modalMessage }}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { useUserStore } from '@/stores/auth'
+import { Modal } from 'bootstrap'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -106,9 +139,25 @@ const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
 
+//Modal 控制
+const modalRef = ref(null)
+const modalMessage = ref('')
+const modalType = ref('success') // 'success' or 'danger'
+let modalInstance = null
+
+onMounted(() => {
+  modalInstance = new Modal(modalRef.value)
+})
+
+function showModal(msg, type = 'danger') {
+  modalMessage.value = msg
+  modalType.value = type
+  modalInstance?.show()
+}
+
 async function handleLogin() {
   if (!form.email || !form.password) {
-    alert('請輸入帳號與密碼')
+    showModal('請輸入帳號與密碼', 'danger')
     return
   }
 
@@ -119,25 +168,25 @@ async function handleLogin() {
 
   try {
     const res = await axios.post(`${baseUrl}/api/v1/users/signin`, payload)
-
     const { token, users: user } = res.data.data
-    //驗證資料格式
-    if (!token || typeof token !== 'string') {
-      throw new Error('回傳 token 格式錯誤')
-    }
-    if (!user || typeof user !== 'object' || !user.username) {
-      throw new Error('回傳 user 格式錯誤')
-    }
 
-    // 儲存登入資料到 Pinia 和 localStorage
+    if (!token || typeof token !== 'string') throw new Error('回傳 token 格式錯誤')
+    if (!user || typeof user !== 'object' || !user.username) throw new Error('回傳 user 格式錯誤')
+
     userStore.setToken(token)
     userStore.setUser(user)
 
-    alert('登入成功')
-    router.push('/')
+    showModal('登入成功', 'success')
+
+    setTimeout(() => {
+      modalInstance.hide() //關閉 Modal
+      const backdrop = document.querySelector('.modal-backdrop')
+      if (backdrop) backdrop.remove() //清除殘留遮罩
+      router.push('/')
+    }, 1500)
   } catch (err) {
     const msg = err.response?.data?.message || err.message || '登入失敗，請確認帳密是否正確'
-    alert(msg)
+    showModal(msg, 'danger')
   }
 }
 </script>
