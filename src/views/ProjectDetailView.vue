@@ -18,10 +18,10 @@
       <p>{{ project.project_team }}</p>
     </section>
 
-    <section v-if="project.plans && project.plans.length">
+    <section v-if="project.project_plans && project.project_plans.length">
       <h2>¶Ò¸ê¤è®×</h2>
       <div
-        v-for="(plan, index) in project.plans"
+        v-for="(plan, index) in project.project_plans"
         :key="index"
         style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem;"
       >
