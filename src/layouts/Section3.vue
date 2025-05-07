@@ -195,4 +195,54 @@ const cards = [
   padding-top: 5rem;
   padding-bottom: 25rem;
 }
+@media (max-width: 991.98px) {
+  .search-form .input-group {
+    width: 100%;
+  }
+  .custom-register.small {
+    font-size: 14px;
+    padding: 4px 10px;
+  }
+  .nav-link.small {
+    font-size: 14px;
+  }
+  .navbar-collapse .nav-link {
+    font-size: 16px;
+    margin-bottom: 0.75rem;
+  }
+  .form-control {
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+
+  .funding-section {
+    padding: 3rem 1rem 10rem;
+  }
+  .section-title {
+    font-size: 2rem;
+  }
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  .card {
+    max-width: 100%;
+  }
+  .section2-bg1,
+  .section2-bg2,
+  .section3-bg1,
+  .section3-bg2 {
+    display: none;
+  }
+  .section2-illustration,
+  .section3-illustration {
+    display: block;
+    position: absolute;
+    bottom: 0px;
+    right: 0;
+    width: 100%;
+    max-width: 320px;
+    z-index: 0;
+  }
+}
 </style>
