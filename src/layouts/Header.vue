@@ -58,7 +58,7 @@
               <span class="fw-semibold">{{ user.username }}</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="#">個人資料</a></li>
+              <li><router-link to="/user/edit" class="dropdown-item">個人資料</router-link></li>
               <li><hr class="dropdown-divider" /></li>
               <li><a class="dropdown-item text-danger" @click="handleLogout">登出</a></li>
             </ul>
