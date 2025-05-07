@@ -1,8 +1,27 @@
 <template>
-  <footer class="footer py-5">
+  <!-- ✅ 手機版 Footer -->
+  <footer class="footer position-relative text-center">
+    <div class="container py-5">
+      <img src="/small-logo.png" alt="Lovia Logo" class="footer-logo mb-3" />
+      <div class="social-icons mb-3">
+        <a href="#" class="me-3">
+          <img src="/facebook.png" alt="Facebook" />
+        </a>
+        <a href="#" class="me-3">
+          <img src="/instagram.png" alt="Instagram" />
+        </a>
+        <a href="#">
+          <img src="/email.png" alt="Email" />
+        </a>
+      </div>
+      <p class="footer-privacy small text-muted">© Copyright 2025 北十有限公司</p>
+    </div>
+  </footer>
+
+  <!-- ✅ 桌機版 Footer -->
+  <footer class="footer-desktop py-5">
     <div class="container custom-container">
       <div class="row align-items-start">
-        <!-- 左：Logo 與社群 icon -->
         <div class="col-md-3 mb-4 text-center text-md-start order-md-1">
           <img src="/homepageS1-logo.png" alt="Lovia Logo" width="100" class="mb-3" />
           <div class="d-flex justify-content-center justify-content-md-start gap-3">
@@ -12,7 +31,6 @@
           </div>
         </div>
 
-        <!-- 中：連結兩列 -->
         <div class="col-md-3 mb-4 text-center text-md-start order-md-2">
           <div class="row">
             <div class="col-6">
@@ -32,7 +50,6 @@
           </div>
         </div>
 
-        <!-- 右：網站說明 -->
         <div class="col-md-6 mb-4 text-center text-md-start order-md-3">
           <strong>公益無時無刻在發生</strong>
           <p class="mt-2 mb-0 small">
@@ -43,8 +60,6 @@
           </p>
         </div>
       </div>
-
-      <!-- 著作權 -->
       <div class="text-center mt-4 small text-muted">© Copyright 2025 北十有限公司</div>
     </div>
   </footer>
@@ -55,10 +70,43 @@
   background-color: #ffd2cf;
 }
 
-/* ✅ 新增集中內容用的容器最大寬度 */
+.footer-logo {
+  width: 100px;
+  margin-top: -0.5rem;
+}
+
+.social-icons {
+  margin-top: 1rem;
+}
+
+.social-icons img {
+  width: 28px;
+  height: 28px;
+}
+
+.footer-privacy {
+  font-size: 0.85rem;
+}
+
+@media (min-width: 769px) {
+  .footer {
+    display: none;
+  }
+}
+
+.footer-desktop {
+  background-color: #ffd2cf;
+}
+
 .custom-container {
   max-width: 1140px;
   margin-left: auto;
   margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .footer-desktop {
+    display: none;
+  }
 }
 </style>

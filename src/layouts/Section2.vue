@@ -195,4 +195,32 @@ const cards = [
   padding-top: 5rem;
   padding-bottom: 25rem;
 }
+@media (max-width: 991.98px) {
+  .funding-section {
+    padding: 3rem 1rem 10rem;
+  }
+  .section-title {
+    font-size: 1.5rem;
+  }
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  .card {
+    max-width: 100%;
+  }
+  .section2-bg1,
+  .section2-bg2 {
+    display: none;
+  }
+  .section2-illustration {
+    display: block;
+    position: absolute;
+    bottom: 0px;
+    right: 0;
+    width: 100%;
+    max-width: 300px;
+    z-index: 0;
+  }
+}
 </style>
