@@ -58,4 +58,31 @@
   line-height: 1.8;
   color: #333;
 }
+@media (max-width: 768px) {
+  .section6 {
+    padding: 1rem 1rem 10rem;
+  }
+
+  .section6-bg {
+    top: 250px;
+    left: 0;
+    width: 100%;
+  }
+
+  .section6-content {
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    margin-top: 0;
+  }
+
+  .section6-title {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+
+  .section6-text {
+    font-size: 0.95rem;
+    text-align: auto;
+  }
+}
 </style>

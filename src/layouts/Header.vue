@@ -1,60 +1,48 @@
 <template v-if="!isLoading">
   <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
-    <div class="container">
-      <!-- Logo -->
-      <router-link to="/" class="navbar-brand me-auto">
+    <div class="container d-flex align-items-center justify-content-between">
+      <!-- ✅ 手機版 Header -->
+      <div class="d-flex d-lg-none align-items-center justify-content-between w-100 px-3 py-2 mobile-header">
+        <button @click.stop="toggleSearch" class="btn p-0 border-0">
+          <img src="/searchicon.png" alt="Search" width="20" />
+        </button>
+        <router-link to="/" @click="isMenuOpen = false; isSearchOpen = false">
+          <img src="/homepageS1-logo.png" alt="Logo" height="25" />
+        </router-link>
+        <button @click.stop="isMenuOpen = true" class="btn p-0 border-0">
+          <img src="/menu.png" alt="Menu" width="24" />
+        </button>
+      </div>
+
+      <!-- ✅ 桌機版 Logo -->
+      <router-link to="/" class="navbar-brand d-none d-lg-block logo-offset">
         <img src="/homepageS1-logo.png" alt="Lovia Logo" width="80" />
       </router-link>
 
-      <!-- 漢堡選單 -->
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <!-- 中間導航連結 -->
-      <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
-        <div class="d-flex align-items-center gap-4">
-          <form class="d-flex align-items-center search-form">
-            <div class="input-group">
-              <span class="input-group-text bg-transparent border-end-0">
-                <img src="/searchicon.png" alt="search" width="20" />
-              </span>
-              <input
-                class="form-control rounded-pill border-start-0"
-                type="search"
-                placeholder="搜尋產品 / 專案 / 團隊"
-                aria-label="Search"
-              />
-            </div>
-          </form>
-          <a href="#" class="nav-link text-dark">探索</a>
-          <a href="#" class="nav-link text-dark">提案</a>
-        </div>
+      <!-- ✅ 桌機中間導覽列 -->
+      <div class="d-none d-lg-flex align-items-center gap-4 middle-nav">
+        <form class="search-form mb-0">
+          <div class="input-group">
+            <span class="input-group-text bg-transparent border-end-0">
+              <img src="/searchicon.png" alt="search" width="18" />
+            </span>
+            <input
+              class="form-control rounded-pill border-start-0"
+              type="search"
+              placeholder="搜尋產品 / 專案"
+            />
+          </div>
+        </form>
+        <a href="#" class="nav-link text-dark">探索</a>
+        <a href="#" class="nav-link text-dark">提案</a>
       </div>
 
-      <!-- 右側區域：登入/註冊 或 使用者頭像 -->
-      <div class="d-flex align-items-center ms-auto gap-3">
+      <!-- ✅ 桌機右側登入／註冊或使用者 -->
+      <div class="d-none d-lg-flex align-items-center gap-3">
         <template v-if="user">
           <div class="dropdown">
-            <button
-              class="btn d-flex align-items-center gap-2"
-              type="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <img
-                :src="user.avatar || defaultAvatar"
-                alt="avatar"
-                class="rounded-circle"
-                width="36"
-                height="36"
-                style="object-fit: cover"
-              />
+            <button class="btn d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+              <img :src="user.avatar || defaultAvatar" class="rounded-circle" width="36" height="36" />
               <span class="fw-semibold">{{ user.username }}</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
@@ -66,35 +54,83 @@
         </template>
         <template v-else>
           <router-link to="/login" class="nav-link text-dark">登入</router-link>
-          <router-link to="/register" class="btn btn-dark rounded-pill px-3 custom-register"
-            >註冊</router-link
-          >
+          <router-link to="/register" class="btn btn-dark rounded-pill px-3 custom-register">註冊</router-link>
         </template>
       </div>
     </div>
   </nav>
+
+  <!-- ✅ 手機版搜尋欄顯示：浮動獨立層 -->
+  <div v-if="isSearchOpen && windowWidth < 992" class="mobile-search-overlay" @click.self="isSearchOpen = false">
+    <form class="search-form mt-2 px-4">
+      <div class="input-group">
+        <span class="input-group-text bg-transparent border-end-0">
+        </span>
+        <input
+          class="form-control rounded-pill border-start-0"
+          type="search"
+          placeholder="搜尋產品 / 專案"
+        />
+      </div>
+    </form>
+  </div>
+
+  <!-- ✅ 展開選單畫面（手機全頁） -->
+  <div v-if="isMenuOpen && windowWidth < 992" class="mobile-menu-overlay" @click.self="isMenuOpen = false">
+    <div class="d-flex flex-column align-items-center py-4 gap-4">
+      <img src="/homepageS1-logo.png" alt="Logo" width="150" @click="isMenuOpen = false" />
+      <router-link to="/" class="menu-link" @click="isMenuOpen = false">首頁</router-link>
+      <router-link to="/explore" class="menu-link" @click="isMenuOpen = false">探索</router-link>
+      <router-link to="/propose" class="menu-link" @click="isMenuOpen = false">提案</router-link>
+      <router-link v-if="!user" to="/register" class="menu-link" @click="isMenuOpen = false">註冊</router-link>
+      <router-link v-if="!user" to="/login" class="menu-link" @click="isMenuOpen = false">登入</router-link>
+      <button @click="isMenuOpen = false" class="btn p-0 border-0">
+        <img src="/close.png" alt="Close" width="24" />
+      </button>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
-import defaultAvatar from '@/assets/images/default-avatar.png'
 import axios from 'axios'
+import defaultAvatar from '@/assets/images/default-avatar.png'
 
 const userStore = useUserStore()
 const router = useRouter()
-
 const user = computed(() => userStore.user)
 const isLoading = ref(true)
+const isMenuOpen = ref(false)
+const isSearchOpen = ref(false)
 const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
+
+const toggleSearch = () => {
+  isSearchOpen.value = !isSearchOpen.value
+  isMenuOpen.value = false
+}
+
+const windowWidth = ref(window.innerWidth)
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth
+}
+
+onMounted(() => {
+  window.addEventListener('resize', updateWindowWidth)
+  updateWindowWidth()
+  checkLoginStatus()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateWindowWidth)
+})
 
 const checkLoginStatus = async () => {
   if (!userStore.token) {
     isLoading.value = false
     return
   }
-
   try {
     const res = await axios.post(`${baseUrl}/api/v1/users/status`, null, {
       headers: { Authorization: `Bearer ${userStore.token}` },
@@ -107,10 +143,6 @@ const checkLoginStatus = async () => {
   }
 }
 
-onMounted(async () => {
-  await checkLoginStatus()
-})
-
 const handleLogout = () => {
   userStore.clear()
   router.push('/')
@@ -118,12 +150,14 @@ const handleLogout = () => {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
-
 .custom-navbar {
-  background-color: rgba(255, 248, 249, 0.4); /* 改為 rgba，只讓背景透明 */
-  padding-top: 10px;
-  padding-bottom: 10px;
+  background-color: rgba(255, 248, 249, 0.4); /*  navbar 背景 */
+  padding: 10px 0;
+}
+
+.middle-nav {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .search-form .input-group {
@@ -136,7 +170,7 @@ const handleLogout = () => {
 
 .form-control {
   border: none;
-  background-color: rgba(255, 255, 255, 0.5); /* 可自行調整顏色 */
+  background-color: rgba(255, 255, 255, 0.4);
 }
 
 .nav-link {
@@ -155,5 +189,67 @@ const handleLogout = () => {
 
 .dropdown-menu {
   min-width: 160px;
+}
+
+.logo-offset {
+  margin-left: 1.5rem;
+}
+
+/* 手機版搜尋浮層樣式 */
+.mobile-search-overlay {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  padding: 12px 0;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* 手機版選單 */
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: #FFD2CF;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.menu-link {
+  font-size: 18px;
+  color: #5F6368;
+  text-decoration: none;
+  border-bottom: 1px solid #EAEAEA;
+  padding-bottom: 8px;
+  width: 400px;
+  text-align: center;
+}
+
+.menu-link:hover {
+  color: #000;
+}
+
+@media (max-width: 991.98px) {
+  .search-form .input-group {
+    width: 100%;
+  }
+  .custom-register.small {
+    font-size: 14px;
+    padding: 4px 10px;
+  }
+  .nav-link.small {
+    font-size: 14px;
+  }
+  .navbar-collapse .nav-link {
+    font-size: 16px;
+    margin-bottom: 0.75rem;
+  }
+  .form-control {
+    font-size: 14px;
+    padding: 6px 10px;
+  }
 }
 </style>

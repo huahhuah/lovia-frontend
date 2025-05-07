@@ -5,6 +5,7 @@
     <img src="/homepageS5-light(L).png" class="light-deco light-left" />
 
     <div class="container position-relative">
+      <h2 class="section-title text-danger fs-4 fw-bold mb-5">立即行動</h2>
       <div class="row justify-content-center gap-4 flex-wrap">
         <!-- 我要提案 -->
         <div class="col-12 col-md-auto d-flex justify-content-center">
@@ -48,7 +49,11 @@
   overflow: hidden;
 }
 
-/* ===================== 卡片 ===================== */
+.section-title {
+  font-size: 2rem;
+  margin-bottom: 3rem;
+}
+
 .card-wrapper {
   width: 360px;
   height: 280px;
@@ -107,7 +112,6 @@
   color: #5F6368
 }
 
-/* ===================== 光暈背景 ===================== */
 .light-deco {
   position: absolute;
   z-index: 0;
@@ -122,5 +126,21 @@
   right: 60px;
   bottom: -50px;
   width: 600px;
+}
+
+@media (max-width: 768px) {
+  .card-wrapper {
+    width: 90%;
+    height: 250px;
+  }
+  .content {
+    position: static;
+    padding: 1rem;
+    text-align: center;
+  }
+  .section-title {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+  }
 }
 </style>

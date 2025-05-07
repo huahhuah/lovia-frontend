@@ -1,3 +1,4 @@
+
 <template>
   <div v-if="project">
     <h1>{{ project.title }}</h1>
