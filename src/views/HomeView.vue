@@ -10,7 +10,6 @@ import Section6 from '@/layouts/Section6.vue'
 
 <template>
   <div>
-    <Header />
     <HeroSection />
     <Section2 />
     <Section3 />
