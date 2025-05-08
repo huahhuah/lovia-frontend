@@ -1,12 +1,14 @@
 <template v-if="!isLoading">
   <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
     <div class="container d-flex align-items-center justify-content-between">
-      <!-- ✅ 手機版 Header -->
-      <div class="d-flex d-lg-none align-items-center justify-content-between w-100 px-3 py-2 mobile-header">
+      <!-- 手機版 -->
+      <div
+        class="d-flex d-lg-none align-items-center justify-content-between w-100 px-3 py-2 mobile-header"
+      >
         <button @click.stop="toggleSearch" class="btn p-0 border-0">
           <img src="/searchicon.png" alt="Search" width="20" />
         </button>
-        <router-link to="/" @click="isMenuOpen = false; isSearchOpen = false">
+        <router-link to="/" @click="handleHomeClick">
           <img src="/homepageS1-logo.png" alt="Logo" height="25" />
         </router-link>
         <button @click.stop="isMenuOpen = true" class="btn p-0 border-0">
@@ -14,12 +16,12 @@
         </button>
       </div>
 
-      <!-- ✅ 桌機版 Logo -->
+      <!-- 桌機版 Logo -->
       <router-link to="/" class="navbar-brand d-none d-lg-block logo-offset">
         <img src="/homepageS1-logo.png" alt="Lovia Logo" width="80" />
       </router-link>
 
-      <!-- ✅ 桌機中間導覽列 -->
+      <!-- 桌機導覽列 -->
       <div class="d-none d-lg-flex align-items-center gap-4 middle-nav">
         <form class="search-form mb-0">
           <div class="input-group">
@@ -37,64 +39,87 @@
         <a href="#" class="nav-link text-dark">提案</a>
       </div>
 
-      <!-- ✅ 桌機右側登入／註冊或使用者 -->
+      <!-- 桌機登入／使用者區 -->
       <div class="d-none d-lg-flex align-items-center gap-3">
         <template v-if="user">
           <div class="dropdown">
-            <button class="btn d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
-              <img :src="user.avatar || defaultAvatar" class="rounded-circle" width="36" height="36" />
+            <button class="btn d-flex align-items-center gap-2" @click="toggleDropdown">
+              <img
+                :src="user.avatar || defaultAvatar"
+                class="rounded-circle"
+                width="36"
+                height="36"
+              />
               <span class="fw-semibold">{{ user.username }}</span>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
+            <ul v-show="isDropdownOpen" class="dropdown-menu dropdown-menu-end show">
               <li><router-link to="/user/edit" class="dropdown-item">個人資料</router-link></li>
+              <!-- <li v-if="isProposer">
+                <router-link to="/proposals" class="dropdown-item">我的提案</router-link>
+              </li>
+              <li v-if="isSponsor">
+                <router-link to="/sponsorships" class="dropdown-item">我的贊助</router-link>
+              </li> -->
+              <li v-if="isAdmin">
+                <router-link to="/admin" class="dropdown-item">管理後台</router-link>
+              </li>
               <li><hr class="dropdown-divider" /></li>
               <li><a class="dropdown-item text-danger" @click="handleLogout">登出</a></li>
             </ul>
           </div>
         </template>
+
         <template v-else>
           <router-link to="/login" class="nav-link text-dark">登入</router-link>
-          <router-link to="/register" class="btn btn-dark rounded-pill px-3 custom-register">註冊</router-link>
+          <router-link to="/register" class="btn btn-dark rounded-pill px-3 custom-register"
+            >註冊</router-link
+          >
         </template>
       </div>
     </div>
   </nav>
 
-  <!-- ✅ 手機版搜尋欄顯示：浮動獨立層 -->
-  <div v-if="isSearchOpen && windowWidth < 992" class="mobile-search-overlay" @click.self="isSearchOpen = false">
+  <!-- 手機搜尋浮層 -->
+  <div
+    v-if="isSearchOpen && windowWidth < 992"
+    class="mobile-search-overlay"
+    @click.self="isSearchOpen = false"
+  >
     <form class="search-form mt-2 px-4">
       <div class="input-group">
-        <span class="input-group-text bg-transparent border-end-0">
-        </span>
-        <input
-          class="form-control rounded-pill border-start-0"
-          type="search"
-          placeholder="搜尋產品 / 專案"
-        />
+        <input class="form-control rounded-pill" type="search" placeholder="搜尋產品 / 專案" />
       </div>
     </form>
   </div>
 
-  <!-- ✅ 展開選單畫面（手機全頁） -->
-  <div v-if="isMenuOpen && windowWidth < 992" class="mobile-menu-overlay" @click.self="isMenuOpen = false">
+  <!-- 手機全頁選單 -->
+  <div
+    v-if="isMenuOpen && windowWidth < 992"
+    class="mobile-menu-overlay"
+    @click.self="isMenuOpen = false"
+  >
     <div class="d-flex flex-column align-items-center py-4 gap-4">
       <img src="/homepageS1-logo.png" alt="Logo" width="150" @click="isMenuOpen = false" />
       <router-link to="/" class="menu-link" @click="isMenuOpen = false">首頁</router-link>
       <router-link to="/explore" class="menu-link" @click="isMenuOpen = false">探索</router-link>
       <router-link to="/propose" class="menu-link" @click="isMenuOpen = false">提案</router-link>
-      <router-link v-if="!user" to="/register" class="menu-link" @click="isMenuOpen = false">註冊</router-link>
-      <router-link v-if="!user" to="/login" class="menu-link" @click="isMenuOpen = false">登入</router-link>
+      <router-link v-if="!user" to="/register" class="menu-link" @click="isMenuOpen = false"
+        >註冊</router-link
+      >
+      <router-link v-if="!user" to="/login" class="menu-link" @click="isMenuOpen = false"
+        >登入</router-link
+      >
       <button @click="isMenuOpen = false" class="btn p-0 border-0">
         <img src="/close.png" alt="Close" width="24" />
       </button>
     </div>
   </div>
 </template>
-
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, watch, onBeforeUnmount } from 'vue'
 import { useUserStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+
 import axios from 'axios'
 import defaultAvatar from '@/assets/images/default-avatar.png'
 
@@ -104,27 +129,50 @@ const user = computed(() => userStore.user)
 const isLoading = ref(true)
 const isMenuOpen = ref(false)
 const isSearchOpen = ref(false)
+const isDropdownOpen = ref(false)
 const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
+
+const isAdmin = computed(() => userStore.isAdmin)
+const isProposer = computed(() => userStore.isProposer)
+const isSponsor = computed(() => userStore.isSponsor)
 
 const toggleSearch = () => {
   isSearchOpen.value = !isSearchOpen.value
   isMenuOpen.value = false
 }
 
-const windowWidth = ref(window.innerWidth)
-const updateWindowWidth = () => {
-  windowWidth.value = window.innerWidth
+const toggleDropdown = (e) => {
+  e.stopPropagation()
+  isDropdownOpen.value = !isDropdownOpen.value
+}
+
+const closeDropdown = () => {
+  isDropdownOpen.value = false
+}
+
+const handleClickOutside = (event) => {
+  const dropdown = document.querySelector('.dropdown')
+  if (dropdown && !dropdown.contains(event.target)) {
+    isDropdownOpen.value = false
+  }
 }
 
 onMounted(() => {
   window.addEventListener('resize', updateWindowWidth)
+  window.addEventListener('click', handleClickOutside)
   updateWindowWidth()
   checkLoginStatus()
 })
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   window.removeEventListener('resize', updateWindowWidth)
+  window.removeEventListener('click', handleClickOutside)
 })
+
+const windowWidth = ref(window.innerWidth)
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth
+}
 
 const checkLoginStatus = async () => {
   if (!userStore.token) {
@@ -143,15 +191,19 @@ const checkLoginStatus = async () => {
   }
 }
 
+const handleHomeClick = () => {
+  isMenuOpen.value = false
+  isSearchOpen.value = false
+}
+
 const handleLogout = () => {
   userStore.clear()
   router.push('/')
 }
 </script>
-
 <style scoped>
 .custom-navbar {
-  background-color: rgba(255, 248, 249, 0.4); /*  navbar 背景 */
+  background-color: rgba(255, 248, 249, 0.4);
   padding: 10px 0;
 }
 
@@ -187,15 +239,30 @@ const handleLogout = () => {
   padding: 6px 16px;
 }
 
+.dropdown {
+  position: relative;
+}
+
 .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 3000;
+  background-color: #fff;
+  border: 1px solid #ccc;
   min-width: 160px;
+  padding: 0.5rem 0;
+  display: none;
+}
+
+.dropdown-menu.show {
+  display: block;
 }
 
 .logo-offset {
   margin-left: 1.5rem;
 }
 
-/* 手機版搜尋浮層樣式 */
 .mobile-search-overlay {
   position: fixed;
   top: 56px;
@@ -203,14 +270,14 @@ const handleLogout = () => {
   right: 0;
   z-index: 1050;
   padding: 12px 0;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: #fff;
 }
 
-/* 手機版選單 */
 .mobile-menu-overlay {
   position: fixed;
   inset: 0;
-  background-color: #FFD2CF;
+  background-color: #ffd2cf;
   z-index: 9999;
   display: flex;
   justify-content: center;
@@ -220,9 +287,9 @@ const handleLogout = () => {
 
 .menu-link {
   font-size: 18px;
-  color: #5F6368;
+  color: #5f6368;
   text-decoration: none;
-  border-bottom: 1px solid #EAEAEA;
+  border-bottom: 1px solid #eaeaea;
   padding-bottom: 8px;
   width: 400px;
   text-align: center;
