@@ -1,40 +1,44 @@
+
 <template>
   <div v-if="project">
     <h1>{{ project.title }}</h1>
     <img :src="project.cover" alt="cover image" width="300" />
 
     <p>{{ project.summary }}</p>
-    <p><strong>¤ÀÃş¡G</strong>{{ project.category?.name || 'µL' }}</p>
-    <p><strong>¶Ò¸ê¥Ø¼Ğ¡G</strong>{{ project.total_amount ? project.total_amount.toLocaleString() : 'µL¸ê®Æ' }} ¤¸</p>
-    <p><strong>´Á¶¡¡G</strong>{{ project.start_time }} ~ {{ project.end_time }}</p>
+    <p><strong>åˆ†é¡:</strong>{{ project.category?.name || 'ç„¡' }}</p>
+    <p>
+      <strong>å‹Ÿè³‡ç›®æ¨™:</strong
+      >{{ project.total_amount ? project.total_amount.toLocaleString() : 'ç„¡è³‡æ–™' }} å…ƒ
+    </p>
+    <p><strong>æœŸé–“</strong>{{ project.start_time }} ~ {{ project.end_time }}</p>
 
     <section>
-      <h2>§¹¾ã¤¶²Ğ</h2>
+      <h2>å®Œæ•´ä»‹ç´¹</h2>
       <p>{{ project.full_content }}</p>
     </section>
 
     <section>
-      <h2>¹Î¶¤¤¶²Ğ</h2>
+      <h2>åœ˜éšŠä»‹ç´¹</h2>
       <p>{{ project.project_team }}</p>
     </section>
 
-    <section v-if="project.project_plans && project.project_plans.length">
-      <h2>¶Ò¸ê¤è®×</h2>
+    <section v-if="project.plans && project.plans.length">
+      <h2>å‹Ÿè³‡æ–¹æ¡ˆ</h2>
       <div
-        v-for="(plan, index) in project.project_plans"
+        v-for="(plan, index) in project.plans"
         :key="index"
-        style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem;"
+        style="border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem"
       >
         <h3>{{ plan.plan_name }}</h3>
-        <p><strong>ª÷ÃB¡G</strong>{{ plan.amount }} ¤¸</p>
-        <p><strong>¦^õX¡G</strong>{{ plan.feedback }}</p>
+        <p><strong>é‡‘é¡:</strong>{{ plan.amount }} å…ƒ</p>
+        <p><strong>å›é¥‹:</strong>{{ plan.feedback }}</p>
         <img v-if="plan.feedback_img" :src="plan.feedback_img" alt="feedback image" width="200" />
-        <p><strong>¥X³f¤é´Á¡G</strong>{{ plan.delivery_date }}</p>
+        <p><strong>å‡ºè²¨æ—¥æœŸ:</strong>{{ plan.delivery_date }}</p>
       </div>
     </section>
   </div>
   <div v-else>
-    <p>¸ü¤J¤¤...</p>
+    <p>è¼‰å…¥ä¸­...</p>
   </div>
 </template>
 
@@ -44,21 +48,21 @@ import { useRoute } from 'vue-router'
 import { getProjectById } from '../api/project.js'
 import axios from 'axios'
 
-const route = useRoute()  // ¨ú±o·í«e¸ô¥Ñ
-const project = ref(null)  // ©w¸q project ¸ê®Æ
+const route = useRoute() // å–å¾—ç•¶å‰è·¯ç”±
+const project = ref(null) // å®šç¾© project è³‡æ–™
 
 onMounted(async () => {
-  const id = route.params.id  // ±q¸ô¥Ñ°Ñ¼Æ¨ú±o±M®× id
+  const id = route.params.id // å¾è·¯ç”±åƒæ•¸å–å¾—å°ˆæ¡ˆ id
   try {
-    const res = await getProjectById(id);  // ©I¥s API ¨ú±o±M®×¸ê®Æ
-    if (res.status ===200 && res.data.status === true) {
-      project.value = res.data.data  // Àx¦s¸ê®Æ
-      console.log('±M®×¸ê®Æ',project.value)
+    const res = await getProjectById(id) // å‘¼å« API å–å¾—å°ˆæ¡ˆè³‡æ–™
+    if (res.status === 200 && res.data.status === true) {
+      project.value = res.data.data // å­˜å„²è³‡æ–™
+      console.log('å°ˆæ¡ˆè³‡æ–™', project.value)
     } else {
-          console.error('API¿ù»~:', err) 
+      console.error('APIéŒ¯èª¤', err)
     }
   } catch (err) {
-    console.error('¨ú±o±M®×¥¢±Ñ:', err) 
+    console.error('å–å¾—å°ˆæ¡ˆå¤±æ•—', err)
   }
 })
 </script>
