@@ -77,7 +77,7 @@
 <script setup>
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { projectAPI } from '@/api/project' // ✅ 改這裡
+import { createProject } from '@/api/project' // ✅ 改這裡
 
 const router = useRouter()
 

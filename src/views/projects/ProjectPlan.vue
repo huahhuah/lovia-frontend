@@ -98,7 +98,7 @@
 <script>
 import { reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { projectAPI } from '@/api/project' // ✅ 模組化 API 匯入
+import { createProjectPlan } from '@/api/project' // ✅ 模組化 API 匯入
 
 export default {
   name: 'ProjectPlan',
