@@ -38,6 +38,32 @@ const router = createRouter({
           name: 'EditProfile',
           component: () => import('@/views/users/EditProfile.vue'),
         },
+        {
+          path: 'password',
+          name: 'EditPassword',
+          component: () => import('@/views/users/EditPassword.vue'),
+        },
+        {
+          path: 'projects/mine',
+          name: 'MyProjects',
+          component: () => import('@/views/users/orders/MyProjects.vue'),
+        },
+        {
+          path: 'sponsorships',
+          name: 'MySponsorships',
+          component: () => import('@/views/users/orders/MySponsorships.vue'),
+        },
+        {
+          path: 'questions',
+          name: 'MyQuestions',
+          component: () => import('@/views/users/questions/MyQuestions.vue'),
+        },
+        {
+          path: 'questions/manage',
+          name: 'ManageQuestions',
+          component: () => import('@/views/users/questions/ManageQuestions.vue'),
+          meta: { proposerOnly: true },
+        },
       ],
     },
     {

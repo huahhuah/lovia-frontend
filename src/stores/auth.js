@@ -17,7 +17,8 @@ export const useUserStore = defineStore('user', {
     isLoggedIn: (state) => !!state.token,
     isAdmin: (state) => state.user?.role?.role_type === '管理員',
     isProposer: (state) => state.user?.role?.role_type === '提案者',
-    isSponsor: (state) => state.user?.role?.role_type === '募資者',
+    isSponsor: (state) =>
+      state.user?.role?.role_type === '募資者' || state.user?.role?.role_type === '提案者',
   },
   actions: {
     setToken(token) {

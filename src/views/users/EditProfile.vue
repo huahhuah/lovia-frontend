@@ -217,17 +217,11 @@ onMounted(async () => {
 })
 
 async function submitForm() {
-  if (!usernameValid.value) return showModal('請輸入 2~50 字的使用者名稱')
-  if (!phoneValid.value) return showModal('請輸入正確的手機號碼')
+  if (!usernameValid.value) return showModalAndAutoClose('請輸入 2~50 字的使用者名稱')
+  if (!phoneValid.value) return showModalAndAutoClose('請輸入正確的手機號碼')
 
   if (form.avatar_url?.startsWith('data:image')) {
-    showModal('圖片尚未上傳，請等待圖片上傳功能完成後再修改頭像')
-    setTimeout(() => {
-      modalInstance.hide()
-      const backdrop = document.querySelector('.modal-backdrop')
-      if (backdrop) backdrop.remove()
-    }, 1500)
-    return
+    return showModalAndAutoClose('圖片尚未上傳，請等待圖片上傳功能完成後再修改頭像')
   }
 
   const payload = {
@@ -255,6 +249,17 @@ async function submitForm() {
   } finally {
     isSubmitting.value = false
   }
+}
+
+function showModalAndAutoClose(msg, type = 'danger', delay = 1500) {
+  showModal(msg, type)
+  setTimeout(() => {
+    modalInstance.hide()
+    const backdrop = document.querySelector('.modal-backdrop')
+    if (backdrop) backdrop.remove()
+    document.body.classList.remove('modal-open')
+    document.body.style = ''
+  }, delay)
 }
 </script>
 
