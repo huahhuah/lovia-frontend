@@ -29,6 +29,19 @@ const router = createRouter({
       component: () => import('../views/ProjectDetailView.vue'),
     },
     {
+      path: '/projects/create',
+      name: 'ProjectForm',
+      component: () => import('@/views/projects/ProjectForm.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/projects/create/plans/:id',
+      name: 'ProjectPlan',
+      component: () => import('@/views/projects/ProjectPlan.vue'),
+      meta: { requiresAuth: true },
+      props: route => ({ id: route.params.id }),  // 確保這裡能夠正確傳遞 id
+    },
+    {
       path: '/user',
       component: () => import('@/layouts/UserLayout.vue'),
       meta: { requiresAuth: true },
