@@ -1,22 +1,96 @@
 <template>
-  <div class="plan-form">
-    <h2>新增回饋方案 - {{ projectData.title }}</h2>
+  <div class="container py-5">
+    <h2 class="mb-4">新增回饋方案 - {{ projectData.title }}</h2>
+
     <form @submit.prevent="submitPlans">
-      <div v-for="(plan, index) in form.plans" :key="index" class="plan-section">
-        <h4>回饋方案 {{ index + 1 }}</h4>
-        <input v-model="plan.plan_name" placeholder="方案名稱" />
-        <input v-model.number="plan.amount" type="number" placeholder="金額" />
-        <input v-model.number="plan.quantity" type="number" placeholder="數量" />
-        <input v-model="plan.feedback" placeholder="回饋內容" />
-        <input v-model="plan.feedback_img" placeholder="回饋圖片網址" />
-        <input v-model="plan.delivery_date" type="date" placeholder="出貨日" />
-        <button type="button" @click="removePlan(index)" style="margin-top: 8px; background-color: #dc2626;">
-          刪除此方案
+      <!-- 方案區塊 -->
+      <div
+        v-for="(plan, index) in form.plans"
+        :key="index"
+        class="border rounded p-4 mb-4 bg-light"
+      >
+        <h5>回饋方案 {{ index + 1 }}</h5>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">方案名稱</label>
+            <input
+              v-model="plan.plan_name"
+              type="text"
+              class="form-control"
+              placeholder="例如：感謝小卡"
+              required
+            />
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">金額</label>
+            <input
+              v-model.number="plan.amount"
+              type="number"
+              class="form-control"
+              min="1"
+              required
+            />
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">數量</label>
+            <input
+              v-model.number="plan.quantity"
+              type="number"
+              class="form-control"
+              min="1"
+              required
+            />
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">回饋說明</label>
+            <textarea
+              v-model="plan.feedback"
+              class="form-control"
+              rows="2"
+              placeholder="我們將寄送手寫感謝卡"
+              required
+            ></textarea>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">回饋圖片網址</label>
+            <input
+              v-model="plan.feedback_img"
+              type="text"
+              class="form-control"
+              placeholder="https://example.com/thankyou.jpg"
+              required
+            />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">預計出貨日期</label>
+            <input v-model="plan.delivery_date" type="date" class="form-control" required />
+          </div>
+
+          <div class="col-12 text-end">
+            <button type="button" class="btn btn-outline-danger" @click="removePlan(index)">
+              刪除此方案
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 新增方案按鈕 -->
+      <div class="mb-4">
+        <button type="button" class="btn btn-outline-secondary" @click="addPlan">
+          ＋ 新增回饋方案
         </button>
       </div>
 
-      <button type="button" @click="addPlan">新增回饋方案</button>
-      <button type="submit">送出回饋方案</button>
+      <!-- 送出按鈕 -->
+      <div class="text-center">
+        <button type="submit" class="btn btn-danger px-5 py-2">送出回饋方案</button>
+      </div>
     </form>
   </div>
 </template>
@@ -33,7 +107,7 @@ export default {
     const router = useRouter()
 
     const form = reactive({
-      project_id: route.params.id || '',  // 從 route.params.id 取出專案 ID
+      project_id: route.params.id || '',
       plans: [],
     })
 
@@ -41,17 +115,18 @@ export default {
       title: '',
     })
 
-    // 當頁面加載完成後，根據 project_id 獲取專案資料
+    // 初始化取得專案資訊
     onMounted(async () => {
       try {
-        const res = await getProjectById(form.project_id)  // 假設這是從 API 獲取專案資料的方法
-        projectData.title = res.data.title  // 設置專案標題
+        const res = await getProjectById(form.project_id)
+        projectData.title = res.data.title
       } catch (err) {
         console.error('獲取專案資料失敗', err)
         alert('無法獲取專案資料')
       }
     })
 
+    // 新增一筆方案
     const addPlan = () => {
       form.plans.push({
         plan_name: '',
@@ -63,10 +138,12 @@ export default {
       })
     }
 
+    // 移除指定方案
     const removePlan = (index) => {
       form.plans.splice(index, 1)
     }
 
+    // 提交所有方案
     const submitPlans = async () => {
       try {
         const token = localStorage.getItem('token')
@@ -75,12 +152,26 @@ export default {
           return
         }
 
-        for (const plan of form.plans) {
-          await createProjectPlan(form.project_id, plan, token)
+        // 檢查欄位完整性
+        for (const [i, plan] of form.plans.entries()) {
+          if (
+            !plan.plan_name ||
+            !plan.amount ||
+            !plan.quantity ||
+            !plan.feedback ||
+            !plan.feedback_img ||
+            !plan.delivery_date
+          ) {
+            alert(`第 ${i + 1} 筆回饋方案未填寫完整`)
+            return
+          }
         }
 
+        // 並行送出所有方案
+        await Promise.all(form.plans.map((plan) => createProjectPlan(form.project_id, plan, token)))
+
         alert('回饋方案提交成功！')
-        router.push('/') // 提交後返回首頁或其他頁面
+        router.push(`/projects/${form.project_id}`) // 導回專案詳情或其他頁面
       } catch (err) {
         console.error('回饋方案提交失敗', err)
         alert('回饋方案提交失敗')
@@ -98,39 +189,4 @@ export default {
 }
 </script>
 
-<style scoped>
-.plan-form {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-.plan-form form > div {
-  margin-bottom: 1rem;
-}
-input,
-textarea {
-  width: 100%;
-  padding: 8px;
-  margin-top: 4px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-button {
-  margin-right: 10px;
-  padding: 8px 16px;
-  border: none;
-  background-color: #2563eb;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-}
-button:hover {
-  background-color: #1d4ed8;
-}
-.plan-section {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background: #f5f5f5;
-  border-radius: 10px;
-}
-</style>
+<style scoped></style>
