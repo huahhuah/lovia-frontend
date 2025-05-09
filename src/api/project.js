@@ -2,8 +2,7 @@
 import axios from 'axios'
 
 //base_url
-const BASE_URL = 'http://localhost:8080'
-
+const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
 
 export const createProject = (data, token) => {
   return axios.post(`${BASE_URL}/api/v1/projects/create`, data, {
@@ -15,16 +14,18 @@ export const createProject = (data, token) => {
 
 // 新增專案方案
 export const createProjectPlan = (projectId, data, token) => {
-  return axios.post(`${BASE_URL}/api/v1/projects/${projectId}/plans`, { plans: data }, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
+  return axios.post(
+    `${BASE_URL}/api/v1/projects/${projectId}/plans`,
+    { plans: data },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
 }
 
-// �ھ� project ID �o�X GET �ШD
+// 取得指定 ID 的專案
 export const getProjectById = (projectId) => {
   return axios.get(`${BASE_URL}/api/v1/projects/${projectId}`)
 }
-
-
