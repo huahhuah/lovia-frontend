@@ -10,34 +10,72 @@
         <h5 class="username-text">{{ user?.username || '使用者' }}</h5>
       </div>
 
-      <nav class="user-nav mt-3">
-        <ul class="nav gap-4">
-          <li class="nav-item">
-            <router-link to="/user" class="nav-link" exact-active-class="active"
-              >會員中心</router-link
+      <ul class="nav gap-4 user-nav">
+        <!-- 會員中心 -->
+        <li class="nav-item">
+          <router-link to="/user" class="nav-link" exact-active-class="active"
+            >會員中心</router-link
+          >
+        </li>
+        <!-- 個人資料 -->
+        <li class="nav-item">
+          <router-link to="/user/edit" class="nav-link" exact-active-class="active"
+            >個人資料</router-link
+          >
+        </li>
+        <!-- 修改密碼 -->
+        <li class="nav-item">
+          <router-link to="/user/password" class="nav-link" exact-active-class="active"
+            >修改密碼</router-link
+          >
+        </li>
+
+        <!--  訂單管理 dropdown-->
+        <li class="nav-item dropdown-nav" v-if="isSponsor">
+          <div class="nav-link" @mouseover="showOrders = true" @mouseleave="showOrders = false">
+            訂單管理 ▾
+            <ul
+              class="dropdown-list"
+              v-show="showOrders"
+              @mouseenter="showOrders = true"
+              @mouseleave="showOrders = false"
             >
-          </li>
-          <li class="nav-item">
-            <router-link to="/user/edit" class="nav-link" exact-active-class="active"
-              >個人資料</router-link
+              <li>
+                <router-link to="/user/sponsorships" class="dropdown-item">我的贊助</router-link>
+              </li>
+              <li v-if="isProposer">
+                <router-link to="/user/projects/mine" class="dropdown-item">我的專案</router-link>
+              </li>
+            </ul>
+          </div>
+        </li>
+
+        <!--  專案提問 dropdown-->
+        <li class="nav-item dropdown-nav" v-if="isSponsor || isProposer">
+          <div
+            class="nav-link"
+            @mouseover="showQuestions = true"
+            @mouseleave="showQuestions = false"
+          >
+            專案提問 ▾
+            <ul
+              class="dropdown-list"
+              v-show="showQuestions"
+              @mouseenter="showQuestions = true"
+              @mouseleave="showQuestions = false"
             >
-          </li>
-          <li class="nav-item">
-            <router-link to="/user/password" class="nav-link" exact-active-class="active"
-              >修改密碼</router-link
-            >
-          </li>
-          <li class="nav-item">
-            <router-link to="/user/orders" class="nav-link">訂單管理</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link to="/user/projects" class="nav-link">提案專案</router-link>
-          </li>
-          <li class="nav-item">
-            <router-link to="/user/questions" class="nav-link">專案提問</router-link>
-          </li>
-        </ul>
-      </nav>
+              <li>
+                <router-link to="/user/questions" class="dropdown-item">我的提問</router-link>
+              </li>
+              <li v-if="isProposer">
+                <router-link to="/user/questions/manage" class="dropdown-item"
+                  >提問管理</router-link
+                >
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
     </section>
 
     <!-- 主內容區塊 -->
@@ -48,11 +86,18 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useUserStore } from '@/stores/auth'
 import defaultAvatar from '@/assets/images/default-avatar.png'
 
 const userStore = useUserStore()
 const user = userStore.user
+const isProposer = userStore.isProposer
+const isSponsor = userStore.isSponsor
+
+// 控制 dropdown 顯示
+const showOrders = ref(false)
+const showQuestions = ref(false)
 </script>
 
 <style scoped>
@@ -63,7 +108,6 @@ const user = userStore.user
   background-image: url('@/assets/images/user bg.png');
 }
 
-/* 背景圖 + 單色漸層 */
 .background-layer {
   position: absolute;
   top: 0;
@@ -77,7 +121,6 @@ const user = userStore.user
   background-position: center top;
 }
 
-/* 上方頭像 + 導覽列 */
 .user-header {
   position: relative;
   z-index: 1;
@@ -108,7 +151,6 @@ const user = userStore.user
   color: #222;
 }
 
-/* 導覽列 */
 .user-nav .nav-link {
   font-weight: 500;
   color: #444;
@@ -130,9 +172,39 @@ const user = userStore.user
   background-color: #f45c7f;
 }
 
-/* 主內容區塊 */
 .user-main {
   position: relative;
-  z-index: 1;
+  z-index: 0;
+}
+
+.dropdown-nav {
+  position: relative;
+}
+
+.dropdown-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1050;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  min-width: 160px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-item {
+  display: block;
+  padding: 0.375rem 1rem;
+  white-space: nowrap;
+  color: #444;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  text-decoration: none;
 }
 </style>
