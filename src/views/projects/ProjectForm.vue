@@ -1,141 +1,131 @@
 <template>
-  <div class="project-form">
-    <h2>新增專案</h2>
+  <div class="container py-5">
+    <h2 class="mb-4">步驟 1 / 2：發起提案</h2>
+
     <form @submit.prevent="submitForm">
-      <div>
-        <label>標題</label>
-        <input v-model="form.title" type="text" required />
+      <!-- 專案標題 -->
+      <div class="mb-3">
+        <label class="form-label">專案標題</label>
+        <input v-model="form.title" type="text" class="form-control" required />
       </div>
 
-      <div>
-        <label>摘要</label>
-        <textarea v-model="form.summary" required />
+      <!-- 分類 -->
+      <div class="mb-3">
+        <label class="form-label">分類</label>
+        <select v-model.number="form.category_id" class="form-select" required>
+          <option disabled value="">請選擇分類</option>
+          <option v-for="category in categories" :key="category.id" :value="category.id">
+            {{ category.name }}
+          </option>
+        </select>
       </div>
 
-      <div>
-        <label>分類 ID</label>
-        <input v-model.number="form.category_id" type="number" required />
+      <!-- 金額與時間 -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label">目標金額</label>
+          <input v-model.number="form.total_amount" type="number" class="form-control" required />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">開始時間</label>
+          <input v-model="form.start_time" type="date" class="form-control" required />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">結束時間</label>
+          <input v-model="form.end_time" type="date" class="form-control" required />
+        </div>
       </div>
 
-      <div>
-        <label>目標金額</label>
-        <input v-model.number="form.total_amount" type="number" required />
+      <!-- 封面圖 -->
+      <div class="mb-3">
+        <label class="form-label">封面圖片網址</label>
+        <input v-model="form.cover" type="text" class="form-control" />
       </div>
 
-      <div>
-        <label>開始時間</label>
-        <input v-model="form.start_time" type="date" required />
+      <!-- 摘要 -->
+      <div class="mb-3">
+        <label class="form-label">摘要</label>
+        <textarea v-model="form.summary" class="form-control" rows="3" required></textarea>
       </div>
 
-      <div>
-        <label>結束時間</label>
-        <input v-model="form.end_time" type="date" required />
+      <!-- 完整內容 -->
+      <div class="mb-3">
+        <label class="form-label">完整內容</label>
+        <textarea v-model="form.full_content" class="form-control" rows="5" required></textarea>
       </div>
 
-      <div>
-        <label>封面圖片網址</label>
-        <input v-model="form.cover" type="text" />
+      <!-- 提案團隊 -->
+      <div class="mb-3">
+        <label class="form-label">提案團隊</label>
+        <input v-model="form.project_team" type="text" class="form-control" />
       </div>
 
-      <div>
-        <label>完整內容</label>
-        <textarea v-model="form.full_content" />
+      <!-- 常見問答 -->
+      <div class="mb-3">
+        <label class="form-label">常見問答</label>
+        <textarea v-model="form.faq" class="form-control" rows="3"></textarea>
       </div>
 
-      <div>
-        <label>提案團隊</label>
-        <textarea v-model="form.project_team" />
+      <!-- 下一步按鈕 -->
+      <div class="text-center mt-4">
+        <button type="submit" class="btn btn-danger px-5 py-2">下一步：填寫回饋方案</button>
       </div>
-
-      <div>
-        <label>常見問答</label>
-        <textarea v-model="form.faq" />
-      </div>
-
-      <button type="submit">送出專案</button>
     </form>
   </div>
 </template>
 
-<script>
-import { createProject } from '@/api/project'
-import { useUserStore } from '@/stores/auth'
+<script setup>
+import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { createProject } from '@/api/project'
 
-export default {
-  name: 'ProjectForm',
-  data() {
-    return {
-      form: {
-        user_id: '',
-        title: '',
-        summary: '',
-        category_id: 1,
-        total_amount: 1000,
-        start_time: '',
-        end_time: '',
-        cover: '',
-        full_content: '',
-        project_team: '',
-        faq: '',
-        plans: [],
-      },
+const router = useRouter()
+
+// 分類選項（靜態）
+const categories = [
+  { id: 1, name: '人文' },
+  { id: 2, name: '環境' },
+  { id: 3, name: '動物' },
+  { id: 4, name: '醫療' },
+  { id: 5, name: '救援' },
+]
+
+// 表單資料
+const form = reactive({
+  title: '',
+  category_id: null,
+  total_amount: null,
+  start_time: '',
+  end_time: '',
+  cover: '',
+  summary: '',
+  full_content: '',
+  project_team: '',
+  faq: '',
+})
+
+// 送出表單
+async function submitForm() {
+  try {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      alert('未登入或 token 遺失')
+      return
     }
-  },
-  setup() {
-    const userStore = useUserStore()
-    const router = useRouter()
-    return { userStore, router }
-  },
-  methods: {
-    async submitForm() {
-      try {
-        this.form.user_id = this.userStore.user?.id
-        const res = await createProject(this.form, this.userStore.token)
-        console.log('專案成功', res.data)
-        alert('專案建立成功！')
 
-        // 跳轉到 ProjectPlan 頁面並傳遞資料
-        this.$router.push({
-          name: 'ProjectPlan',
-          params: { id: res.data.id }, // res.data.id 是從創建專案後返回的專案 ID
-        })
-      } catch (err) {
-        console.error('專案失敗', err.response?.data || err)
-        alert('專案失敗：' + (err.response?.data?.message || err.message))
-      }
-    },
-  },
+    const res = await createProject(form, token)
+    const newProjectId = res.data.data?.project_id
+
+    if (!newProjectId) {
+      alert('建立成功但未取得專案 ID')
+      return
+    }
+
+    alert('專案建立成功，請繼續填寫回饋方案')
+    router.push(`/projects/${newProjectId}/plans`)
+  } catch (err) {
+    console.error('建立專案失敗', err)
+    alert('建立專案失敗，請確認欄位是否填寫完整')
+  }
 }
 </script>
-
-<style scoped>
-.project-form {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 1rem;
-}
-.project-form form > div {
-  margin-bottom: 1rem;
-}
-input,
-textarea {
-  width: 100%;
-  padding: 8px;
-  margin-top: 4px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-button {
-  margin-right: 10px;
-  padding: 8px 16px;
-  border: none;
-  background-color: #2563eb;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-}
-button:hover {
-  background-color: #1d4ed8;
-}
-</style>

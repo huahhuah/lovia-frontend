@@ -9,6 +9,12 @@
         <li>
           <router-link to="/admin/projects" class="nav-link text-white">專案管理</router-link>
         </li>
+        <li>
+          <router-link to="#" class="nav-link text-white">交易管理</router-link>
+        </li>
+        <li>
+          <router-link to="#" class="nav-link text-white">公告管理</router-link>
+        </li>
       </ul>
     </div>
 

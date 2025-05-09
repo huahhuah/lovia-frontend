@@ -35,11 +35,11 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/projects/create/plans/:id',
+      path: '/projects/:id/plans', // 放在 projects/:id/plans
       name: 'ProjectPlan',
       component: () => import('@/views/projects/ProjectPlan.vue'),
+      props: (route) => ({ id: route.params.id }),
       meta: { requiresAuth: true },
-      props: route => ({ id: route.params.id }),  // 確保這裡能夠正確傳遞 id
     },
     {
       path: '/user',

@@ -36,7 +36,7 @@
           </div>
         </form>
         <a href="#" class="nav-link text-dark">探索</a>
-        <a href="#" class="nav-link text-dark">提案</a>
+        <router-link to="/projects/create" class="nav-link text-dark">提案</router-link>
       </div>
 
       <!-- 桌機登入／使用者區 -->
