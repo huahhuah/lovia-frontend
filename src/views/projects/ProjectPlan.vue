@@ -118,7 +118,7 @@ export default {
     // 初始化取得專案資訊
     onMounted(async () => {
       try {
-        const res = await projectAPI.getById(form.project_id) // ✅ 改這裡
+        const res = await createProject.getById(form.project_id) // ✅ 改這裡
         projectData.title = res.data.title
       } catch (err) {
         console.error('獲取專案資料失敗', err)
