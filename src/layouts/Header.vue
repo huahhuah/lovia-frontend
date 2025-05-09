@@ -53,16 +53,52 @@
               <span class="fw-semibold">{{ user.username }}</span>
             </button>
             <ul v-show="isDropdownOpen" class="dropdown-menu dropdown-menu-end show">
-              <li><router-link to="/user/edit" class="dropdown-item">個人資料</router-link></li>
-              <!-- <li v-if="isProposer">
-                <router-link to="/proposals" class="dropdown-item">我的提案</router-link>
-              </li>
-              <li v-if="isSponsor">
-                <router-link to="/sponsorships" class="dropdown-item">我的贊助</router-link>
-              </li> -->
+              <!-- ✅ 管理員專屬 -->
               <li v-if="isAdmin">
                 <router-link to="/admin" class="dropdown-item">管理後台</router-link>
               </li>
+
+              <!-- ✅ 一般會員（贊助者 + 提案者）功能 -->
+              <template v-else>
+                <li><router-link to="/user" class="dropdown-item">會員中心</router-link></li>
+                <li><router-link to="/user/edit" class="dropdown-item">個人資料</router-link></li>
+                <li>
+                  <router-link to="/user/password" class="dropdown-item">修改密碼</router-link>
+                </li>
+
+                <!-- 訂單管理 -->
+                <li v-if="isProposer" class="dropdown-submenu">
+                  <a class="dropdown-item dropdown-toggle" href="#">訂單管理</a>
+                  <ul class="dropdown-menu">
+                    <li><router-link to="/orders" class="dropdown-item">我的贊助</router-link></li>
+                    <li>
+                      <router-link to="/projects/mine" class="dropdown-item">我的專案</router-link>
+                    </li>
+                  </ul>
+                </li>
+                <li v-else>
+                  <router-link to="/orders" class="dropdown-item">訂單管理</router-link>
+                </li>
+
+                <!-- 專案提問 -->
+                <li v-if="isProposer" class="dropdown-submenu">
+                  <a class="dropdown-item dropdown-toggle" href="#">專案提問</a>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <router-link to="/questions" class="dropdown-item">我的提問</router-link>
+                    </li>
+                    <li>
+                      <router-link to="/questions/manage" class="dropdown-item"
+                        >提問管理</router-link
+                      >
+                    </li>
+                  </ul>
+                </li>
+                <li v-else>
+                  <router-link to="/questions" class="dropdown-item">專案提問</router-link>
+                </li>
+              </template>
+
               <li><hr class="dropdown-divider" /></li>
               <li><a class="dropdown-item text-danger" @click="handleLogout">登出</a></li>
             </ul>
@@ -318,5 +354,21 @@ const handleLogout = () => {
     font-size: 14px;
     padding: 6px 10px;
   }
+}
+.dropdown-submenu {
+  position: relative;
+}
+
+.dropdown-submenu > .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  display: none;
+  position: absolute;
+}
+
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
 }
 </style>
