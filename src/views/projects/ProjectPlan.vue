@@ -98,7 +98,7 @@
 <script>
 import { reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { createProjectPlan } from '@/api/project' // ✅ 模組化 API 匯入
+import { getProjectById, createProjectPlan } from '@/api/project'
 
 export default {
   name: 'ProjectPlan',
@@ -118,7 +118,8 @@ export default {
     // 初始化取得專案資訊
     onMounted(async () => {
       try {
-        const res = await createProject.getById(form.project_id) // ✅ 改這裡
+        const token = localStorage.getItem('token')
+        const res = await getProjectById(form.project_id, token)
         projectData.title = res.data.title
       } catch (err) {
         console.error('獲取專案資料失敗', err)
@@ -166,9 +167,7 @@ export default {
           }
         }
 
-        await Promise.all(
-          form.plans.map((plan) => projectAPI.createPlan(form.project_id, plan, token)) // ✅ 改這裡
-        )
+        await Promise.all(form.plans.map((plan) => createProjectPlan(form.project_id, plan, token)))
 
         alert('回饋方案提交成功！')
         router.push(`/projects/${form.project_id}`)
