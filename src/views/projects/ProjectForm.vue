@@ -113,7 +113,7 @@ async function submitForm() {
       return
     }
 
-    const res = await createProject.create(form, token) // 使用模組化函式
+    const res = await createProject(form, token) // 使用模組化函式
     const newProjectId = res.data.data?.project_id
 
     if (!newProjectId) {
