@@ -77,7 +77,7 @@
 <script setup>
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { createProject } from '@/api/project'
+import { projectAPI } from '@/api/project' // ✅ 改這裡
 
 const router = useRouter()
 
@@ -113,7 +113,7 @@ async function submitForm() {
       return
     }
 
-    const res = await createProject(form, token)
+    const res = await projectAPI.create(form, token) // 使用模組化函式
     const newProjectId = res.data.data?.project_id
 
     if (!newProjectId) {

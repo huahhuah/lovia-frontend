@@ -98,7 +98,7 @@
 <script>
 import { reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { createProjectPlan, getProjectById } from '@/api/project'
+import { projectAPI } from '@/api/project' // ✅ 模組化 API 匯入
 
 export default {
   name: 'ProjectPlan',
@@ -118,7 +118,7 @@ export default {
     // 初始化取得專案資訊
     onMounted(async () => {
       try {
-        const res = await getProjectById(form.project_id)
+        const res = await projectAPI.getById(form.project_id) // ✅ 改這裡
         projectData.title = res.data.title
       } catch (err) {
         console.error('獲取專案資料失敗', err)
@@ -152,7 +152,6 @@ export default {
           return
         }
 
-        // 檢查欄位完整性
         for (const [i, plan] of form.plans.entries()) {
           if (
             !plan.plan_name ||
@@ -167,11 +166,12 @@ export default {
           }
         }
 
-        // 並行送出所有方案
-        await Promise.all(form.plans.map((plan) => createProjectPlan(form.project_id, plan, token)))
+        await Promise.all(
+          form.plans.map((plan) => projectAPI.createPlan(form.project_id, plan, token)) // ✅ 改這裡
+        )
 
         alert('回饋方案提交成功！')
-        router.push(`/projects/${form.project_id}`) // 導回專案詳情或其他頁面
+        router.push(`/projects/${form.project_id}`)
       } catch (err) {
         console.error('回饋方案提交失敗', err)
         alert('回饋方案提交失敗')
