@@ -6,15 +6,21 @@
     <img src="/homepageS4-illustration.png" alt="illustration" class="section4-illustration" />
 
     <h2 class="section-title text-danger fs-4 fw-bold mb-5">歷年專案</h2>
-    <div class="container" style="padding-left: 10rem; padding-right: 10rem;">
+
+    <div class="container" style="padding-left: 10rem; padding-right: 10rem">
       <div class="row justify-content-center g-4">
-        <div class="col-md-4" v-for="(card, index) in pastCards" :key="index">
+        <div class="col-md-4" v-for="(card, index) in visibleCards" :key="index">
           <div class="card shadow-sm rounded-5 h-100 d-flex flex-column overflow-hidden">
             <div class="position-relative">
-              <img :src="card.image" class="card-img-top rounded-top-4" :alt="card.title" />
-              <img :src="card.categoryImg" class="category-badge" />
+              <img :src="card.cover" class="card-img-top rounded-top-4" :alt="card.title" />
+              <img
+                :src="card.category_img || '/default.png'"
+                alt="分類標籤"
+                class="category-badge"
+              />
+
               <div class="overlay-dark"></div>
-              <img :src="card.statusImg" class="status-stamp" alt="狀態印章" />
+              <img :src="card.status_img" class="status-stamp" alt="狀態印章" />
               <div class="favorite-wrapper">
                 <img src="/favorite.png" alt="收藏" class="favorite-icon" />
               </div>
@@ -22,69 +28,75 @@
 
             <div class="card-body text-start px-3 pb-4 d-flex flex-column flex-grow-1">
               <h5 class="card-title fw-bold text-ellipsis-2">{{ card.title }}</h5>
-              <p class="card-text small mb-1 text-ellipsis-3">{{ card.description }}</p>
+              <p class="card-text small mb-1 text-ellipsis-3">{{ card.summary }}</p>
               <p class="text-proposer mb-2">提案單位：{{ card.proposer }}</p>
 
               <div class="mt-auto">
                 <div class="d-flex justify-content-between align-items-center">
                   <small class="text-muted">已結束</small>
-                  <small>達成率 {{ card.progress }}%</small>
+                  <small>達成率 {{ card.percentage }}%</small>
                 </div>
                 <div class="progress my-2 progress-custom">
-                  <div class="progress-bar" :style="{ width: card.progress + '%' }"></div>
+                  <div class="progress-bar" :style="{ width: card.percentage + '%' }"></div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
                   <strong>NT$ {{ card.amount.toLocaleString() }}</strong>
-                  <button class="btn btn-sm btn-dark rounded-pill px-3">查看成果</button>
+                  <button class="btn btn-sm btn-danger rounded-pill px-3">查看專案 ></button>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <button class="btn btn-outline-danger rounded-pill mt-4">查看更多</button>
+
+      <button
+        v-if="archivedProjects.length > 3"
+        @click="showAll = !showAll"
+        class="btn btn-outline-danger rounded-pill mt-4"
+      >
+        {{ showAll ? '收起' : '查看更多' }}
+      </button>
     </div>
   </section>
 </template>
 
 <script setup>
-const pastCards = [
-  {
-    title: '浪浪絕育公益火化計畫',
-    description: '我們以協會多年的流浪動物協助計畫，致力為每一隻浪浪安排更妥善的終老火化與生活末期。',
-    proposer: '台灣浪浪共照推進協會',
-    image: '/homepageS4-card01.png',
-    categoryImg: '/blackcategory-動物.png',
-    statusImg: '/募資達標.png',
-    progress: 100,
-    amount: 42700,
-  },
-  {
-    title: '愛奇兒家庭長期服務計畫',
-    description: '關照慢飛天使的成長與家庭，也陪伴父母走過焦慮的心路歷程。協會長期提供居住與教育協助。',
-    proposer: '天使心家族社會福利基金會',
-    image: '/homepageS4-card02.png',
-    categoryImg: '/blackcategory-醫療.png',
-    statusImg: '/募資達標.png',
-    progress: 100,
-    amount: 342755,
-  },
-  {
-    title: '搶救海洋保育類動物贊助計畫',
-    description: '幫助每隻重傷的海洋動物，打造更完整的照養中心。',
-    proposer: '中華鯨豚協會',
-    image: '/homepageS4-card03.png',
-    categoryImg: '/blackcategory-動物.png',
-    statusImg: '/募資結束.png',
-    progress: 89,
-    amount: 120120,
-  },
-];
+import { ref, computed, onMounted } from 'vue'
+import { getAllProjects } from '@/api/project'
+import axios from 'axios'
+
+const archivedProjects = ref([])
+const showAll = ref(false)
+const isLoading = ref(true)
+
+const visibleCards = computed(() =>
+  showAll.value ? archivedProjects.value : archivedProjects.value.slice(0, 3)
+)
+
+onMounted(async () => {
+  try {
+    const res = await getAllProjects({
+      filter: 'archived',
+      page: 1,
+      per_page: 99,
+    })
+    if (res.data.status && Array.isArray(res.data.data)) {
+      archivedProjects.value = res.data.data.map((p) => ({
+        ...p,
+        status_img: p.percentage >= 100 ? '/募資達標.png' : '/募資結束.png',
+      }))
+    }
+  } catch (err) {
+    console.error('取得歷年專案失敗:', err)
+  } finally {
+    isLoading.value = false
+  }
+})
 </script>
 
 <style scoped>
 .funding-section {
-  background: linear-gradient(to right, #FFEDF2, #FFF6E3);
+  background: linear-gradient(to right, #ffedf2, #fff6e3);
   position: relative;
   padding-top: 8rem;
   padding-bottom: 25rem;
@@ -128,12 +140,12 @@ const pastCards = [
   overflow: hidden;
 }
 .progress-custom .progress-bar {
-  background-image: linear-gradient(to right, #FC7C9D, #FFC443);
+  background-image: linear-gradient(to right, #fc7c9d, #ffc443);
 }
 
 /* 提案單位 */
 .text-proposer {
-  color: #C4C4C4;
+  color: #c4c4c4;
   font-size: 14px;
 }
 

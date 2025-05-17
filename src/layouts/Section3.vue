@@ -5,92 +5,115 @@
     <img src="/homepageS3-bg2.png" alt="bg2" class="section3-bg2" />
     <img src="/homepageS3-illustration.png" alt="illustration" class="section3-illustration" />
 
-    <h2 class="section-title text-danger fs-4 fw-bold mb-5">長期贊助</h2>
-    <div class="container" style="padding-left: 10rem; padding-right: 10rem;">
-      <div class="row justify-content-center g-4">
-        <div class="col-md-4" v-for="(card, index) in cards" :key="index">
-          <div class="card shadow-sm rounded-5 h-100 d-flex flex-column overflow-hidden">
-            <!-- 卡片圖片與 icon -->
-            <div class="position-relative">
-              <img :src="card.image" class="card-img-top rounded-top-4" :alt="card.title" />
-              <img :src="card.categoryImg" alt="分類標籤" class="category-badge" />
-              <div class="favorite-wrapper">
-                <img src="/favorite.png" alt="收藏" class="favorite-icon" />
+    <div v-if="isLoading">載入中...</div>
+    <div v-else>
+      <h2 class="section-title text-danger fs-4 fw-bold mb-5">長期贊助</h2>
+
+      <div
+        v-if="!isLoading && visibleCards.length > 0"
+        class="container"
+        style="padding-left: 10rem; padding-right: 10rem"
+      >
+        <div class="row justify-content-center g-4">
+          <div class="col-md-4" v-for="(card, index) in visibleCards" :key="index">
+            <div class="card shadow-sm rounded-5 h-100 d-flex flex-column overflow-hidden">
+              <!-- 卡片圖片與 icon -->
+              <div class="position-relative">
+                <img :src="card.cover" class="card-img-top rounded-top-4" :alt="card.title" />
+                <img
+                  :src="card.category_img || '/default.png'"
+                  alt="分類標籤"
+                  class="category-badge"
+                />
+                <div class="favorite-wrapper">
+                  <img src="/favorite.png" alt="收藏" class="favorite-icon" />
+                </div>
               </div>
-            </div>
 
-            <!-- 卡片內文 -->
-            <div class="card-body text-start px-3 pb-4 d-flex flex-column flex-grow-1">
-              <!-- 標題區 -->
-              <h5 class="card-title fw-bold text-ellipsis-2">{{ card.title }}</h5>
+              <!-- 卡片內文 -->
+              <div class="card-body text-start px-3 pb-4 d-flex flex-column flex-grow-1">
+                <!-- 標題區 -->
+                <h5 class="card-title fw-bold text-ellipsis-2">{{ card.title }}</h5>
+                <!-- 說明區 -->
+                <p class="card-text small mb-1 text-ellipsis-3">{{ card.summary }}</p>
+                <!-- 提案單位 -->
+                <p class="text-proposer mb-2">提案單位：{{ card.proposer }}</p>
 
-              <!-- 說明區 -->
-              <p class="card-text small mb-1 text-ellipsis-3">{{ card.description }}</p>
-
-              <!-- 提案單位 -->
-              <p class="text-proposer mb-2">提案單位：{{ card.proposer }}</p>
-
-              <!-- 進度與按鈕（固定底部） -->
-              <div class="mt-auto">
-                <div class="d-flex justify-content-between align-items-center">
-                  <small class="text-muted">倒數 {{ card.daysLeft }} 天</small>
-                  <small>{{ card.progress }}%</small>
-                </div>
-                <div class="progress my-2 progress-custom">
-                  <div class="progress-bar" :style="{ width: card.progress + '%' }"></div>
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                  <strong>NT$ {{ card.amount.toLocaleString() }}</strong>
-                  <button class="btn btn-sm btn-danger rounded-pill px-3">立即贊助 ></button>
+                <!-- 進度與按鈕（固定底部） -->
+                <div class="mt-auto">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">倒數 {{ card.daysLeft }} 天</small>
+                    <small>{{ card.percentage }}%</small>
+                  </div>
+                  <div class="progress my-2 progress-custom">
+                    <div class="progress-bar" :style="{ width: card.percentage + '%' }"></div>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <strong>NT$ {{ card.amount.toLocaleString() }}</strong>
+                    <button class="btn btn-sm btn-danger rounded-pill px-3">立即贊助 ></button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <button class="btn btn-outline-danger rounded-pill mt-4">查看更多</button>
+
+      <!-- 查看更多 -->
+      <div class="text-center mt-4" v-if="longTermProjects.length > 3">
+        <button class="btn btn-outline-danger rounded-pill mt-4" @click="showAll = !showAll">
+          {{ showAll ? '收起' : '查看更多' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- 沒資料時 -->
+    <div v-if="!isLoading && visibleCards.length === 0" class="text-muted my-5">
+      (尚無長期贊助資料)
     </div>
   </section>
 </template>
 
 <script setup>
-const cards = [
-  {
-    title: '讓偏鄉沒有遺憾',
-    description: '在這個世界上，仍許多偏鄉孩子因為資源不足錯過了學習、夢想和成長的機會。',
-    proposer: '無憾未來兒童教育基金',
-    image: '/homepageS3-card01.png',
-    categoryImg: '/category-人文.png',
-    progress: 60,
-    amount: 100000,
-    daysLeft: 9999,
-  },
-  {
-    title: '讓每一頓飯都充滿溫暖',
-    description: '對我們來說，一日三餐是理所當然的日常，但對許多弱勢家庭來說，每一餐都是沈重的負擔。',
-    proposer: '溫暖一餐關懷協會',
-    image: '/homepageS3-card02.png',
-    categoryImg: '/category-人文.png',
-    progress: 60,
-    amount: 128900,
-    daysLeft: 9999,
-  },
-  {
-    title: '動物救傷站計畫',
-    description: '在城市的街頭、鄉間的小路，每天都有受傷、生病、無助的動物等待救援。',
-    proposer: '希望毛孩救援站',
-    image: '/homepageS3-card03.png',
-    categoryImg: '/category-動物.png',
-    progress: 60,
-    amount: 40000,
-    daysLeft: 9999,
-  },
-];
+import { ref, computed, onMounted } from 'vue'
+import { getAllProjects } from '@/api/project'
+
+const isLoading = ref(true)
+const longTermProjects = ref([])
+const showAll = ref(false)
+
+onMounted(async () => {
+  try {
+    const params = {
+      page: 1,
+      per_page: 6,
+      filter: 'long',
+      sort: 'newest',
+    }
+
+    const res = await getAllProjects(params)
+    console.log('📦 長期贊助 API 回傳：', res.data)
+
+    if (res.data?.status && Array.isArray(res.data.data)) {
+      longTermProjects.value = res.data.data
+    } else {
+      console.warn('沒有符合條件的長期贊助資料')
+    }
+  } catch (err) {
+    console.error('取得長期贊助資料失敗:', err)
+  } finally {
+    isLoading.value = false
+  }
+})
+
+const visibleCards = computed(() =>
+  showAll.value ? longTermProjects.value : longTermProjects.value.slice(0, 3)
+)
 </script>
 
 <style scoped>
 .funding-section {
-  background: linear-gradient(to right, #FFEDF2, #FFF6E3);
+  background: linear-gradient(to right, #ffedf2, #fff6e3);
   position: relative;
   padding-top: 8rem;
   padding-bottom: 8rem;
@@ -101,6 +124,13 @@ const cards = [
   height: 100%;
   max-width: 300px;
   margin: 0 auto;
+}
+.card-img-top {
+  width: 100%;
+  height: 200px; /* 與原卡片圖片保持一致可調 */
+  object-fit: cover;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
 }
 
 .category-badge {
@@ -132,7 +162,7 @@ const cards = [
 }
 
 .text-proposer {
-  color: #C4C4C4;
+  color: #c4c4c4;
   font-size: 14px;
 }
 
@@ -143,7 +173,7 @@ const cards = [
   overflow: hidden;
 }
 .progress-custom .progress-bar {
-  background-image: linear-gradient(to right, #FC7C9D, #FFC443);
+  background-image: linear-gradient(to right, #fc7c9d, #ffc443);
 }
 
 /* 標題區兩行 */

@@ -49,9 +49,12 @@
                 class="form-control"
                 id="username"
                 v-model="form.username"
+                maxlength="50"
                 placeholder="請輸入使用者名稱"
+                :class="{ 'is-invalid': isUsernameTooLong }"
                 required
               />
+              <div class="invalid-feedback">使用者名稱最多 50 字元</div>
             </div>
 
             <!-- 密碼 -->
@@ -194,6 +197,8 @@ const passwordMismatch = computed(
   () => form.password && form.confirmPassword && form.password !== form.confirmPassword
 )
 
+const isUsernameTooLong = computed(() => form.username.length > 50)
+
 //Modal 控制
 const modalRef = ref(null)
 const modalMessage = ref('')
@@ -213,6 +218,10 @@ function showModal(msg, type = 'danger') {
 async function handleRegister() {
   if (!isEmailValid.value || !isPasswordValid.value || passwordMismatch.value || !form.agree) return
 
+  if (form.username.length > 50) {
+    showModal('使用者名稱長度不能超過 50 字元')
+    return
+  }
   try {
     const payload = {
       account: form.email,
@@ -221,7 +230,7 @@ async function handleRegister() {
     }
     await axios.post(`${baseUrl}/api/v1/users/signup`, payload)
     //modalMessage.value = '註冊成功！即將跳轉登入頁'
-    showModal('註冊成功！', '即將跳轉登入頁')
+    showModal('註冊成功！即將跳轉登入頁', 'success')
     setTimeout(() => {
       modalInstance.hide() //關閉 Modal
       const backdrop = document.querySelector('.modal-backdrop')
