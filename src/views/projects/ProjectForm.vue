@@ -1,87 +1,196 @@
 <template>
-  <div class="container py-5">
-    <h2 class="mb-4">步驟 1 / 2：發起提案</h2>
+  <div class="proposal-wrapper position-relative" style="font-family: 'Noto Sans', sans-serif;">
+    <!-- 背景圖 -->
+    <img src="/proposal-bg2.png" class="position-absolute top-0 start-0" style="z-index: -1; width: 100%; height: 80vh; object-fit: cover;" />
 
-    <form @submit.prevent="submitForm">
-      <!-- 專案標題 -->
-      <div class="mb-3">
-        <label class="form-label">專案標題</label>
-        <input v-model="form.title" type="text" class="form-control" required />
+    <!-- 標題區 -->
+    <div class="proposal-header text-white">
+      <img src="/proposal-deco.png" class="position-absolute deco-icon" style="top: 60px; left: 120px; width: 280px;" />
+      <div class="container py-2 d-flex flex-column align-items-start text-start" style="padding-top: 6rem !important; max-width: 900px; margin: 0 auto;">
+        <h1 style="font-size: 2em; margin-top: 5rem; margin-bottom: 0.5rem; color: black;">發起提案</h1>
+        <p style="font-size: 1rem; color: black;">讓改變，從這裡開始</p>
       </div>
+    </div>
 
-      <!-- 分類 -->
-      <div class="mb-3">
-        <label class="form-label">分類</label>
-        <select v-model.number="form.category_id" class="form-select" required>
-          <option disabled value="">請選擇分類</option>
-          <option v-for="category in categories" :key="category.id" :value="category.id">
-            {{ category.name }}
-          </option>
-        </select>
-      </div>
+    <!-- 表單內容 -->
+    <div class="proposal-body py-5" style="background-image: url('/proposal-bg.png'); background-size: cover; background-position: 0 -10px;">
+      <div class="container" style="padding-top: 10rem; max-width: 900px; margin: 0 auto;">
+        <form @submit.prevent="submitForm">
 
-      <!-- 金額與時間 -->
-      <div class="row g-3 mb-3">
-        <div class="col-md-6">
-          <label class="form-label">目標金額</label>
-          <input v-model.number="form.total_amount" type="number" class="form-control" required />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">開始時間</label>
-          <input v-model="form.start_time" type="date" class="form-control" required />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label">結束時間</label>
-          <input v-model="form.end_time" type="date" class="form-control" required />
-        </div>
-      </div>
+          <!-- (1) 基本資訊 -->
+          <div class="form-section mb-5">
+            <h3 class="section-title mb-4">基本資訊</h3>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <!-- 提案標題 -->
+                <div class="mb-3 position-relative">
+                  <label class="form-label">提案標題<span class="text-danger">*</span></label>
+                  <input
+                    v-model="form.title"
+                    maxlength="40"
+                    @input="titleCount = form.title.length"
+                    type="text"
+                    class="form-control bg-light rounded"
+                    placeholder="請簡短描述本提案的名稱"
+                    required
+                  />
+                  <small class="char-count text-muted">{{ titleCount }}/40</small>
+                </div>
 
-      <!-- 封面圖 -->
-      <div class="mb-3">
-        <label class="form-label">封面圖片網址</label>
-        <input v-model="form.cover" type="text" class="form-control" />
-      </div>
+                <!-- 類別 -->
+                <div class="mb-3">
+                  <label class="form-label">提案分類<span class="text-danger">*</span></label>
+                  <select
+                    v-model.number="form.category_id"
+                    class="form-select bg-light rounded"
+                    :class="{ 'text-muted': !form.category_id }"
+                    required
+                  >
+                    <option disabled value="">請選擇本提案所屬的類別，例如教育、環保、人文等</option>
+                    <option v-for="category in categories" :key="category.id" :value="category.id">
+                      {{ category.name }}
+                    </option>
+                  </select>
+                </div>
 
-      <!-- 摘要 -->
-      <div class="mb-3">
-        <label class="form-label">摘要</label>
-        <textarea v-model="form.summary" class="form-control" rows="3" required></textarea>
-      </div>
+                <!-- 團隊 -->
+                <div class="mb-3">
+                  <label class="form-label">提案團隊<span class="text-danger">*</span></label>
+                  <input v-model="form.project_team" type="text" class="form-control bg-light rounded" placeholder="請輸入提案人姓名或團隊名稱" required />
+                </div>
 
-      <!-- 完整內容 -->
-      <div class="mb-3">
-        <label class="form-label">完整內容</label>
-        <textarea v-model="form.full_content" class="form-control" rows="5" required></textarea>
-      </div>
+                <!-- 團隊介紹 -->
+                <div class="mb-3">
+                  <label class="form-label">團隊介紹</label>
+                  <textarea class="form-control bg-light rounded" placeholder="請介紹團隊成員與專業背景，讓支持者更安心地了解您們如何實現這項計畫。"></textarea>
+                </div>
+              </div>
 
-      <!-- 提案團隊 -->
-      <div class="mb-3">
-        <label class="form-label">提案團隊</label>
-        <input v-model="form.project_team" type="text" class="form-control" />
-      </div>
+              <!-- 封面 -->
+              <div class="col-md-6 d-flex flex-column align-items-stretch">
+                <label class="form-label mb-2" style="color: #5F6368; font-weight: 400;">
+                  專案封面<span class="text-danger">*</span>
+                </label>
+                <div class="upload-box bg-light w-100 d-flex align-items-center justify-content-center">
+                  <div class="inner-box">
+                    <img src="/upload.png" alt="upload" style="width: 30px" class="mb-2" />
+                    <p class="mb-1">拖曳圖片至此處，或點擊選擇檔案</p>
+                    <p class="mb-1 text-muted">支援 PNG、JPG 格式，大小上限 10MB</p>
+                    <button type="button" class="btn btn-outline-secondary mt-2">選擇檔案</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <!-- 常見問答 -->
-      <div class="mb-3">
-        <label class="form-label">常見問答</label>
-        <textarea v-model="form.faq" class="form-control" rows="3"></textarea>
-      </div>
+          <!-- (2) 募資設定 -->
+          <div class="form-section mb-5">
+            <h3 class="section-title mb-4">募資設定</h3>
+            <div class="mb-3">
+              <label class="form-label">目標金額<span class="text-danger">*</span></label>
+              <div class="icon-overlay-wrapper">
+                <span class="calendar-overlay" style="left: 10px; font-size: 0.9rem; color: #5F6368;">NT$</span>
+                <input v-model.number="form.total_amount" type="number" class="form-control bg-light" placeholder="請輸入您希望募得的總金額" required />
+              </div>
+            </div>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label">開始日期<span class="text-danger">*</span></label>
+                <div class="icon-overlay-wrapper">
+                  <img src="/calendar.png" alt="calendar" class="calendar-overlay" style="width: 20px;" />
+                  <input v-model="form.start_time" type="text" class="form-control bg-light" placeholder="請選擇專案希望開始募資的日期" @focus="(e) => e.target.type='date'" required />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">結束日期<span class="text-danger">*</span></label>
+                <div class="icon-overlay-wrapper">
+                  <img src="/calendar.png" alt="calendar" class="calendar-overlay" style="width: 20px;" />
+                  <input v-model="form.end_time" type="text" class="form-control bg-light" placeholder="請選擇專案結束募資的日期" @focus="(e) => e.target.type='date'" required />
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <!-- 下一步按鈕 -->
-      <div class="text-center mt-4">
-        <button type="submit" class="btn btn-danger px-5 py-2">下一步：填寫回饋方案</button>
+          <!-- (3) 提案說明 -->
+          <div class="form-section mb-5">
+            <h3 class="section-title mb-4">提案說明</h3>
+            <div class="mb-3 position-relative">
+              <label class="form-label">摘要說明<span class="text-danger">*</span></label>
+              <textarea v-model="form.summary" maxlength="100" @input="summaryCount = form.summary.length" class="form-control bg-light rounded" placeholder="請簡要介紹您的提案，讓支持者了解計畫初衷，並將希望與支持帶給需要的人。" rows="3" required></textarea>
+              <small class="char-count text-muted">{{ summaryCount }}/100</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">詳細介紹<span class="text-danger">*</span></label>
+              <textarea v-model="form.full_content" class="form-control bg-light rounded" placeholder="請補充完整專案內容，說明創新性、社會影響力及可持續性，建議包括背景、執行方式、經費用途及預期成果。" rows="6" required></textarea>
+            </div>
+          </div>
+
+          <!-- 常見問題區塊 -->
+          <div class="form-section mb-5">
+            <h3 class="section-title mb-4">常見問題</h3>
+            <div v-for="(faq, index) in formFaqs" :key="index" class="faq-box mb-4 shadow-sm">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="d-flex align-items-center gap-2">
+                  <img src="/vector.png" width="16" />
+                  <img src="/layers.png" width="16" />
+                  <span style="font-weight: 300; color: #000000;">{{ faq.question }}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <img src="/edit.png" width="16" alt="edit" style="cursor: pointer;" />
+                  <img src="/delete.png" width="16" alt="delete" style="cursor: pointer;" @click="formFaqs.splice(index, 1)" />
+                </div>
+              </div>
+              <div class="faq-divider"></div>
+              <p class="faq-answer">{{ faq.answer }}</p>
+            </div>
+          </div>
+
+          <!-- 新增常見問題 -->
+          <div class="form-section mb-5">
+            <h3 class="section-title mb-4" style="font-size: 1rem;">新增常見問題</h3>
+            <div class="faq-box faq-new shadow-sm">
+              <div class="mb-3 d-flex align-items-center gap-2">
+                <img src="/vector.png" width="16" />
+                <img src="/layers.png" width="16" />
+                <input type="text" class="form-control bg-light" style="font-weight: 300;" :placeholder="questionPlaceholder" v-model="newFaq.question" />
+              </div>
+              <div class="faq-divider"></div>
+              <div class="mb-3">
+                <textarea class="form-control bg-light" style="font-weight: 300;" rows="3" placeholder="請回答上方問題，提供具體資訊或執行方式說明。" v-model="newFaq.answer"></textarea>
+              </div>
+              <div class="text-end">
+                <button type="button" class="addbtn btn-outline-dark rounded-pill px-2.5 py-1" @click="addFaq">＋ 新增</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 提交按鈕 -->
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-danger rounded-pill px-6 py-2">下一步：填寫回饋方案</button>
+            <p class="mt-2" style="font-size: 0.6rem; color: #5F6368;">確認所有 * 欄位皆完成填寫</p>
+          </div>
+
+        </form>
       </div>
-    </form>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { createProject } from '@/api/project' // ✅ 改這裡
+import { createProject } from '@/api/project'
+
+const questionPlaceholder = ref('請輸入支持者可能會提出的問題，例如：捐款是否可抵稅？')
+
+onMounted(() => {
+  if (window.innerWidth <= 767.98) {
+    questionPlaceholder.value = '請輸入支持者可能會提出的問題'
+  }
+})
 
 const router = useRouter()
 
-// 分類選項（靜態）
 const categories = [
   { id: 1, name: '人文' },
   { id: 2, name: '環境' },
@@ -90,7 +199,9 @@ const categories = [
   { id: 5, name: '救援' },
 ]
 
-// 表單資料
+const titleCount = ref(0)
+const summaryCount = ref(0)
+
 const form = reactive({
   title: '',
   category_id: null,
@@ -104,7 +215,36 @@ const form = reactive({
   faq: '',
 })
 
-// 送出表單
+const formFaqs = ref([
+  {
+    question: '專案成功後，什麼時候會開始執行？',
+    answer: '一旦募資成功，我們將於 7 月啟動購置流程，預計在 9 月開學前完成設備發送與教學安排。'
+  },
+  {
+    question: '我可以指定支持某一所學校嗎？',
+    answer: '目前本專案為整體性規劃，未提供指定對象功能。不過您將會收到我們在三所學校執行的完整成果紀錄。'
+  },
+  {
+    question: '這個協會真的可信嗎',
+    answer: '我們為正式立案之公益團體，協會資訊可於內政部網站查詢。我們也會在專案頁面展示過往成果與媒體報導。'
+  }
+])
+
+const newFaq = reactive({
+  question: '',
+  answer: ''
+})
+
+function addFaq() {
+  if (newFaq.question && newFaq.answer) {
+    formFaqs.value.push({ ...newFaq })
+    newFaq.question = ''
+    newFaq.answer = ''
+  } else {
+    alert('請填寫完整的問題與答案')
+  }
+}
+
 async function submitForm() {
   try {
     const token = localStorage.getItem('token')
@@ -113,7 +253,7 @@ async function submitForm() {
       return
     }
 
-    const res = await createProject(form, token) // 使用模組化函式
+    const res = await createProject(form, token)
     const newProjectId = res.data.data?.project_id
 
     if (!newProjectId) {
@@ -129,3 +269,263 @@ async function submitForm() {
   }
 }
 </script>
+
+<style scoped>
+.form-label {
+  color: #5F6368;
+  font-weight: 400;
+}
+.text-danger {
+  color: #FC5B53 !important;
+}
+.form-control,
+.form-select {
+  font-weight: 300 !important;
+  border-radius: 0.75rem !important;
+}
+::placeholder {
+  color: #C4C4C4 !important;
+  font-size: 0.9rem;
+  font-weight: 300;
+}
+option:disabled {
+  color: #C4C4C4;
+}
+.border-dashed {
+  border-style: dashed !important;
+}
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+.position-relative {
+  position: relative;
+}
+.char-count {
+  position: absolute;
+  right: 12px;
+  font-size: 0.7rem;
+  color: #C4C4C4;
+}
+/* 新增：讓 input-group icon 與 input 欄位邊框無縫連接 */
+.input-group .input-group-text {
+  border: none;
+  background: transparent;
+  padding-right: 0;
+}
+.input-group .form-control {
+  border-left: none;
+}
+.input-group .calendar-icon img {
+  margin-left: 8px;
+}
+/* 可選：讓 icon 疊在欄位上 */
+.icon-overlay-wrapper {
+  position: relative;
+}
+.icon-overlay-wrapper .calendar-overlay {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 2;
+}
+.icon-overlay-wrapper input {
+  padding-left: 2.5rem;
+}
+.faq-divider {
+  border-top: 1px dashed #C4C4C4;
+  margin: 12px 0;
+  width: 100%;
+  max-width: 780px;
+  height: 1px;
+}
+.faq-box {
+  background-color: #FFF8F9;
+  border-radius: 1rem;
+  border: 1px solid #dee2e6;
+  padding: 2rem 3rem; /* 上下 3rem, 左右 2rem */
+}
+.faq-answer {
+  color: #5F6368;
+  font-weight: 300;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  padding-left: 25px;
+}
+.faq-box h3.section-title {
+  font-size: 1rem;
+}
+
+button.btn-outline-dark.rounded-pill {
+  background-color: black;
+  color: white;
+  border: none !important;
+  transition: all 0.2s ease-in-out;
+  font-weight: 300;
+  font-size: 1rem;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+}
+
+button.btn-outline-dark.rounded-pill:active {
+  color: #C4C4C4;
+}
+
+button.btn-danger.rounded-pill {
+  border-radius: 999px !important;
+  background-color: #FC5B53 !important;
+  border: none !important;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+.upload-box {
+  min-height: 320px;
+  border-radius: 0.8rem;
+  border: 1px solid #dee2e6;
+}
+
+.upload-box .inner-box {
+  width: 97%;
+  height: 97%;
+  border: 1px dashed #dee2e6;
+  border-radius: 0.8rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width: 767.98px) {
+  .faq-new .d-flex.align-items-center {
+    flex-wrap: wrap !important; /* ✅ 讓裡面的元素可換行 */
+    align-items: flex-start;
+  }
+
+  .faq-new .d-flex.align-items-center input.form-control {
+    width: 100% !important;
+    margin-top: 0.8rem;
+  }
+  .faq-box textarea.form-control {
+    width: 100% !important;
+    display: block;
+  }
+
+  .faq-box .addbtn {
+    width: 30%;
+    margin-top: 0.5rem;
+  }
+
+  .faq-box img {
+    width: 16px;
+    height: auto;
+  }
+  
+  /* 1. 縮短上方背景圖高度 */
+  img[src="/proposal-bg2.png"] {
+    height: 50vh !important;
+  }
+
+  img[src="/edit.png"],
+  img[src="/delete.png"] {
+    display: none !important;
+  }
+  .container {
+    padding-left: 1.5rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .proposal-header .container {
+    align-items: center !important;
+    text-align: center !important;
+    padding-top: 3rem !important;
+  }
+
+  .proposal-header h1 {
+    font-size: 1.5rem !important;
+    margin-top: 3rem !important;
+    color: black !important;
+  }
+
+  .proposal-header p {
+    font-size: 1rem !important;
+    color: black !important;
+  }
+
+  .deco-icon {
+    display: none !important;
+  }
+
+  .proposal-body {
+    padding-top: 0rem !important;
+    background-position: -150px -50px !important;
+  }
+
+  .form-section {
+    padding: 0 0.5rem;
+  }
+
+  .faq-box {
+    padding: 1rem 1.5rem !important;
+  }
+
+  .upload-box {
+    min-height: 200px !important;
+    padding: 1rem;
+  }
+
+  .upload-box .inner-box {
+    padding: 1rem;
+  }
+
+  .upload-box p {
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  .upload-box button {
+    font-size: 0.85rem;
+    padding: 0.25rem 1rem;
+  }
+
+  .form-label {
+    font-size: 0.9rem !important;
+  }
+
+  .form-control,
+  .form-select {
+    font-size: 0.9rem !important;
+  }
+
+  .char-count {
+    font-size: 0.65rem;
+    right: 8px;
+  }
+
+  .section-title {
+    font-size: 1.1rem !important;
+  }
+
+  .faq-answer {
+    padding-left: 0.5rem !important;
+  }
+
+  .btn-danger.rounded-pill {
+    font-size: 1rem;
+    padding: 0.6rem 1.5rem !important;
+    width: 100%;
+  }
+
+  .addbtn {
+    width: 100%;
+    font-size: 0.9rem;
+  }
+}
+  .btn-danger {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+    max-width: 75%;
+  }
+
+</style>
