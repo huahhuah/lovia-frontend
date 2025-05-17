@@ -42,6 +42,29 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/projects/explore-projects',
+      name: 'explore-projects',
+      component: () => import('@/views/projects/ExploreProjects.vue'),
+      // redirect: '/projects/funding',
+      children: [
+        {
+          path: 'funding',
+          name: 'funding-projects',
+          component: () => import('@/views/projects/FundingProjects.vue'),
+        },
+        {
+          path: 'long-term',
+          name: 'long-term-projects',
+          component: () => import('@/views/projects/LongTermProjects.vue'),
+        },
+        {
+          path: 'archived',
+          name: 'archived-projects',
+          component: () => import('@/views/projects/ArchivedProjects.vue'),
+        },
+      ],
+    },
+    {
       path: '/user',
       component: () => import('@/layouts/UserLayout.vue'),
       meta: { requiresAuth: true },

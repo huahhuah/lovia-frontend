@@ -29,3 +29,30 @@ export const createProjectPlan = (projectId, data, token) => {
 export const getProjectById = (projectId) => {
   return axios.get(`${BASE_URL}/api/v1/projects/${projectId}`)
 }
+
+// 取得首頁整包分類
+export const getAllProjects = ({
+  page = 1,
+  per_page = 6,
+  filter = 'all',
+  sort = 'newest',
+  category_id = null,
+} = {}) => {
+  const params = {
+    page,
+    per_page,
+    filter,
+    sort,
+  }
+
+  if (category_id) {
+    params.category_id = category_id
+  }
+
+  return axios.get(`${BASE_URL}/api/v1/projects`, { params })
+}
+
+// 取得所有分類（探索頁用）
+export const getAllCategories = () => {
+  return axios.get(`${BASE_URL}/api/v1/projects/categories`)
+}

@@ -35,7 +35,7 @@
             />
           </div>
         </form>
-        <a href="#" class="nav-link text-dark">探索</a>
+        <router-link to="/projects/explore-projects" class="nav-link text-dark">探索</router-link>
         <router-link to="/projects/create" class="nav-link text-dark">提案</router-link>
       </div>
 

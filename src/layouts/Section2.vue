@@ -4,93 +4,102 @@
     <img src="/homepageS2-bg.png" alt="bg1" class="section2-bg1" />
     <img src="/homepageS2-bg2.png" alt="bg2" class="section2-bg2" />
     <img src="/homepageS2-illustration.png" alt="illustration" class="section2-illustration" />
+    <div v-if="isLoading">載入中...</div>
+    <div v-else>
+      <h2 class="section-title text-danger fs-4 fw-bold mb-5">募資中</h2>
 
-    <h2 class="section-title text-danger fs-4 fw-bold mb-5">募資中</h2>
-    <div class="container" style="padding-left: 10rem; padding-right: 10rem;">
-      <div class="row justify-content-center g-4">
-        <div class="col-md-4" v-for="(card, index) in cards" :key="index">
-          <div class="card shadow-sm rounded-5 h-100 d-flex flex-column overflow-hidden">
-            <!-- 卡片圖片與 icon -->
-            <div class="position-relative">
-              <img :src="card.image" class="card-img-top rounded-top-4" :alt="card.title" />
-              <img :src="card.categoryImg" alt="分類標籤" class="category-badge" />
-              <div class="favorite-wrapper">
-                <img src="/favorite.png" alt="收藏" class="favorite-icon" />
+      <div class="container" style="padding-left: 10rem; padding-right: 10rem">
+        <div class="row justify-content-center g-4">
+          <div class="col-md-4" v-for="(card, index) in visibleCards" :key="index">
+            <div class="card shadow-sm rounded-5 h-100 d-flex flex-column overflow-hidden">
+              <!-- 卡片圖片與 icon -->
+              <div class="position-relative">
+                <img :src="card.cover" class="card-img-top rounded-top-4" :alt="card.title" />
+                <img
+                  :src="card.category_img || '/default.png'"
+                  alt="分類標籤"
+                  class="category-badge"
+                />
+                <div class="favorite-wrapper">
+                  <img src="/favorite.png" alt="收藏" class="favorite-icon" />
+                </div>
               </div>
-            </div>
 
-            <!-- 卡片內文 -->
-            <div class="card-body text-start px-3 pb-4 d-flex flex-column flex-grow-1">
-              <!-- 標題區 -->
-              <h5 class="card-title fw-bold text-ellipsis-2">{{ card.title }}</h5>
+              <!-- 卡片內文 -->
+              <div class="card-body text-start px-3 pb-4 d-flex flex-column flex-grow-1">
+                <!-- 標題區 -->
+                <h5 class="card-title fw-bold text-ellipsis-2">{{ card.title }}</h5>
+                <!-- 說明區 -->
+                <p class="card-text small mb-1 text-ellipsis-3">{{ card.summary }}</p>
+                <!-- 提案單位 -->
+                <p class="text-proposer mb-2">提案單位：{{ card.proposer }}</p>
 
-              <!-- 說明區 -->
-              <p class="card-text small mb-1 text-ellipsis-3">{{ card.description }}</p>
-
-              <!-- 提案單位 -->
-              <p class="text-proposer mb-2">提案單位：{{ card.proposer }}</p>
-
-              <!-- 進度與按鈕（固定底部） -->
-              <div class="mt-auto">
-                <div class="d-flex justify-content-between align-items-center">
-                  <small class="text-muted">倒數 {{ card.daysLeft }} 天</small>
-                  <small>{{ card.progress }}%</small>
-                </div>
-                <div class="progress my-2 progress-custom">
-                  <div class="progress-bar" :style="{ width: card.progress + '%' }"></div>
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                  <strong>NT$ {{ card.amount.toLocaleString() }}</strong>
-                  <button class="btn btn-sm btn-danger rounded-pill px-3">立即贊助 ></button>
+                <!-- 進度與按鈕（固定底部） -->
+                <div class="mt-auto">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">倒數 {{ card.days_left }} 天</small>
+                    <small>{{ card.percentage }}%</small>
+                  </div>
+                  <div class="progress my-2 progress-custom">
+                    <div class="progress-bar" :style="{ width: card.percentage + '%' }"></div>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <strong>NT$ {{ card.amount.toLocaleString() }}</strong>
+                    <button class="btn btn-sm btn-danger rounded-pill px-3">立即贊助 ></button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <button
+          class="btn btn-outline-danger rounded-pill mt-4"
+          @click="showAll = !showAll"
+          v-if="projects.length > 3"
+        >
+          {{ showAll ? '收起' : '查看更多' }}
+        </button>
       </div>
-      <button class="btn btn-outline-danger rounded-pill mt-4">查看更多</button>
     </div>
   </section>
 </template>
 
 <script setup>
-const cards = [
-  {
-    title: '弱勢偏鄉與罕病者【復康巴士服務補助】',
-    description: '對許多身障者與罕病者而言，復康巴士的交通費用是一筆沈重負擔。為了不讓距離成為就醫與生活的障礙，協會致力...',
-    proposer: '多扶無障礙生活與交通發展協會',
-    image: '/homepageS2-card01.png',
-    categoryImg: '/category-人文.png',
-    progress: 33,
-    amount: 26580,
-    daysLeft: 25,
-  },
-  {
-    title: '偏鄉醫療支援計畫',
-    description: '偏鄉地區的醫療資源匱乏，許多居民因為交通不便、醫療設施不足，無法及時獲得必要的醫療服務。',
-    proposer: '多偏鄉醫療支援協會',
-    image: '/homepageS2-card02.png',
-    categoryImg: '/category-人文.png',
-    progress: 24,
-    amount: 9456,
-    daysLeft: 34,
-  },
-  {
-    title: '海洋廢棄物清理計畫',
-    description: '如果我們不採取行動，未來的海洋將不再是生命的搖籃，而是廢棄物的墳場。',
-    proposer: '海洋守護者聯盟',
-    image: '/homepageS2-card03.png',
-    categoryImg: '/category-環境.png',
-    progress: 24,
-    amount: 26000,
-    daysLeft: 15,
-  },
-];
+import { ref, computed, onMounted } from 'vue'
+import { getAllProjects } from '@/api/project'
+import axios from 'axios'
+
+const isLoading = ref(true)
+const projects = ref([])
+const showAll = ref(false)
+
+onMounted(async () => {
+  try {
+    const res = await getAllProjects({
+      filter: 'funding',
+      page: 1,
+      per_page: 6,
+    })
+
+    console.log('API 回傳：', res.data)
+
+    if (res.data.status && Array.isArray(res.data.data)) {
+      projects.value = res.data.data
+    }
+  } catch (err) {
+    console.error('取得募資中失敗:', err)
+  } finally {
+    isLoading.value = false
+  }
+})
+
+const visibleCards = computed(() => (showAll.value ? projects.value : projects.value.slice(0, 3)))
 </script>
 
 <style scoped>
 .funding-section {
-  background: linear-gradient(to right, #FFEDF2, #FFF6E3);
+  background: linear-gradient(to right, #ffedf2, #fff6e3);
   position: relative;
   padding-top: 8rem;
   padding-bottom: 8rem;
@@ -132,7 +141,7 @@ const cards = [
 }
 
 .text-proposer {
-  color: #C4C4C4;
+  color: #c4c4c4;
   font-size: 14px;
 }
 
@@ -143,7 +152,7 @@ const cards = [
   overflow: hidden;
 }
 .progress-custom .progress-bar {
-  background-image: linear-gradient(to right, #FC7C9D, #FFC443);
+  background-image: linear-gradient(to right, #fc7c9d, #ffc443);
 }
 
 /* 標題區兩行 */
