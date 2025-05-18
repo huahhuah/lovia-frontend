@@ -56,3 +56,8 @@ export const getAllProjects = ({
 export const getAllCategories = () => {
   return axios.get(`${BASE_URL}/api/v1/projects/categories`)
 }
+
+// 取得專案進度
+export const getProgress = (projectId) =>{
+  return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/progresses`)
+}
