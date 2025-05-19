@@ -66,3 +66,8 @@ export const getProjectOverview = async (projectId) => {
 export const getProjectPlans = async (projectId) => {
   return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/plans`)
 }
+
+// 取得專案進度
+export const getProgress = (projectId) => {
+  return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/progresses`)
+}
