@@ -65,6 +65,12 @@ const router = createRouter({
       ],
     },
     {
+      path: '/projects/funding/:id',
+      name: 'FundingProjectDetail',
+      component: () => import('@/views/projects/FundingProjectDetail.vue'),
+      props: true,
+    },
+    {
       path: '/user',
       component: () => import('@/layouts/UserLayout.vue'),
       meta: { requiresAuth: true },

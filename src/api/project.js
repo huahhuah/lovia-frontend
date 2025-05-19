@@ -2,7 +2,8 @@
 import axios from 'axios'
 
 //base_url
-const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
+//const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
+const BASE_URL = 'http://127.0.0.1:8080'
 
 export const createProject = (data, token) => {
   return axios.post(`${BASE_URL}/api/v1/projects/create`, data, {
@@ -55,4 +56,14 @@ export const getAllProjects = ({
 // 取得所有分類（探索頁用）
 export const getAllCategories = () => {
   return axios.get(`${BASE_URL}/api/v1/projects/categories`)
+}
+
+// 取得專案概覽資料
+export const getProjectOverview = async (projectId) => {
+  return axios.get(`${BASE_URL}/api/v1/projects/${projectId}`)
+}
+
+// 取得專案的所有回饋方案
+export const getProjectPlans = async (projectId) => {
+  return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/plans`)
 }

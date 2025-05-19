@@ -5,15 +5,13 @@
     <img src="/homepageS3-bg2.png" alt="bg2" class="section3-bg2" />
     <img src="/homepageS3-illustration.png" alt="illustration" class="section3-illustration" />
 
+    <!-- 載入中 -->
     <div v-if="isLoading">載入中...</div>
-    <div v-else>
-      <h2 class="section-title text-danger fs-4 fw-bold mb-5">長期贊助</h2>
 
-      <div
-        v-if="!isLoading && visibleCards.length > 0"
-        class="container"
-        style="padding-left: 10rem; padding-right: 10rem"
-      >
+    <!-- 有資料 -->
+    <div v-else-if="visibleCards.length > 0">
+      <h2 class="section-title text-danger fs-4 fw-bold mb-5">長期贊助</h2>
+      <div class="container" style="padding-left: 10rem; padding-right: 10rem">
         <div class="row justify-content-center g-4">
           <div class="col-md-4" v-for="(card, index) in visibleCards" :key="index">
             <div class="card shadow-sm rounded-5 h-100 d-flex flex-column overflow-hidden">
@@ -50,7 +48,12 @@
                   </div>
                   <div class="d-flex justify-content-between align-items-center">
                     <strong>NT$ {{ card.amount.toLocaleString() }}</strong>
-                    <button class="btn btn-sm btn-danger rounded-pill px-3">立即贊助 ></button>
+                    <router-link
+                      :to="`/projects/funding/${card.id}`"
+                      class="btn btn-sm btn-danger rounded-pill px-3"
+                    >
+                      立即贊助 >
+                    </router-link>
                   </div>
                 </div>
               </div>
@@ -67,10 +70,8 @@
       </div>
     </div>
 
-    <!-- 沒資料時 -->
-    <div v-if="!isLoading && visibleCards.length === 0" class="text-muted my-5">
-      (尚無長期贊助資料)
-    </div>
+    <!-- 無資料 -->
+    <div v-else class="text-muted my-5">(尚無長期贊助資料)</div>
   </section>
 </template>
 
@@ -95,7 +96,19 @@ onMounted(async () => {
     console.log('📦 長期贊助 API 回傳：', res.data)
 
     if (res.data?.status && Array.isArray(res.data.data)) {
-      longTermProjects.value = res.data.data
+      // 加工處理每個卡片項目，補上倒數天數與格式化
+      longTermProjects.value = res.data.data.map((p) => {
+        const daysLeft = Math.max(
+          0,
+          Math.ceil((new Date(p.end_time) - new Date()) / (1000 * 60 * 60 * 24))
+        )
+        const percentage = p.total_amount === 0 ? 0 : (p.amount / p.total_amount) * 100
+        return {
+          ...p,
+          daysLeft,
+          percentage: parseFloat(percentage.toFixed(2)),
+        }
+      })
     } else {
       console.warn('沒有符合條件的長期贊助資料')
     }
