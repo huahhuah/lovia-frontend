@@ -37,12 +37,7 @@
           </div>
 
           <div v-else-if="activeTab === '常見問題'">
-            <ul class="list-unstyled text-muted">
-              <li>Q：如何贊助？</li>
-              <li>A：點擊「立即贊助」按鈕即可完成操作。</li>
-              <li class="mt-3">Q：我可以取消贊助嗎？</li>
-              <li>A：請聯繫平台客服協助處理。</li>
-            </ul>
+            <p class="text-muted">尚未提供 常見問題 資料。</p>
           </div>
 
           <div v-else-if="activeTab === '進度分享'">
