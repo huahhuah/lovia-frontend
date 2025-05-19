@@ -45,7 +45,12 @@
                   </div>
                   <div class="d-flex justify-content-between align-items-center">
                     <strong>NT$ {{ card.amount.toLocaleString() }}</strong>
-                    <button class="btn btn-sm btn-danger rounded-pill px-3">立即贊助 ></button>
+                    <router-link
+                      :to="`/projects/funding/${card.id}`"
+                      class="btn btn-sm btn-danger rounded-pill px-3"
+                    >
+                      立即贊助 >
+                    </router-link>
                   </div>
                 </div>
               </div>

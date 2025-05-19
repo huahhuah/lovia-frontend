@@ -57,7 +57,17 @@ export const getAllCategories = () => {
   return axios.get(`${BASE_URL}/api/v1/projects/categories`)
 }
 
+// 取得專案概覽資料
+export const getProjectOverview = async (projectId) => {
+  return axios.get(`${BASE_URL}/api/v1/projects/${projectId}`)
+}
+
+// 取得專案的所有回饋方案
+export const getProjectPlans = async (projectId) => {
+  return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/plans`)
+}
+
 // 取得專案進度
-export const getProgress = (projectId) =>{
+export const getProgress = (projectId) => {
   return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/progresses`)
 }
