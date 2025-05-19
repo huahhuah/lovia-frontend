@@ -2,8 +2,7 @@
 import axios from 'axios'
 
 //base_url
-//const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
-const BASE_URL = 'http://127.0.0.1:8080'
+const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
 
 export const createProject = (data, token) => {
   return axios.post(`${BASE_URL}/api/v1/projects/create`, data, {
