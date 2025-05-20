@@ -71,13 +71,36 @@
                 <label class="form-label mb-2" style="color: #5F6368; font-weight: 400;">
                   專案封面<span class="text-danger">*</span>
                 </label>
-                <div class="upload-box bg-light w-100 d-flex align-items-center justify-content-center">
-                  <div class="inner-box">
-                    <img src="/upload.png" alt="upload" style="width: 30px" class="mb-2" />
-                    <p class="mb-1">拖曳圖片至此處，或點擊選擇檔案</p>
-                    <p class="mb-1 text-muted">支援 PNG、JPG 格式，大小上限 10MB</p>
-                    <button type="button" class="btn btn-outline-secondary mt-2">選擇檔案</button>
+                <div 
+                  class="upload-box bg-light w-100 d-flex align-items-center justify-content-center"
+                  :class="{ 'drag-over': isDragging}"
+                  @dragover.prevent="onDragOver"
+                  @dragleave.prevent="isDragging = false"
+                  @drop.prevent="onDrop"  
+                >
+                  <div class="inner-box position-relative">
+                  <img
+                    v-if="imagePreview"
+                    :src="imagePreview"
+                    class="preview-image"
+                  />
+                    <div v-if="!imagePreview" class="upload-content text-center">
+                      <img src="/upload.png" alt="upload" style="width: 30px" class="mb-2" />
+                      <p class="mb-1">拖曳圖片至此處，或點擊選擇檔案</p>
+                      <p class="mb-1 text-muted">支援 PNG、JPG 格式，大小上限 10MB</p>
+                      <button type="button" class="btn btn-outline-secondary mt-2" @click="triggerFileInput">選擇檔案</button>
+                      <input
+                        type="file"
+                        ref="fileInput"
+                        accept="image/jpeg, image/png"
+                        style="display: none;"
+                        @change="onFileChange"
+                      />
+                    </div>
                   </div>
+                </div>
+                <div v-if="isUpload" class="text-center mt-2">
+                  <small class="text-muted">正在上傳...</small>
                 </div>
               </div>
             </div>
@@ -180,6 +203,72 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { createProject } from '@/api/project'
+import axios from 'axios'
+
+const router = useRouter()  
+const imageFile = ref(null)  //  原始檔
+const imagePreview = ref(null)  // 預覽用
+const isUpload = ref(false)  // 上傳狀態
+const isDragging = ref(false)  //  增加拖曳狀態
+const fileInput = ref(null)
+
+function triggerFileInput(){
+  fileInput.value?.click()
+}
+
+function onFileChange(event){
+  const file = event.target.files[0]
+  handleImageFile(file)
+}
+
+function onDragOver(event){
+  isDragging.value = true
+}
+
+function onDrop(event){
+  isDragging.value = false
+  const file = event.dataTransfer.files[0]
+  handleImageFile(file)
+}
+
+function handleImageFile(file){
+  if(!file) return;
+  if(!['image/jpeg', 'image/png'].includes(file.type)){
+    alert('僅支援 JPG 或 PNG 格式');
+    return;
+  }
+  if(file.size > 2*1024*1024 ){
+    alert('圖片大小不能超過 2MB');
+    return;
+  }
+  //  本地預覽
+  imageFile.value = file;
+  imagePreview.value = URL.createObjectURL(file);
+  //  開始上傳
+  uploadFile(file);
+}
+
+//  圖片上傳
+async function uploadFile(file){
+  try{
+    isUpload.value = true;
+    const formData = new FormData();
+    formData.append('file',file);
+    
+    const res = await axios.post('https://lovia-backend-xl4e.onrender.com/api/v1/uploads/image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    form.cover = res.data.url;
+    imagePreview.value = res.data.url
+  } catch(err){
+    alert('圖片上傳失敗:'+(err.response?.data?.message || err.message));
+  } finally{
+    isUpload.value = false;
+  }
+}
 
 const questionPlaceholder = ref('請輸入支持者可能會提出的問題，例如：捐款是否可抵稅？')
 
@@ -188,8 +277,6 @@ onMounted(() => {
     questionPlaceholder.value = '請輸入支持者可能會提出的問題'
   }
 })
-
-const router = useRouter()
 
 const categories = [
   { id: 1, name: '人文' },
@@ -382,13 +469,19 @@ button.btn-danger.rounded-pill {
 }
 .upload-box {
   min-height: 320px;
+  max-height: 320px;  /* 加這行 */
+  width: 100%;  /* 加這行 */
+  max-width: 400px;  /* 加這行 */
   border-radius: 0.8rem;
   border: 1px solid #dee2e6;
+  position: relative;  /* 加這行 */
+  overflow: hidden;  /* 加這行 */
 }
 
 .upload-box .inner-box {
   width: 97%;
   height: 97%;
+  max-height: 300px;  /* 加這行 */
   border: 1px dashed #dee2e6;
   border-radius: 0.8rem;
   padding: 2rem;
@@ -396,6 +489,8 @@ button.btn-danger.rounded-pill {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  position: relative;  /* 加這行 */
+  overflow: hidden; /* 加這行 */
 }
 @media (max-width: 767.98px) {
   .faq-new .d-flex.align-items-center {
@@ -472,11 +567,18 @@ button.btn-danger.rounded-pill {
 
   .upload-box {
     min-height: 200px !important;
+    max-height: 200px;  /* 加這行 */
+    max-width: 100%;  /* 加這行 */
     padding: 1rem;
+    overflow: hidden; /* 加這行 */
+    position: relative; /* 加這行 */
   }
 
   .upload-box .inner-box {
     padding: 1rem;
+    max-height: 180px; /* 加這行 */
+    position: relative; /* 加這行 */
+    overflow: hidden;   /* 加這行 */
   }
 
   .upload-box p {
@@ -487,6 +589,26 @@ button.btn-danger.rounded-pill {
   .upload-box button {
     font-size: 0.85rem;
     padding: 0.25rem 1rem;
+  }
+
+  .preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    border-radius: 0.8rem;
+  }
+
+  .upload-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
   }
 
   .form-label {
