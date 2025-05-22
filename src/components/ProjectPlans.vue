@@ -1,23 +1,32 @@
 <template>
-  <div class="d-flex flex-column gap-3">
-    <PlanCard v-for="plan in plans" :key="plan.plan_id" :plan="plan" @sponsor="goToSponsorPage" />
+  <div>
+    <PlanCard
+      v-for="plan in plans"
+      :key="plan.plan_id"
+      :plan="plan"
+      :projectType="projectType"
+      @sponsor="handleSponsor"
+    />
   </div>
 </template>
 
 <script setup>
-import PlanCard from './PlanCard.vue'
-import { useRouter } from 'vue-router'
+import PlanCard from '../components/PlanCard.vue'
 
-defineProps({
+const props = defineProps({
   plans: {
     type: Array,
     required: true,
   },
+  projectType: {
+    type: String,
+    required: true, // 由父層傳入 "募資中" / "歷年專案" / ...
+  },
 })
 
-const router = useRouter()
+const emit = defineEmits(['sponsor'])
 
-function goToSponsorPage(planId) {
-  router.push(`/checkout/${planId}`)
+function handleSponsor(planId) {
+  emit('sponsor', planId)
 }
 </script>

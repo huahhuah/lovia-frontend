@@ -59,7 +59,7 @@ export const getAllCategories = () => {
 
 // 取得專案概覽資料
 export const getProjectOverview = async (projectId) => {
-  return axios.get(`${BASE_URL}/api/v1/projects/${projectId}`)
+  return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/overview`)
 }
 
 // 取得專案的所有回饋方案
@@ -70,4 +70,17 @@ export const getProjectPlans = async (projectId) => {
 // 取得專案進度
 export const getProgress = (projectId) => {
   return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/progresses`)
+}
+
+// 建立留言
+export function createProjectComment(projectId, content, token) {
+  return axios.post(
+    `${BASE_URL}/api/v1/projects/${projectId}/comments`,
+    { content },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
 }
