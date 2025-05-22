@@ -237,8 +237,8 @@ function handleImageFile(file){
     alert('僅支援 JPG 或 PNG 格式');
     return;
   }
-  if(file.size > 2*1024*1024 ){
-    alert('圖片大小不能超過 2MB');
+  if(file.size > 10*1024*1024 ){
+    alert('圖片大小不能超過 10MB');
     return;
   }
   //  本地預覽
