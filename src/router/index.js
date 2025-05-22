@@ -142,7 +142,7 @@ const router = createRouter({
   ],
 })
 
-// ⭐ 全域守衛: 驗證登入狀態 & 親級權限
+//  全域守衛: 驗證登入狀態 & 親級權限
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
 

@@ -1,12 +1,15 @@
 <template>
-  <div class="plan-card rounded-4 p-4 mb-4 shadow-sm">
+  <div
+    class="plan-card rounded-4 p-4 mb-4 shadow-sm"
+    :class="{ 'opacity-50': projectType === '歷年專案' }"
+  >
     <!-- 標題 -->
     <h6 class="fw-bold mb-2 text-dark">{{ plan.plan_name }}</h6>
 
-    <!-- 價格獨立一行 -->
+    <!-- 價格 -->
     <p class="text-danger fw-bold fs-5 mb-2">NT$ {{ plan.amount }}</p>
 
-    <!-- 贊助人數 icon + 數字 -->
+    <!-- 贊助人數 -->
     <div class="d-flex align-items-center text-secondary small mb-3">
       <img
         src="@/assets/icons/group.svg"
@@ -31,8 +34,13 @@
     </p>
 
     <!-- 贊助按鈕 -->
-    <button class="btn btn-danger w-100 mt-3 fw-bold rounded-pill py-2" @click="handleSponsor">
-      立即贊助
+    <button
+      class="btn btn-danger w-100 mt-3 fw-bold rounded-pill py-2"
+      @click="handleSponsor"
+      :disabled="projectType === '歷年專案'"
+      :title="projectType === '歷年專案' ? '此為歷年專案，無法再贊助' : '立即贊助此方案'"
+    >
+      {{ projectType === '歷年專案' ? '無法贊助' : '立即贊助' }}
     </button>
   </div>
 </template>
@@ -44,6 +52,10 @@ import defaultImg from '@/assets/images/default.png'
 const props = defineProps({
   plan: {
     type: Object,
+    required: true,
+  },
+  projectType: {
+    type: String,
     required: true,
   },
 })
@@ -72,5 +84,8 @@ onMounted(() => {
 <style scoped>
 .plan-card {
   background-color: #fff5f5;
+}
+.plan-card.opacity-50 {
+  pointer-events: none;
 }
 </style>

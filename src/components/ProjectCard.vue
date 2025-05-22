@@ -13,7 +13,9 @@
     <div class="card-body text-start px-3 pb-4 d-flex flex-column flex-grow-1">
       <h5 class="card-title fw-bold text-ellipsis-2">{{ project.title }}</h5>
       <p class="card-text small mb-1 text-ellipsis-3">{{ project.summary }}</p>
-      <p class="text-proposer mb-2">提案單位：{{ project.proposer }}</p>
+      <p class="text-proposer mb-2" v-if="project.project_team">
+        提案單位：{{ project.project_team }}
+      </p>
 
       <div class="mt-auto">
         <div class="d-flex justify-content-between align-items-center">

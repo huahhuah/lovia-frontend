@@ -33,7 +33,41 @@
           </div>
 
           <div v-else-if="activeTab === '問與答'">
-            <p class="text-muted">尚未提供 Q&A 資料。</p>
+            <!-- 問與答留言輸入區塊 -->
+            <div
+              v-if="isLogin"
+              class="comment-box d-flex p-4 rounded-4 mb-4"
+              style="background-color: #fff8f5"
+            >
+              <!-- 使用者頭像 -->
+              <img
+                :src="user?.avatar || '/default-avatar.png'"
+                @error="(e) => (e.target.src = '/default-avatar.png')"
+                alt="user avatar"
+                class="rounded-circle me-3"
+                style="width: 44px; height: 44px; object-fit: cover"
+              />
+
+              <!-- 輸入框 + 按鈕 -->
+              <div class="flex-grow-1 d-flex flex-column">
+                <textarea
+                  v-model="commentContent"
+                  rows="3"
+                  placeholder="有任何疑問或想了解的細節嗎？歡迎留言提問！"
+                  class="form-control border-0 rounded-4 px-3 py-2 mb-2"
+                  style="background-color: #fdf9f8"
+                ></textarea>
+
+                <div class="text-end">
+                  <button class="btn btn-dark rounded-pill px-4" @click="handleSubmitComment">
+                    提問
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 未登入時顯示提示 -->
+            <div v-else class="text-muted fst-italic">請先登入後才能留言。</div>
           </div>
 
           <div v-else-if="activeTab === '常見問題'">
@@ -67,15 +101,45 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import ProjectBanner from '@/components/ProjectBanner.vue'
 import ProjectPlans from '@/components/ProjectPlans.vue'
-import { getProjectOverview, getProjectPlans } from '@/api/project'
+import { createProjectComment, getProjectOverview, getProjectPlans } from '@/api/project'
 
 const route = useRoute()
 const projectId = route.params.id
+const user = ref(JSON.parse(localStorage.getItem('user') || '{}'))
+const isLogin = !!localStorage.getItem('token')
 
 const project = ref(null)
 const plans = ref([])
 const activeTab = ref('提案內容')
 const tabs = ['提案內容', '問與答', '常見問題', '進度分享']
+
+//留言內容
+const commentContent = ref('')
+const commentSuccess = ref(false)
+const commentError = ref('')
+//提交留言
+const handleSubmitComment = async () => {
+  if (!commentContent.value.trim()) {
+    commentError.value = '留言內容不能為空'
+    return
+  }
+
+  const token = localStorage.getItem('token')
+  if (!token) {
+    commentError.value = '請先登入後再留言'
+    return
+  }
+
+  try {
+    await createProjectComment(projectId, commentContent.value, token)
+    commentSuccess.value = true
+    commentContent.value = ''
+    commentError.value = ''
+  } catch (err) {
+    commentError.value = '留言失敗，請稍後再試'
+    console.error(err)
+  }
+}
 
 onMounted(async () => {
   const projectId = parseInt(route.params.id)
@@ -87,7 +151,7 @@ onMounted(async () => {
 
     const resPlans = await getProjectPlans(projectId)
     plans.value = resPlans.data.data
-    console.log('✅ plans:', plans.value)
+    console.log(' plans:', plans.value)
   } catch (err) {
     console.error('讀取專案資料失敗', err)
   }
@@ -128,5 +192,8 @@ onMounted(async () => {
   height: 3px;
   background-color: #e74c3c;
   border-radius: 6px;
+}
+.comment-box {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 </style>
