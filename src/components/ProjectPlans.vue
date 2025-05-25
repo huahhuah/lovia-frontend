@@ -4,29 +4,33 @@
       v-for="plan in plans"
       :key="plan.plan_id"
       :plan="plan"
+      :projectId="numericProjectId"
       :projectType="projectType"
-      @sponsor="handleSponsor"
     />
   </div>
 </template>
 
 <script setup>
-import PlanCard from '../components/PlanCard.vue'
+import PlanCard from '@/components/PlanCard.vue'
 
 const props = defineProps({
   plans: {
     type: Array,
     required: true,
   },
+  projectId: {
+    type: [String, Number],
+    required: true,
+  },
   projectType: {
     type: String,
-    required: true, // 由父層傳入 "募資中" / "歷年專案" / ...
+    required: true,
   },
 })
 
-const emit = defineEmits(['sponsor'])
-
-function handleSponsor(planId) {
-  emit('sponsor', planId)
+// ✅ 確保 projectId 是有效數字
+const numericProjectId = Number(props.projectId)
+if (!numericProjectId || isNaN(numericProjectId)) {
+  console.error('❌ ProjectPlans 傳入的 projectId 無效:', props.projectId)
 }
 </script>

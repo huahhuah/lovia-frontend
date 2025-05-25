@@ -71,6 +71,7 @@ const router = createRouter({
       props: true,
     },
     {
+<<<<<<< Updated upstream
         path: '/projects/:projectId/progress',
         name: 'ProgressFormCreate',
         component: () => import('@/views/projects/ProgressForm.vue'),
@@ -83,6 +84,24 @@ const router = createRouter({
         component: () => import('@/views/projects/ProgressForm.vue'),
         props: true,
         meta: {requiresAuth: true}
+=======
+      // 贊助專案確認
+      path: '/checkout',
+      name: 'SponsorshipConfirm',
+      component: () => import('@/views/projects/SponsorshipConfirm.vue'),
+    },
+    {
+      //訂單填寫資料
+      path: '/checkout/order',
+      name: 'Checkout',
+      component: () => import('@/views/projects/OrderSponsorEntry.vue'),
+    },
+    {
+      //確認訂單資料
+      path: '/checkout/confirm',
+      name: 'OrderConfirm',
+      component: () => import('@/views/projects/OrderConfirm.vue'),
+>>>>>>> Stashed changes
     },
     {
       path: '/user',

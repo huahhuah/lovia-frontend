@@ -174,7 +174,10 @@ async function handleLogin() {
     if (!user || typeof user !== 'object' || !user.username) throw new Error('回傳 user 格式錯誤')
 
     userStore.setToken(token)
-    userStore.setUser(user)
+    userStore.setUser({
+      ...user,
+      account: form.email,
+    })
 
     showModal('登入成功', 'success')
 
