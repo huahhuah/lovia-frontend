@@ -47,38 +47,45 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import defaultImg from '@/assets/images/default.png'
 
+const router = useRouter()
+
 const props = defineProps({
-  plan: {
-    type: Object,
-    required: true,
-  },
-  projectType: {
-    type: String,
-    required: true,
-  },
+  plan: Object,
+  projectId: [String, Number],
+  projectType: String,
 })
 
-const emit = defineEmits(['sponsor'])
-
-function handleSponsor() {
-  emit('sponsor', props.plan.plan_id)
-}
-
-// fallback 圖片處理
 const imgSrc = ref(defaultImg)
 
 onMounted(() => {
   const testImg = new Image()
   testImg.src = props.plan.feedback_img
-  testImg.onload = () => {
-    imgSrc.value = props.plan.feedback_img
-  }
-  testImg.onerror = () => {
-    imgSrc.value = defaultImg
-  }
+  testImg.onload = () => (imgSrc.value = props.plan.feedback_img)
+  testImg.onerror = () => (imgSrc.value = defaultImg)
 })
+
+function handleSponsor() {
+  const numericProjectId = Number(props.projectId)
+  const planId = Number(props.plan.plan_id)
+
+  if (isNaN(numericProjectId) || isNaN(planId)) {
+    console.error('❌ 無效參數', { projectId: props.projectId, planId })
+    return
+  }
+
+  console.log('🧭 導頁參數：', { projectId: numericProjectId, planId })
+
+  router.push({
+    name: 'SponsorshipConfirm',
+    query: {
+      projectId: numericProjectId,
+      planId,
+    },
+  })
+}
 </script>
 
 <style scoped>
