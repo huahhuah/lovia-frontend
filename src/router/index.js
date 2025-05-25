@@ -71,6 +71,13 @@ const router = createRouter({
       props: true,
     },
     {
+        path: '/projects/:id/progress',
+        name: 'ProgressForm',
+        component: () => import('@/views/projects/ProgressForm.vue'),
+        props: true,
+        meta: { requiresAuth: false } 
+    },
+    {
       path: '/user',
       component: () => import('@/layouts/UserLayout.vue'),
       meta: { requiresAuth: true },
