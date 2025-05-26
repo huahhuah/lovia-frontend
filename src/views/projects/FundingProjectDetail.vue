@@ -106,12 +106,16 @@ const tabs = ['提案內容', '問與答', '常見問題', '進度分享']
 //滾動到贊助區塊
 const sponsorSection = ref(null)
 function scrollToSponsorSection() {
-  const offset = 100 // 根據你的 header 高度可調整
-  const el = sponsorSection.value
-  if (el) {
-    const top = el.getBoundingClientRect().top + window.scrollY - offset
-    window.scrollTo({ top, behavior: 'smooth' })
-  }
+  setTimeout(() => {
+    const offset = 100
+    const el = sponsorSection.value
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - offset
+      window.scrollTo({ top, behavior: 'smooth' })
+    } else {
+      console.warn('找不到 sponsorSection')
+    }
+  }, 300)
 }
 
 const handleSubmitComment = async () => {

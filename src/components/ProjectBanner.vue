@@ -98,7 +98,10 @@
           <img :src="favoriteIcon" alt="收藏" style="width: 24px; height: 24px" />
         </button>
 
-        <button class="btn btn-danger rounded-pill flex-grow-1 py-2 fw-bold shadow-sm">
+        <button
+          class="btn btn-danger rounded-pill flex-grow-1 py-2 fw-bold shadow-sm"
+          @click="emit('scrollToSponsor')"
+        >
           立即贊助
         </button>
       </div>
@@ -108,6 +111,8 @@
 
 <script setup>
 import { ref, computed, watchEffect } from 'vue'
+
+const emit = defineEmits(['scrollToSponsor'])
 
 const props = defineProps({
   project: Object,
