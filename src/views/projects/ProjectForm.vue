@@ -71,12 +71,12 @@
                 <label class="form-label mb-2" style="color: #5F6368; font-weight: 400;">
                   專案封面<span class="text-danger">*</span>
                 </label>
-                <div 
+                <div
                   class="upload-box bg-light w-100 d-flex align-items-center justify-content-center"
                   :class="{ 'drag-over': isDragging}"
                   @dragover.prevent="onDragOver"
                   @dragleave.prevent="isDragging = false"
-                  @drop.prevent="onDrop"  
+                  @drop.prevent="onDrop"
                 >
                   <div class="inner-box position-relative">
                   <img
@@ -205,7 +205,7 @@ import { useRouter } from 'vue-router'
 import { createProject } from '@/api/project'
 import axios from 'axios'
 
-const router = useRouter()  
+const router = useRouter()
 const imageFile = ref(null)  //  原始檔
 const imagePreview = ref(null)  // 預覽用
 const isUpload = ref(false)  // 上傳狀態
@@ -254,7 +254,7 @@ async function uploadFile(file){
     isUpload.value = true;
     const formData = new FormData();
     formData.append('file',file);
-    
+
     const res = await axios.post('https://lovia-backend-xl4e.onrender.com/api/v1/uploads/image', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -340,7 +340,12 @@ async function submitForm() {
       return
     }
 
-    const res = await createProject(form, token)
+    const payload = {
+      ...form,
+      faq: formFaqs.value,  // 把 faq 字串改成陣列送出去，後端才能收到多筆 FAQ
+    }
+
+    const res = await createProject(payload, token)
     const newProjectId = res.data.data?.project_id
 
     if (!newProjectId) {
@@ -516,7 +521,7 @@ button.btn-danger.rounded-pill {
     width: 16px;
     height: auto;
   }
-  
+
   /* 1. 縮短上方背景圖高度 */
   img[src="/proposal-bg2.png"] {
     height: 50vh !important;
