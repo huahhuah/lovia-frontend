@@ -1,7 +1,10 @@
 <template>
   <div class="container py-5" v-if="project">
     <!-- 上方 Banner -->
-    <ProjectBanner :project="project" />
+    <ProjectBanner :project="project" @scrollToSponsor="scrollToSponsorSection" />
+
+    <!-- 滾動目標: 放在 row -->
+    <div ref="sponsorSection"></div>
 
     <!-- 分頁切換區塊 -->
     <div class="row mt-5">
@@ -100,6 +103,17 @@ const commentContent = ref('')
 const activeTab = ref('提案內容')
 const tabs = ['提案內容', '問與答', '常見問題', '進度分享']
 
+//滾動到贊助區塊
+const sponsorSection = ref(null)
+function scrollToSponsorSection() {
+  const offset = 100 // 根據你的 header 高度可調整
+  const el = sponsorSection.value
+  if (el) {
+    const top = el.getBoundingClientRect().top + window.scrollY - offset
+    window.scrollTo({ top, behavior: 'smooth' })
+  }
+}
+
 const handleSubmitComment = async () => {
   if (!commentContent.value.trim()) return
   try {
@@ -119,11 +133,9 @@ onMounted(async () => {
   try {
     const resOverview = await getProjectOverview(projectId)
     project.value = resOverview.data.data
-    console.log('📦 專案資料:', project.value)
 
     const resPlans = await getProjectPlans(projectId)
     plans.value = resPlans.data.data || []
-    console.log(' 回饋方案:', plans.value)
   } catch (err) {
     console.error(' 讀取專案資料失敗', err)
   }
