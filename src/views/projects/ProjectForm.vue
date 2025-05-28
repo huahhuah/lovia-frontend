@@ -7,7 +7,9 @@
     <div class="proposal-header text-white">
       <img src="/proposal-deco.png" class="position-absolute deco-icon" style="top: 60px; left: 120px; width: 280px;" />
       <div class="container py-2 d-flex flex-column align-items-start text-start" style="padding-top: 6rem !important; max-width: 900px; margin: 0 auto;">
-        <h1 style="font-size: 2em; margin-top: 5rem; margin-bottom: 0.5rem; color: black;">發起提案</h1>
+        <h1 style="font-size: 2em; margin-top: 5rem; margin-bottom: 0.5rem; color: black;">
+          {{isEdit ? '編輯提案' : '發起提案'}}
+        </h1>
         <p style="font-size: 1rem; color: black;">讓改變，從這裡開始</p>
       </div>
     </div>
@@ -62,7 +64,9 @@
                 <!-- 團隊介紹 -->
                 <div class="mb-3">
                   <label class="form-label">團隊介紹</label>
-                  <textarea class="form-control bg-light rounded" placeholder="請介紹團隊成員與專業背景，讓支持者更安心地了解您們如何實現這項計畫。"></textarea>
+                  <textarea 
+                    v-model = "form.project_team"
+                    class="form-control bg-light rounded" placeholder="請介紹團隊成員與專業背景，讓支持者更安心地了解您們如何實現這項計畫。"></textarea>
                 </div>
               </div>
 
@@ -156,9 +160,30 @@
                 <div class="d-flex align-items-center gap-2">
                   <img src="/vector.png" width="16" />
                   <img src="/layers.png" width="16" />
+                  <input
+                    v-if = "faq.isEditing"
+                    v-model = "fag.question"
+                    type = "text"
+                    class = "form-control bg-light" 
+                    placeholder="請輸入問題" 
+                  />
                   <span style="font-weight: 300; color: #000000;">{{ faq.question }}</span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
+                  <img 
+                    src="/edit.png" 
+                    width="16" 
+                    alt="edit" 
+                    style="cursor: pointer;" 
+                    @click="faq.isEditing = !faq.isEditing"
+                  />
+                  <img 
+                    src="/delete.png" 
+                    width="16" 
+                    alt="delete" 
+                    style="cursor: pointer;" 
+                    @click="formFaqs.splice(index, 1)"
+                  />
                   <img src="/edit.png" width="16" alt="edit" style="cursor: pointer;" />
                   <img src="/delete.png" width="16" alt="delete" style="cursor: pointer;" @click="formFaqs.splice(index, 1)" />
                 </div>
@@ -201,16 +226,19 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { createProject } from '@/api/project'
+import { useRouter, useRoute } from 'vue-router'
+import { createProject, updateProject } from '@/api/project'
 import axios from 'axios'
 
 const router = useRouter()
+const route = useRoute()
 const imageFile = ref(null)  //  原始檔
 const imagePreview = ref(null)  // 預覽用
 const isUpload = ref(false)  // 上傳狀態
 const isDragging = ref(false)  //  增加拖曳狀態
 const fileInput = ref(null)
+const projectId = route.params.project_id
+const isEdit = ref(route.name === 'ProjectFormEdit')
 
 function triggerFileInput(){
   fileInput.value?.click()
@@ -272,12 +300,6 @@ async function uploadFile(file){
 
 const questionPlaceholder = ref('請輸入支持者可能會提出的問題，例如：捐款是否可抵稅？')
 
-onMounted(() => {
-  if (window.innerWidth <= 767.98) {
-    questionPlaceholder.value = '請輸入支持者可能會提出的問題'
-  }
-})
-
 const categories = [
   { id: 1, name: '人文' },
   { id: 2, name: '環境' },
@@ -332,6 +354,41 @@ function addFaq() {
   }
 }
 
+async function loadProjectData(id) {
+  try {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      alert('未登入或 token 遺失')
+      router.push('/login')
+      return
+    }
+    const res = await axios.get(`https://lovia-backend-xl4e.onrender.com/api/v1/projects/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    const project = res.data.data
+    form.title = project.title
+    form.category_id = project.category?.id || null
+    form.total_amount = project.total_amount
+    form.start_time = project.start_time
+    form.end_time = project.end_time
+    form.cover = project.cover
+    form.summary = project.summary
+    form.full_content = project.full_content
+    form.project_team = project.project_team
+    // FAQ 預設處理
+    formFaqs.value = Array.isArray(project.faq) ? project.faq.map(faq => ({
+      question: faq.question || '',
+      answer: faq.answer || ''
+    })) : [];
+    // 封面圖片預覽
+    imagePreview.value = project.cover
+    console.log('form:', form) //這裡
+  } catch (error) {
+    console.error('專案載入失敗', error)
+    alert ('專案載入失敗，請稍後再試')
+  }
+}
+
 async function submitForm() {
   try {
     const token = localStorage.getItem('token')
@@ -340,26 +397,68 @@ async function submitForm() {
       return
     }
 
+    if (!form.title ||
+       !form.category_id ||
+       !form.total_amount ||
+       !form.start_time ||
+       !form.end_time ||
+       !form.cover ||
+       !form.summary ||
+       !form.full_content ||
+       !form.project_team){
+        alert ('請確認所有必填欄位已完成')
+        return
+       }
+
     const payload = {
-      ...form,
+      title: form.title,
+      summary: form.summary,
+      category_id: form.category_id,
+      total_amount: form.total_amount,
+      start_time: form.start_time,
+      end_time: form.end_time,
+      cover: form.cover,
+      full_content: form.full_content,
+      project_team: form.project_team,
       faq: formFaqs.value,  // 把 faq 字串改成陣列送出去，後端才能收到多筆 FAQ
     }
-
-    const res = await createProject(payload, token)
-    const newProjectId = res.data.data?.project_id
-
-    if (!newProjectId) {
-      alert('建立成功但未取得專案 ID')
-      return
+    let newProjectId = null
+    if (isEdit.value && projectId){
+      // put 更新
+      await updateProject(projectId, payload, token)
+      alert('專案更新成功，請更新回饋方案')
+      router.push({
+       path: `/projects/${projectId}/plans`,
+       query: { isEdit: true },
+      })
+    } else {
+      const res = await createProject(payload, token)
+      const newProjectId = res.data.data?.project_id
+      if (!newProjectId) {
+        alert('建立成功但未取得專案 ID')
+        return
+      }
+      alert('專案建立成功，請繼續填寫回饋方案')
+      router.push(`/projects/${newProjectId}/plans`)
     }
-
-    alert('專案建立成功，請繼續填寫回饋方案')
-    router.push(`/projects/${newProjectId}/plans`)
   } catch (err) {
     console.error('建立專案失敗', err)
     alert('建立專案失敗，請確認欄位是否填寫完整')
   }
 }
+
+onMounted(async () => {
+  console.log('onMounted -> projectId:', projectId)
+  console.log('onMounted -> isEdit:', isEdit.value)
+  if (projectId && isEdit.value) {
+    await loadProjectData(projectId)
+  }
+
+  if (window.innerWidth <= 767.98) {
+    questionPlaceholder.value = '請輸入支持者可能會提出的問題'
+  }
+})
+
 </script>
 
 <style scoped>

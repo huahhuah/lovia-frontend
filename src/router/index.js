@@ -35,10 +35,10 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/projects/:id/plans', // 放在 projects/:id/plans
+      path: '/projects/:project_id/plans', 
       name: 'ProjectPlan',
       component: () => import('@/views/projects/ProjectPlan.vue'),
-      props: (route) => ({ id: route.params.id }),
+      props: (route) => ({ project_id: route.params.project_id }),
       meta: { requiresAuth: true },
     },
     {
@@ -83,6 +83,13 @@ const router = createRouter({
       component: () => import('@/views/projects/ProgressForm.vue'),
       props: true,
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/projects/:project_id/edit',
+      name: 'ProjectFormEdit',
+      component: () => import('@/views/projects/ProjectForm.vue'),
+      props: true,
+      meta: { requiresAuth: true},
     },
     {
       // 贊助專案確認

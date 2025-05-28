@@ -1,12 +1,14 @@
 <template>
   <div class="container py-5">
-    <h2 class="mb-4">新增回饋方案 - {{ projectData.title }}</h2>
+    <h2 class="mb-4">
+      {{ isEdit ? '編輯回饋方案' : '新增回饋方案'}} - {{ projectData.title }}
+    </h2>
 
     <form @submit.prevent="submitPlans">
       <!-- 方案區塊 -->
       <div
         v-for="(plan, index) in form.plans"
-        :key="index"
+        :key="plan.id || index"
         class="border rounded p-4 mb-4 bg-light"
       >
         <h5>回饋方案 {{ index + 1 }}</h5>
@@ -89,16 +91,18 @@
 
       <!-- 送出按鈕 -->
       <div class="text-center">
-        <button type="submit" class="btn btn-danger px-5 py-2">送出回饋方案</button>
+        <button type="submit" class="btn btn-danger px-5 py-2">
+          {{ isEdit ? '更新回饋方案' : '送出回饋方案'}}
+        </button>
       </div>
     </form>
   </div>
 </template>
 
 <script>
-import { reactive, onMounted } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getProjectById, createProjectPlan } from '@/api/project'
+import { getProjectById, createProjectPlan, getProjectPlans, updateProjectPlan } from '@/api/project'
 
 export default {
   name: 'ProjectPlan',
@@ -106,26 +110,44 @@ export default {
     const route = useRoute()
     const router = useRouter()
 
+    const project_id = route.params.project_id || ''
+    const isEdit = route.query.isEdit === 'true'
+    const token = localStorage.getItem('token')
+
     const form = reactive({
-      project_id: route.params.id || '',
-      plans: [],
+      project_id, plans: [],
     })
 
     const projectData = reactive({
       title: '',
     })
 
+    const isSubmitting = ref(false)
+
     // 初始化取得專案資訊
     onMounted(async () => {
       try {
-        const token = localStorage.getItem('token')
         const res = await getProjectById(form.project_id, token)
-        projectData.title = res.data.title
-      } catch (err) {
+        projectData.title = res.data.data.title
+      if (isEdit) {
+        const planRes = await getProjectPlans(form.project_id, token)
+        form.plans = planRes.data.data.map(plan => ({
+          id: plan.plan_id,
+          plan_name: plan.plan_name,
+          amount: plan.amount,
+          quantity: plan.quantity,
+          feedback: plan.feedback,
+          feedback_img: plan.feedback_img,
+          delivery_date: plan.delivery_date
+        }))
+      } else {
+        form.plans = []
+      }
+    } catch (err) {
         console.error('獲取專案資料失敗', err)
         alert('無法獲取專案資料')
-      }
-    })
+    }
+  })
 
     // 新增一筆方案
     const addPlan = () => {
@@ -146,13 +168,12 @@ export default {
 
     // 提交所有方案
     const submitPlans = async () => {
-      try {
-        const token = localStorage.getItem('token')
-        if (!token) {
-          alert('未登入或 token 遺失')
-          return
-        }
-
+      if (!token) {
+        alert('未登入或 token 遺失')
+        return
+      }
+      isSubmitting.value = true
+      try{
         for (const [i, plan] of form.plans.entries()) {
           if (
             !plan.plan_name ||
@@ -160,20 +181,40 @@ export default {
             !plan.quantity ||
             !plan.feedback ||
             !plan.feedback_img ||
-            !plan.delivery_date
+            !plan.delivery_date ||
+            plan.amount <= 0
           ) {
             alert(`第 ${i + 1} 筆回饋方案未填寫完整`)
+            isSubmitting.value = false
             return
           }
         }
 
-        await Promise.all(form.plans.map((plan) => createProjectPlan(form.project_id, plan, token)))
+        await Promise.all(
+          form.plans.map((plan) => {
+            const planPayload = {
+              plan_name: plan.plan_name,
+              amount: plan.amount,
+              quantity: plan.quantity,
+              feedback: plan.feedback,
+              feedback_img: plan.feedback_img,
+              delivery_date: plan.delivery_date,
+            }
+            if (plan.id){
+              return updateProjectPlan(form.project_id, plan.id, planPayload, token)
+            } else {
+              return createProjectPlan(form.project_id, planPayload, token)
+            }
+          })
+        )
 
         alert('回饋方案提交成功！')
         router.push(`/projects/${form.project_id}`)
       } catch (err) {
         console.error('回饋方案提交失敗', err)
         alert('回饋方案提交失敗')
+      } finally {
+        isSubmitting.value = false
       }
     }
 
@@ -183,6 +224,8 @@ export default {
       removePlan,
       submitPlans,
       projectData,
+      isSubmitting,
+      isEdit,
     }
   },
 }
