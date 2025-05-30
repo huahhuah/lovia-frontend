@@ -131,3 +131,13 @@ export const updateProjectPlan = (projectId, planId, data, token) => {
 export async function getProjectCommets (projectId){
   return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/comments`)
 }
+
+// 取得專案FAQ
+export async function getProjectFaqs (projectId){
+  return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/faq`)
+}
+
+// 取得專案進度
+export async function getProjectProgresses (projectId){
+  return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/progresses`)
+}
