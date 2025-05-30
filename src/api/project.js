@@ -126,3 +126,8 @@ export const updateProjectPlan = (projectId, planId, data, token) => {
     }
   })
 }
+
+// 取得專案留言
+export async function getProjectCommets (projectId){
+  return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/comments`)
+}

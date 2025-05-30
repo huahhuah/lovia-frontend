@@ -54,6 +54,15 @@
               </div>
             </div>
             <div v-else class="text-muted fst-italic">請先登入後才能留言。</div>
+            <!--留言處-->
+            <div class="comments-list mt-4">
+              <div v-if="comments.length === 0" class="text-muted">尚無留言</div>
+              <div v-for="comment in comments" :key="comment.id" class="comment-item mb-3">
+                <strong>{{ comment.user.name }}</strong>：<br />
+                <p>{{ comment.content }}</p>
+                <small class="text-muted">{{ new Date(comment.created_at).toLocaleString() }}</small>
+              </div>
+            </div>
           </div>
 
           <p v-else-if="activeTab === '常見問題'" class="text-muted">尚未提供 常見問題 資料。</p>
@@ -90,7 +99,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import ProjectBanner from '@/components/ProjectBanner.vue'
 import ProjectPlans from '@/components/ProjectPlans.vue'
-import { createProjectComment, getProjectOverview, getProjectPlans } from '@/api/project'
+import { createProjectComment, getProjectOverview, getProjectPlans, getProjectCommets } from '@/api/project'
 
 const route = useRoute()
 const projectId = parseInt(route.params.id)
@@ -128,6 +137,17 @@ const handleSubmitComment = async () => {
   }
 }
 
+// 取得專案留言
+const comments = ref([])
+async function existingComments(){
+  try{
+    const res = await getProjectCommets(projectId)
+    comments.value = res.data.data || []
+  } catch (err){
+    console.log('取得留言失敗', err)
+  }
+}
+
 onMounted(async () => {
   if (isNaN(projectId)) {
     console.error('無效的 route.params.id:', route.params.id)
@@ -140,6 +160,7 @@ onMounted(async () => {
 
     const resPlans = await getProjectPlans(projectId)
     plans.value = resPlans.data.data || []
+    await existingComments()
   } catch (err) {
     console.error(' 讀取專案資料失敗', err)
   }
