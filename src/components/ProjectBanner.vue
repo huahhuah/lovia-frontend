@@ -92,7 +92,7 @@
       <div class="d-flex justify-content-between align-items-center gap-2 mt-2">
         <button
           class="border-0 bg-transparent rounded-circle p-2"
-          @click="toggleFavorite"
+          @click="handleToggleFavorite"
           :style="{ backgroundColor: isFavorited ? '#ffe6e9' : '#fff0f2' }"
         >
           <img :src="favoriteIcon" alt="收藏" style="width: 24px; height: 24px" />
@@ -100,7 +100,7 @@
 
         <button
           class="btn btn-danger rounded-pill flex-grow-1 py-2 fw-bold shadow-sm"
-          @click="emit('scrollToSponsor')"
+          @click="$emit('scrollToSponsor')"
         >
           立即贊助
         </button>
@@ -111,8 +111,12 @@
 
 <script setup>
 import { ref, computed, watchEffect } from 'vue'
+import { toggleFavorite as toggleFavoriteAPI } from '@/api/user'
+import { useRoute } from 'vue-router'
 
 const emit = defineEmits(['scrollToSponsor'])
+const route = useRoute()
+const isFavorited = ref(false)
 
 const props = defineProps({
   project: Object,
@@ -122,20 +126,31 @@ const props = defineProps({
 const imgSrc = ref('')
 watchEffect(() => {
   imgSrc.value = props.project?.cover || '/images/default.jpg'
+  isFavorited.value = !!props.project?.follow
 })
 function onImageError(e) {
   e.target.src = '/images/default.jpg'
 }
 
 // 收藏邏輯
-const isFavorited = ref(false)
+const projectId = parseInt(route.params.id)
 const favoriteIcon = computed(() =>
   isFavorited.value
     ? new URL('@/assets/icons/heart-clicked.svg', import.meta.url).href
     : new URL('@/assets/icons/heart-default.svg', import.meta.url).href
 )
-function toggleFavorite() {
-  isFavorited.value = !isFavorited.value
+async function handleToggleFavorite() {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    return alert('登入後才能收藏')
+  }
+  try {
+    const res = await toggleFavoriteAPI(projectId, token)
+    alert(res.data.message)
+    isFavorited.value = res.data.follow
+  } catch (err) {
+    console.error ('收藏失敗', err)
+  }
 }
 
 // 倒數天數
