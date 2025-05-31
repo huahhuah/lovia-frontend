@@ -15,20 +15,40 @@
       </div>
 
       <!-- 控制箭頭 -->
-      <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#heroCarousel"
+        data-bs-slide="prev"
+      >
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Previous</span>
       </button>
-      <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#heroCarousel"
+        data-bs-slide="next"
+      >
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Next</span>
       </button>
 
       <!-- Overlay -->
-      <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-start">
+      <div
+        class="hero-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-start"
+      >
         <div class="hero-stack position-relative">
-          <img src="/homepageS1-Frame 489.png" alt="背景底圖" class="img-fluid hero-subheadline position-absolute" />
-          <img src="/homepageS1-headline.png" alt="匯聚希望，改變世界" class="img-fluid hero-headline position-relative" />
+          <img
+            src="/homepageS1-Frame 489.png"
+            alt="背景底圖"
+            class="img-fluid hero-subheadline position-absolute"
+          />
+          <img
+            src="/homepageS1-headline.png"
+            alt="匯聚希望，改變世界"
+            class="img-fluid hero-headline position-relative"
+          />
         </div>
         <button class="btn custom-cta rounded-pill px-4 py-2 mt-3">立刻行動 >></button>
       </div>
@@ -62,7 +82,7 @@ onMounted(() => {
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
 
 .homepage-bg {
-  background-image: linear-gradient(to right, #FFEDF2, #FFF6E3);
+  background-image: linear-gradient(to right, #ffedf2, #fff6e3);
   min-height: 100vh;
   font-family: 'Noto Sans', sans-serif;
   position: relative;
@@ -107,8 +127,8 @@ onMounted(() => {
 }
 
 .custom-cta {
-  background-color: #FC5B53;
-  color: #FAFAFA;
+  background-color: #fc5b53;
+  color: #fafafa;
   border: none;
   margin-left: 3vw;
 }
@@ -132,17 +152,17 @@ onMounted(() => {
   }
 
   .hero-overlay {
-  padding-left: 8vw;
-  padding-right: 8vw;
-  padding-top: 45vh;
-  padding-bottom: 5vh;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
+    padding-left: 8vw;
+    padding-right: 8vw;
+    padding-top: 45vh;
+    padding-bottom: 5vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
 
-  /* 加這行可以調整靠左 / 置中 / 靠右 */
-  align-items: center; /* 改為 center = 置中 */
+    /* 加這行可以調整靠左 / 置中 / 靠右 */
+    align-items: center; /* 改為 center = 置中 */
   }
 
   .hero-stack {
@@ -157,18 +177,17 @@ onMounted(() => {
   }
 
   .custom-cta {
-   background-color: #FC5B53;
-   color: #FAFAFA;
-   border: none;
-   margin-left: 0;
-   display: block;
-   text-align: center;
-   margin: 0 auto;
+    background-color: #fc5b53;
+    color: #fafafa;
+    border: none;
+    margin-left: 0;
+    display: block;
+    text-align: center;
+    margin: 0 auto;
   }
 
   .hero-illustration {
     display: none;
   }
 }
-
 </style>

@@ -2,7 +2,8 @@
 import axios from 'axios'
 
 //base_url
-const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
+//const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
+const BASE_URL = 'http://127.0.0.1:8080'
 
 // 新增專案
 export const createProject = (data, token) => {
@@ -112,22 +113,48 @@ export async function createSponsorship(projectId, planId, payload, token) {
 // 更新專案資料
 export const updateProject = (projectId, data, token) => {
   return axios.put(`${BASE_URL}/api/v1/projects/${projectId}`, data, {
-    headers:{
+    headers: {
       Authorization: `Bearer ${token}`,
-    }
+    },
   })
 }
 
 // 更新專案方案資料
 export const updateProjectPlan = (projectId, planId, data, token) => {
   return axios.put(`${BASE_URL}/api/v1/projects/${projectId}/plans/${planId}`, data, {
-    headers:{
+    headers: {
       Authorization: `Bearer ${token}`,
-    }
+    },
   })
 }
 
 // 取得專案留言
-export async function getProjectCommets (projectId){
+export async function getProjectCommets(projectId) {
   return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/comments`)
+}
+
+// 建立付款連結
+export async function createOrderPaymentLink(orderId, paymentType = 'credit', token) {
+  return axios.post(
+    `${BASE_URL}/api/v1/users/orders/${orderId}/payment`,
+    { payment_type: paymentType },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+}
+
+export async function createOrderPaymentForm(orderId, amount, email, token) {
+  return axios.post(
+    `${BASE_URL}/api/v1/users/ecpay/orders/${orderId}`, // ✅ 修正這一行
+    { amount, email },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      responseType: 'document', // 🔄 綠界回傳的是 HTML form
+    }
+  )
 }
