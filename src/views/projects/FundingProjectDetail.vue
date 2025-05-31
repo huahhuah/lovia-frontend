@@ -65,8 +65,47 @@
             </div>
           </div>
 
-          <p v-else-if="activeTab === '常見問題'" class="text-muted">尚未提供 常見問題 資料。</p>
-          <p v-else-if="activeTab === '進度分享'" class="text-muted">尚未發布任何更新內容。</p>
+          <div v-else-if="activeTab === '常見問題'">
+            <!--FAQ有資料的處理方式-->
+            <div v-if="faqs.length > 0">
+              <div v-for="(faq, index) in faqs" :key="index" class="mb-3">
+                <strong> Q: {{ faq.question }}</strong>
+                <p> A: {{ faq.answer }}</p>
+              </div>
+            </div>
+            <p v-else class="text-muted">尚未提供 常見問題 資料。</p>
+          </div>
+          <div v-else-if="activeTab === '進度分享'">
+            <!--進度有資料的處理方式-->
+            <div v-if="progresses.length >0">
+              <div v-for="(progress, index) in progresses" :key="index" class="mb-3">
+                <strong> 標題： {{progress.title}}</strong>
+                <p> 發布日期： {{progress.date}}<br/>  {{progress.content}}</p>
+                <!--資金用途表格-->
+                <div v-if="progress.fund_usages && progress.fund_usages.length >0 " class="table-responsive">
+                  <table class="table table-bordered text-center align-middle">
+                    <thead>
+                      <tr>
+                        <th scope="col">匯款對象</th>
+                        <th scope="col">資金用途</th>
+                        <th scope="col">金額</th>
+                        <th scope="col">狀態</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(usage, uIndex) in progress.fund_usages" :key="uIndex">
+                        <td>{{ usage.recipient }}</td>
+                        <td>{{ usage.usage }}</td>
+                        <td>{{ usage.amount.toLocaleString() }}</td>
+                        <td>{{ usage.status }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div> 
+          <p v-else class="text-muted">尚未發布任何更新內容。</p>
         </div>
       </div>
 
@@ -99,7 +138,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import ProjectBanner from '@/components/ProjectBanner.vue'
 import ProjectPlans from '@/components/ProjectPlans.vue'
-import { createProjectComment, getProjectOverview, getProjectPlans, getProjectCommets } from '@/api/project'
+import { createProjectComment, getProjectOverview, getProjectPlans, getProjectCommets, getProjectFaqs, getProjectProgresses } from '@/api/project'
 
 const route = useRoute()
 const projectId = parseInt(route.params.id)
@@ -148,6 +187,28 @@ async function existingComments(){
   }
 }
 
+// 取得FAQ
+const faqs = ref([])
+async function allFaqs(){
+  try {
+    const res = await getProjectFaqs(projectId)
+    faqs.value = res.data?.data || []
+  } catch (err){
+    console.log('取得FAQ失敗', err)
+  }
+}
+
+// 取得進度
+const progresses = ref([])
+async function allProgresses(){
+  try{
+    const res = await getProjectProgresses(projectId)
+    progresses.value = res.data?.data || []
+  } catch (err){
+    console.log('無法取得進度', err)
+  }
+}
+
 onMounted(async () => {
   if (isNaN(projectId)) {
     console.error('無效的 route.params.id:', route.params.id)
@@ -161,6 +222,8 @@ onMounted(async () => {
     const resPlans = await getProjectPlans(projectId)
     plans.value = resPlans.data.data || []
     await existingComments()
+    await allFaqs()
+    await allProgresses()
   } catch (err) {
     console.error(' 讀取專案資料失敗', err)
   }
