@@ -444,7 +444,7 @@ async function submitOrder() {
     localStorage.setItem(
       'checkoutOrderData',
       JSON.stringify({
-        orderId: res.data.order_uuid,
+        order_uuid: res.data.order_uuid,
         amount: amount,
         name: form.value.name,
         email: form.value.account,

@@ -112,32 +112,54 @@ export async function createSponsorship(projectId, planId, payload, token) {
 // 更新專案資料
 export const updateProject = (projectId, data, token) => {
   return axios.put(`${BASE_URL}/api/v1/projects/${projectId}`, data, {
-    headers:{
+    headers: {
       Authorization: `Bearer ${token}`,
-    }
+    },
   })
 }
 
 // 更新專案方案資料
 export const updateProjectPlan = (projectId, planId, data, token) => {
   return axios.put(`${BASE_URL}/api/v1/projects/${projectId}/plans/${planId}`, data, {
-    headers:{
+    headers: {
       Authorization: `Bearer ${token}`,
-    }
+    },
   })
 }
 
 // 取得專案留言
-export async function getProjectCommets (projectId){
+export async function getProjectCommets(projectId) {
   return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/comments`)
 }
 
 // 取得專案FAQ
-export async function getProjectFaqs (projectId){
+export async function getProjectFaqs(projectId) {
   return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/faq`)
 }
 
 // 取得專案進度
-export async function getProjectProgresses (projectId){
+export async function getProjectProgresses(projectId) {
   return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/progresses`)
+}
+
+// 建立付款連結
+export async function createOrderPaymentLink(orderId, paymentType = 'credit', token) {
+  return axios.post(
+    `${BASE_URL}/api/v1/users/orders/${orderId}/payment`,
+    { payment_type: paymentType },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+}
+
+export async function createOrderPaymentForm(orderId, amount, email, token) {
+  return axios.post(`${BASE_URL}/api/v1/users/ecpay/orders/${orderId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    responseType: 'document',
+  })
 }

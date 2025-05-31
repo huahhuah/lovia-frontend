@@ -2,7 +2,6 @@
 <template>
   <SponsorshipLayout>
     <div class="container py-5">
-      <!-- 顯示 localStorage 儲存的訂單資訊 -->
       <div class="row">
         <!-- 左側內容區 -->
         <div class="col-lg-8">
@@ -11,7 +10,7 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label">訂單編號</label>
-                <input type="text" class="form-control" :value="orderData.orderId" disabled />
+                <input type="text" class="form-control" :value="orderData.order_uuid" disabled />
               </div>
               <div class="col-md-6">
                 <label class="form-label">贊助金額</label>
@@ -51,7 +50,7 @@
             </div>
             <div class="mt-3">
               <label class="form-label">備註</label>
-              <textarea class="form-control" rows="3" v-model="orderData.note" disabled></textarea>
+              <textarea class="form-control" rows="3" :value="orderData.note" disabled></textarea>
             </div>
           </section>
 
@@ -80,7 +79,13 @@
               <span>NT$ {{ orderData.amount }}</span>
             </div>
             <p class="text-muted small mt-3">備註：{{ orderData.note || '無' }}</p>
-            <button class="btn btn-primary w-100 mt-3" @click="goToResult">立即付款</button>
+            <button
+              class="btn btn-primary w-100 mt-3"
+              @click="submitPayment"
+              :disabled="isSubmitting"
+            >
+              {{ isSubmitting ? '正在跳轉中...' : '立即付款' }}
+            </button>
           </div>
         </div>
       </div>
@@ -88,14 +93,15 @@
   </SponsorshipLayout>
 </template>
 
-<script setup></script>
-
 <script setup>
 import SponsorshipLayout from '@/layouts/SponsorshipLayout.vue'
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/auth'
 
 const router = useRouter()
+const userStore = useUserStore()
+const token = userStore.token
 
 const orderData = ref({})
 const sponsorData = ref({
@@ -103,10 +109,8 @@ const sponsorData = ref({
   feedback: '',
 })
 
-// baseAmount：回饋方案的原始金額
 const baseAmount = ref(0)
 
-// 計算額外贊助金額：總金額 - 回饋原始金額
 const extraAmount = computed(() => {
   const total = orderData.value.amount || 0
   return total > baseAmount.value ? total - baseAmount.value : 0
@@ -120,27 +124,71 @@ onMounted(() => {
     return
   }
 
-  const parsed = JSON.parse(raw)
+  let parsed
+  try {
+    parsed = JSON.parse(raw)
+  } catch (err) {
+    alert('訂單資料格式錯誤，請重新操作')
+    router.push('/checkout')
+    return
+  }
 
-  // 套入訂單資料
   orderData.value = parsed
-
-  // 套入專案摘要資料
   sponsorData.value.project_title = parsed.project_title || '未提供'
   sponsorData.value.feedback = parsed.feedback || '未提供'
-
-  // 若 base_amount 有設定就使用，否則 fallback 為總金額
   baseAmount.value = parsed.base_amount || parsed.amount || 0
 })
 
-function goToResult() {
-  // 後續可串接金流邏輯，目前先跳轉完成頁面
-  router.push('/order-result')
+const isSubmitting = ref(false)
+
+async function submitPayment() {
+  isSubmitting.value = true
+  try {
+    const orderId = orderData.value.order_uuid
+    const amount = orderData.value.amount
+    const email = orderData.value.email
+
+    const response = await fetch(
+      `https://lovia-backend-xl4e.onrender.com/api/v1/users/orders/${orderId}/ecpay`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ amount, email }),
+      }
+    )
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`建立付款失敗，HTTP ${response.status}：${errorText}`)
+    }
+
+    const html = await response.text()
+
+    const paymentWindow = window.open('', '_blank')
+    if (!paymentWindow) {
+      alert('無法開啟付款視窗，請確認瀏覽器未封鎖彈出視窗')
+      return
+    }
+
+    paymentWindow.document.open()
+    paymentWindow.document.write(html)
+    paymentWindow.document.close()
+  } catch (err) {
+    console.error('付款建立失敗：', err)
+    alert('付款建立失敗：' + err.message)
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
 <style scoped>
 .card {
   border-radius: 1rem;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
 }
 </style>
