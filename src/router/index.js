@@ -120,11 +120,7 @@ const router = createRouter({
       name: 'OrderConfirm',
       component: () => import('@/views/projects/OrderConfirm.vue'),
     },
-    {
-      path: '/checkout/result',
-      name: 'OrderResult',
-      component: () => import('@/views/projects/OrderResult.vue'),
-    },
+
     {
       path: '/checkout/linepay',
       name: 'LinePayCheckout',
