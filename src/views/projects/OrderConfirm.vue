@@ -80,7 +80,13 @@
               <span>NT$ {{ orderData.amount }}</span>
             </div>
             <p class="text-muted small mt-3">備註：{{ orderData.note || '無' }}</p>
-            <button class="btn btn-primary w-100 mt-3" @click="submitPayment">立即付款</button>
+            <button
+              class="btn btn-primary w-100 mt-3"
+              @click="submitPayment"
+              :disabled="isSubmitting"
+            >
+              {{ isSubmitting ? '處理中...' : '立即付款' }}
+            </button>
           </div>
         </div>
       </div>
@@ -138,8 +144,8 @@ async function submitPayment() {
   isSubmitting.value = true
 
   const token = localStorage.getItem('token')
-  const paymentType = (orderData.value.payment || '').toLowerCase()
 
+  const paymentType = (orderData.value.payment || '').toLowerCase()
   if (!paymentType) {
     alert('找不到付款方式，請回到上一頁重新選擇')
     router.push('/checkout/order')
@@ -147,18 +153,10 @@ async function submitPayment() {
   }
 
   try {
-    const orderId = orderData.value.order_uuid
+    const orderId = orderData.value.order_uuid || orderData.value.orderId
     const amount = orderData.value.amount
     const email = orderData.value.email
-    const productName = sponsorData.value.feedback || 'Loveia 專案贊助'
 
-    // 檢查必要欄位
-    if (!orderId || !amount || !email || !productName) {
-      alert('付款資料不完整，請確認金額、信箱與訂單資訊')
-      return
-    }
-
-    // 組成請求資料
     const requestBody = {
       amount,
       email,
@@ -166,12 +164,12 @@ async function submitPayment() {
 
     if (paymentType === 'line') {
       requestBody.orderId = orderId
-      requestBody.productName = productName
+      requestBody.productName = sponsorData.value.feedback || 'Loveia 專案贊助'
     }
+    console.log('🧾 建立付款 requestBody：', requestBody)
 
-    // 判斷 API URL
-    const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1/users/orders/'
     let url = ''
+    const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1/users/orders/'
 
     if (paymentType === 'line') {
       url = `${baseURL}${orderId}/linepay`
@@ -180,8 +178,6 @@ async function submitPayment() {
     } else {
       url = `${baseURL}${orderId}/ecpay`
     }
-
-    console.log('✅ 建立付款請求：', url, requestBody)
 
     const response = await fetch(url, {
       method: 'POST',
@@ -200,9 +196,13 @@ async function submitPayment() {
     const data = await response.json()
 
     if (paymentType === 'line') {
-      if (!data?.data?.payment_url) throw new Error('付款連結建立失敗')
-      window.open(data.data.payment_url, '_blank')
+      // LINE Pay 使用原頁面跳轉，保留 localStorage 登入狀態
+      if (!data?.data?.payment_url) {
+        throw new Error('付款連結建立失敗')
+      }
+      window.location.href = data.data.payment_url
     } else {
+      // 其他（ATM / ECPay）使用新視窗
       const paymentWindow = window.open('', '_blank')
       if (!paymentWindow) {
         alert('無法開啟付款視窗，請確認瀏覽器未封鎖彈出視窗')
