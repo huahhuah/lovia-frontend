@@ -4,6 +4,7 @@ import axios from 'axios'
 //base_url
 const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
 
+// 新增專案
 export const createProject = (data, token) => {
   return axios.post(`${BASE_URL}/api/v1/projects/create`, data, {
     headers: {
@@ -106,4 +107,37 @@ export async function createSponsorship(projectId, planId, payload, token) {
     }
   )
   return res.data
+}
+
+// 更新專案資料
+export const updateProject = (projectId, data, token) => {
+  return axios.put(`${BASE_URL}/api/v1/projects/${projectId}`, data, {
+    headers:{
+      Authorization: `Bearer ${token}`,
+    }
+  })
+}
+
+// 更新專案方案資料
+export const updateProjectPlan = (projectId, planId, data, token) => {
+  return axios.put(`${BASE_URL}/api/v1/projects/${projectId}/plans/${planId}`, data, {
+    headers:{
+      Authorization: `Bearer ${token}`,
+    }
+  })
+}
+
+// 取得專案留言
+export async function getProjectCommets (projectId){
+  return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/comments`)
+}
+
+// 取得專案FAQ
+export async function getProjectFaqs (projectId){
+  return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/faq`)
+}
+
+// 取得專案進度
+export async function getProjectProgresses (projectId){
+  return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/progresses`)
 }

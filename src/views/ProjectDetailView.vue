@@ -75,6 +75,7 @@ const project = ref(null) // 定義 project 資料
 const progresses = ref([]) 
 
 onMounted(async () => {
+  // 專案資料取得(完整提案、進度)，缺意見、問題
   const id = route.params.id // 從路由參數取得專案 id
   try {
     const res = await getProjectById(id) // 呼叫 API 取得專案資料
