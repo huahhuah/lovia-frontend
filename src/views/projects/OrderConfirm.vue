@@ -120,22 +120,91 @@ onMounted(() => {
     return
   }
 
-  const parsed = JSON.parse(raw)
-
-  // 套入訂單資料
-  orderData.value = parsed
-
-  // 套入專案摘要資料
-  sponsorData.value.project_title = parsed.project_title || '未提供'
-  sponsorData.value.feedback = parsed.feedback || '未提供'
-
-  // 若 base_amount 有設定就使用，否則 fallback 為總金額
-  baseAmount.value = parsed.base_amount || parsed.amount || 0
+  try {
+    const parsed = JSON.parse(raw)
+    orderData.value = parsed
+    sponsorData.value.project_title = parsed.project_title || '未提供'
+    sponsorData.value.feedback = parsed.feedback || '未提供'
+    baseAmount.value = parsed.base_amount || parsed.amount || 0
+  } catch (err) {
+    alert('訂單資料格式錯誤，請重新操作')
+    router.push('/checkout')
+  }
 })
 
-function goToResult() {
-  // 後續可串接金流邏輯，目前先跳轉完成頁面
-  router.push('/order-result')
+const isSubmitting = ref(false)
+
+async function submitPayment() {
+  isSubmitting.value = true
+
+  const paymentType = (orderData.value.payment || '').toLowerCase()
+  if (!paymentType) {
+    alert('找不到付款方式，請回到上一頁重新選擇')
+    router.push('/checkout/order')
+    return
+  }
+
+  try {
+    const orderId = orderData.value.order_uuid
+    const amount = orderData.value.amount
+    const email = orderData.value.email
+
+    const requestBody = {
+      amount,
+      email,
+    }
+
+    if (paymentType === 'line') {
+      requestBody.orderId = orderId
+      requestBody.productName = sponsorData.value.feedback || 'Loveia 專案贊助'
+    }
+
+    let url = ''
+    const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1/users/orders/'
+
+    if (paymentType === 'line') {
+      url = `${baseURL}${orderId}/linepay`
+    } else if (paymentType === 'atm') {
+      url = `${baseURL}${orderId}/newebpay`
+    } else {
+      url = `${baseURL}${orderId}/ecpay`
+    }
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(requestBody),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`建立付款失敗，HTTP ${response.status}：${errorText}`)
+    }
+
+    const data = await response.json()
+
+    if (paymentType === 'line') {
+      if (!data?.data?.payment_url) throw new Error('付款連結建立失敗')
+      window.open(data.data.payment_url, '_blank')
+    } else {
+      const paymentWindow = window.open('', '_blank')
+      if (!paymentWindow) {
+        alert('無法開啟付款視窗，請確認瀏覽器未封鎖彈出視窗')
+        return
+      }
+      paymentWindow.document.open()
+      paymentWindow.document.write(data)
+      paymentWindow.document.close()
+    }
+  } catch (err) {
+    console.error('付款建立失敗：', err)
+    alert('付款建立失敗：' + err.message)
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
