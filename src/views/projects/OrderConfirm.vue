@@ -80,7 +80,7 @@
               <span>NT$ {{ orderData.amount }}</span>
             </div>
             <p class="text-muted small mt-3">備註：{{ orderData.note || '無' }}</p>
-            <button class="btn btn-primary w-100 mt-3" @click="goToResult">立即付款</button>
+            <button class="btn btn-primary w-100 mt-3" @click="submitPayment">立即付款</button>
           </div>
         </div>
       </div>
@@ -136,6 +136,8 @@ const isSubmitting = ref(false)
 
 async function submitPayment() {
   isSubmitting.value = true
+
+  const token = localStorage.getItem('token')
 
   const paymentType = (orderData.value.payment || '').toLowerCase()
   if (!paymentType) {
