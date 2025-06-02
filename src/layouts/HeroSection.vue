@@ -125,6 +125,11 @@ onMounted(() => {
   max-width: 400px;
 }
 
+.carousel-control-prev,
+.carousel-control-next {
+  z-index: 3; /* 蓋過 overlay */
+}
+
 @media (max-width: 768px) {
   .hero-img {
     height: 100vh;

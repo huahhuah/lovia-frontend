@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="d-flex flex-column gap-4 px-3"> <!-- ✅ 加左右 padding -->
     <PlanCard
       v-for="plan in plans"
       :key="plan.plan_id"

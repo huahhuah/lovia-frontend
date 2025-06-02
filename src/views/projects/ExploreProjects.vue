@@ -296,12 +296,9 @@ onMounted(() => {
 @media (max-width: 768px) {
   /* 背景固定、位置向上調整 */
   .explore-page-wrapper {
-    background-image: url('@/assets/images/explore bg.png'); /* ✅ 一定要補 */
+    background-image: url('@/assets/images/explore-mobile bg.png'); /* ✅ 一定要補 */
     background-repeat: no-repeat;
     background-size: cover;
-    background-position: 50% top;
-    padding-bottom: 1rem;
-    min-height: 100vh;
   }
 
   /* 隱藏裝飾圖 */
@@ -318,7 +315,7 @@ onMounted(() => {
   .hero-text {
     text-align: center;
     margin-left: 0;
-    padding-top: 11rem;
+    padding-top: 6rem;
   }
 
   .hero-text h1,
@@ -328,8 +325,8 @@ onMounted(() => {
 
   /* 分類區往上調整，避免背景留白 */
   .filter-section {
-    margin-top: 80px;
-    padding-top: 16px;
+    margin-top: 70px !important;  
+    padding-top: 12px;
     flex-direction: column;
     gap: 0.75rem;
   }

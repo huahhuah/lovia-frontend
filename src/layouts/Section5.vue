@@ -142,5 +142,11 @@
     font-size: 1.5rem;
     margin-bottom: 2rem;
   }
+  .light-deco {
+    display: none !important;
+  }
+  .bg-layer.base {
+    display: none;
+  }
 }
 </style>
