@@ -24,7 +24,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import { useUserStore } from '@/stores/user'
+import { useUserStore } from '@/stores/auth'
 
 const userStore = useUserStore()
 const result = ref(null)
