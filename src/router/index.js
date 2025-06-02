@@ -46,7 +46,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/projects/:project_id/plans', 
+      path: '/projects/:project_id/plans',
       name: 'ProjectPlan',
       component: () => import('@/views/projects/ProjectPlan.vue'),
       props: (route) => ({ project_id: route.params.project_id }),
@@ -100,7 +100,7 @@ const router = createRouter({
       name: 'ProjectFormEdit',
       component: () => import('@/views/projects/ProjectForm.vue'),
       props: true,
-      meta: { requiresAuth: true},
+      meta: { requiresAuth: true },
     },
     {
       // 贊助專案確認
@@ -120,6 +120,27 @@ const router = createRouter({
       name: 'OrderConfirm',
       component: () => import('@/views/projects/OrderConfirm.vue'),
     },
+    {
+      path: '/checkout/result',
+      name: 'OrderResult',
+      component: () => import('@/views/projects/OrderResult.vue'),
+    },
+    {
+      path: '/checkout/linepay',
+      name: 'LinePayCheckout',
+      component: () => import('@/views/payment/linepay/Checkout.vue'),
+    },
+    {
+      path: '/payment/linepay/success',
+      name: 'LinePaySuccess',
+      component: () => import('@/views/payment/linepay/PaymentSuccess.vue'),
+    },
+    {
+      path: '/payment/linepay/cancel',
+      name: 'LinePayCancel',
+      component: () => import('@/views/payment/linepay/PaymentCancel.vue'),
+    },
+
     {
       path: '/user',
       component: () => import('@/layouts/UserLayout.vue'),
@@ -198,7 +219,7 @@ router.beforeEach(async (to, from, next) => {
 
   // 排除不需要認證檢查的頁面
   const publicPages = ['/login', '/register', '/forgot-password', '/reset-password']
-  const isPublicPage = publicPages.some(page => to.path.startsWith(page))
+  const isPublicPage = publicPages.some((page) => to.path.startsWith(page))
 
   if (isPublicPage) {
     return next() // 直接通過，不做認證檢查

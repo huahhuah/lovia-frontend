@@ -247,6 +247,7 @@ const errors = ref({
   zipcode: '',
   address: '',
   payment: '',
+  note: '',
 })
 
 // 方案原始金額
@@ -311,6 +312,7 @@ function validateInvoiceForm(form) {
   errors.value.invoiceType = ''
   errors.value.mobileBarcode = ''
   errors.value.taxId = ''
+  errors.value.note = ''
 
   const type = form.invoiceType
   const carrier = form.mobileBarcode?.trim()
@@ -457,8 +459,10 @@ async function submitOrder() {
         project_title: sponsorData.value.project_title,
         feedback: sponsorData.value.feedback,
         base_amount: baseAmountToSave,
+        payment: form.value.payment,
       })
     )
+    console.log('使用付款方式:', form.value.payment)
 
     console.log(' 建立訂單成功：', res.data)
     router.push('/checkout/confirm')
