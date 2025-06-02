@@ -24,6 +24,17 @@ const router = createRouter({
       component: () => import('../views/RegisterForm.vue'),
     },
     {
+      path: '/forgot-password',
+      name: 'ForgotPassword',
+      component: () => import('../views/users/ForgotPasswordView.vue'),
+    },
+    {
+      path: '/reset-password/:token',
+      name: 'ResetPassword',
+      component: () => import('../views/users/ResetPasswordView.vue'),
+      props: true, // 讓 token 可透過 props 傳入元件
+    },
+    {
       path: '/projects/:id',
       name: 'ProjectDetail',
       component: () => import('../views/ProjectDetailView.vue'),
@@ -184,6 +195,14 @@ const router = createRouter({
 //  全域守衛: 驗證登入狀態 & 親級權限
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
+
+  // 排除不需要認證檢查的頁面
+  const publicPages = ['/login', '/register', '/forgot-password', '/reset-password']
+  const isPublicPage = publicPages.some(page => to.path.startsWith(page))
+
+  if (isPublicPage) {
+    return next() // 直接通過，不做認證檢查
+  }
 
   const isLoggedIn = userStore.isLoggedIn
 
