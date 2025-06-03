@@ -171,6 +171,7 @@ const handleSubmitComment = async () => {
   try {
     await createProjectComment(projectId, commentContent.value, localStorage.getItem('token'))
     commentContent.value = ''
+    await existingComments()
   } catch (err) {
     console.error('留言失敗', err)
   }
