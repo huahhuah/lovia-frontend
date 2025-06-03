@@ -1,109 +1,109 @@
 <template>
-  <div
-    class="project-banner p-4 mb-4 rounded-4 d-flex flex-column flex-lg-row align-items-start"
-    style="background: linear-gradient(90deg, #fff5f7, #fff9f5)"
-  >
-    <!-- 左圖 + 分類 -->
-    <div
-      class="position-relative w-100 w-lg-50 mb-3 mb-lg-0"
-      style="max-width: 500px; overflow: hidden"
-    >
+  <div class="project-banner d-flex flex-column flex-lg-row align-items-start mb-4">
+    <!-- 左：圖片區（8/12） -->
+    <div class="position-relative mb-3 mb-lg-0 banner-image-container col-12 col-lg-8">
       <img
         :src="imgSrc"
         @error="onImageError"
-        class="rounded-3 w-100"
-        style="object-fit: cover"
+        class="w-100 rounded-3 project-banner-img"
         alt="project cover"
       />
 
-      <!-- 分類圖示與名稱（固定左上角） -->
+      <!-- 分類圖示 -->
       <div
         v-if="project?.category_img"
         class="position-absolute"
-        style="
-          top: 12px;
-          left: 12px;
-          background-color: rgba(0, 0, 0, 0);
-          padding: 2px 6px;
-          border-radius: 8px;
-          z-index: 10;
-        "
+        style="top: 12px; left: 12px; z-index: 10"
       >
-        <img :src="project.category_img" alt="分類圖" style="height: 16px; width: auto" />
+        <img :src="project.category_img" alt="分類圖" style="height: 25px" />
       </div>
     </div>
 
-    <!-- 右卡片 -->
-    <div class="bg-white rounded-4 shadow-sm p-4 flex-grow-1 ms-lg-4 w-100">
-      <h5 class="fw-bold mb-2">{{ project?.title || '未命名提案' }}</h5>
+    <!-- 右：資訊區（4/12） -->
+    <div class="info-area d-flex flex-column justify-content-between ms-lg-4 col-12 col-lg-4">
+      <!-- 上：標題／團隊／簡介 -->
+      <div class="info-area-top">
+        <h5 class="fw-bold mb-2">{{ project?.title || '未命名提案' }}</h5>
 
-      <div class="d-flex align-items-center gap-2 mb-2">
-        <img src="@/assets/icons/group.svg" alt="人 icon" style="width: 20px; height: 20px" />
-        <span class="badge bg-light text-secondary fw-normal px-2 py-1">
-          {{ project?.project_team || '提案者' }}
-        </span>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <img src="@/assets/icons/group.svg" alt="人 icon" style="width: 20px" />
+          <span class="badge bg-light text-secondary fw-normal px-2 py-1">
+            {{ project?.project_team || '提案者' }}
+          </span>
+        </div>
+
+        <p class="text-muted small summary-text">
+          {{ project?.summary || '尚無摘要' }}
+        </p>
       </div>
 
-      <p class="text-muted small mb-3">{{ project?.summary || '尚無摘要' }}</p>
+      <!-- 下：贊助進度與按鈕 -->
+      <div class="info-area-content mt-3">
+        <div class="d-flex align-items-center text-secondary small mb-1 gap-3">
+          <div class="d-flex align-items-center gap-1">
+            <img src="@/assets/icons/vector.svg" alt="時鐘" style="width: 16px" />
+            <span class="fw-bold text-dark">
+              倒數 <span style="color: #FD7269" class="fw-bold">{{ remainingDays }}</span> 天
+            </span>
+          </div>
 
-      <div class="d-flex align-items-center gap-3 text-secondary small mb-1">
-        <img src="@/assets/icons/vector.svg" alt="時鐘" style="width: 16px; height: 16px" />
-        倒數 {{ remainingDays }} 天
+          <div class="d-flex align-items-center gap-1">
+            <img src="@/assets/icons/group.svg" alt="人" style="width: 16px" />
+            <span class="fw-bold text-dark">
+              <span style="color: #FD7269" class="fw-bold">{{ project?.supporters ?? 0 }}</span> 人已贊助
+            </span>
+          </div>
 
-        <img
-          src="@/assets/icons/group.svg"
-          class="ms-3"
-          alt="人"
-          style="width: 16px; height: 16px"
-        />
-        {{ project?.supporters ?? 0 }} 人已贊助
+          <span class="ms-auto fw-bold" style="color: #FD7269">
+            {{ project?.progress_percent ?? 0 }}%
+          </span>
+        </div>
 
-        <span class="ms-auto text-danger fw-bold">{{ project?.progress_percent ?? 0 }}%</span>
-      </div>
+        <div class="progress rounded-pill mb-2" style="height: 8px">
+          <div
+            class="progress-bar bg-danger"
+            :style="{ width: (project?.progress_percent ?? 0) + '%' }"
+          ></div>
+        </div>
 
-      <div class="progress rounded-pill" style="height: 8px">
-        <div
-          class="progress-bar bg-danger"
-          :style="{ width: (project?.progress_percent ?? 0) + '%' }"
-        ></div>
-      </div>
-
-      <p class="mt-3 fw-bold fs-5 text-danger mb-1">
-        NT$
-        {{
-          typeof project?.current_amount === 'number'
-            ? project.current_amount.toLocaleString()
-            : '尚無資料'
-        }}
-        <small class="text-muted fs-6">
-          ／目標 NT$
+        <p class="fw-bold fs-5 text-dark mb-1">
+          NT$
           {{
-            typeof project?.total_amount === 'number'
-              ? project.total_amount.toLocaleString()
-              : '未設定'
+            typeof project?.current_amount === 'number'
+              ? project.current_amount.toLocaleString()
+              : '尚無資料'
           }}
-        </small>
-      </p>
+          <small class="text-muted fs-6">
+            ／目標 NT$
+            {{
+              typeof project?.total_amount === 'number'
+                ? project.total_amount.toLocaleString()
+                : '未設定'
+            }}
+          </small>
+        </p>
 
-      <p class="text-secondary small mb-3">
-        募資期間：{{ project?.start_time }} ~ {{ project?.end_time }}
-      </p>
+        <p class="text-secondary small mb-3">
+          募資期間：{{ formatDate(project?.start_time) }} ~ {{ formatDate(project?.end_time) }}
+        </p>
 
-      <div class="d-flex justify-content-between align-items-center gap-2 mt-2">
-        <button
-          class="border-0 bg-transparent rounded-circle p-2"
-          @click="handleToggleFavorite"
-          :style="{ backgroundColor: isFavorited ? '#ffe6e9' : '#fff0f2' }"
-        >
-          <img :src="favoriteIcon" alt="收藏" style="width: 24px; height: 24px" />
-        </button>
+        <div class="d-flex justify-content-between align-items-center gap-2 mt-2">
+          <button
+            class="border-0 bg-transparent rounded-circle p-2"
+            @click="handleToggleFavorite"
+            :style="{ backgroundColor: isFavorited ? '#ffe6e9' : '#fff0f2' }"
+          >
+            <img :src="favoriteIcon" alt="收藏" style="width: 24px; height: 24px" />
+          </button>
 
-        <button
-          class="btn btn-danger rounded-pill flex-grow-1 py-2 fw-bold shadow-sm"
-          @click="$emit('scrollToSponsor')"
-        >
-          立即贊助
-        </button>
+          <button
+            class="btn rounded-pill flex-grow-1 py-2 fw-bold shadow-sm text-white"
+            style="background-color: #FC5B53"
+            @click="$emit('scrollToSponsor')"
+          >
+            立即贊助 >>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -116,29 +116,32 @@ import { useRoute } from 'vue-router'
 
 const emit = defineEmits(['scrollToSponsor'])
 const route = useRoute()
-const isFavorited = ref(false)
 
 const props = defineProps({
   project: Object,
 })
 
-// 封面 fallback
 const imgSrc = ref('')
+const isFavorited = ref(false)
+
 watchEffect(() => {
   imgSrc.value = props.project?.cover || '/images/default.jpg'
   isFavorited.value = !!props.project?.follow
 })
+
 function onImageError(e) {
   e.target.src = '/images/default.jpg'
 }
 
 // 收藏邏輯
 const projectId = parseInt(route.params.id)
+
 const favoriteIcon = computed(() =>
   isFavorited.value
     ? new URL('@/assets/icons/heart-clicked.svg', import.meta.url).href
     : new URL('@/assets/icons/heart-default.svg', import.meta.url).href
 )
+
 async function handleToggleFavorite() {
   const token = localStorage.getItem('token')
   if (!token) {
@@ -149,11 +152,10 @@ async function handleToggleFavorite() {
     alert(res.data.message)
     isFavorited.value = res.data.follow
   } catch (err) {
-    console.error ('收藏失敗', err)
+    console.error('收藏失敗', err)
   }
 }
 
-// 倒數天數
 const remainingDays = computed(() => {
   const end = props.project?.end_time ? new Date(props.project.end_time) : null
   if (!end || isNaN(end)) return '？'
@@ -161,4 +163,80 @@ const remainingDays = computed(() => {
   const diff = Math.ceil((end - now) / (1000 * 60 * 60 * 24))
   return diff > 0 ? diff : 0
 })
+
+function formatDate(dateStr) {
+  if (!dateStr) return '未設定'
+  const date = new Date(dateStr)
+  if (isNaN(date)) return '未設定'
+  const yyyy = date.getFullYear()
+  const mm = String(date.getMonth() + 1).padStart(2, '0')
+  const dd = String(date.getDate()).padStart(2, '0')
+  return `${yyyy}/${mm}/${dd}`
+}
 </script>
+
+<style>
+.project-banner-img {
+  object-fit: cover;
+  aspect-ratio: 16 / 9;
+}
+
+.banner-image-container {
+  width: 66.666%;
+  overflow: hidden;
+}
+
+.info-area {
+  width: 33.333%;
+}
+
+/* 桌機版固定高度兩行顯示 */
+@media (min-width: 992px) {
+  .summary-text {
+    min-height: 4rem;
+    max-height: 4rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 10;
+    -webkit-box-orient: vertical;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .project-banner {
+    flex-direction: column !important;
+  }
+
+  .banner-image-container,
+  .info-area {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  .summary-text {
+    min-height: auto;
+    max-height: none;
+    margin-bottom: 0.75rem;
+    overflow: visible;
+    display: block;
+  }
+
+  .info-area-top {
+    margin-bottom: 0.5rem;
+  }
+
+  .info-area-content {
+    padding-top: 0.5rem;
+    margin-top: 0;
+    padding-bottom: 2rem;
+  }
+
+  .progress {
+    height: 6px;
+  }
+
+  .project-banner .btn {
+    font-size: 14px;
+  }
+}
+</style>
