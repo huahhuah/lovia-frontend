@@ -46,6 +46,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/proposer/apply',
+      name: 'Proposer',
+      component: () => import('@/views/users/Proposer.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/projects/:project_id/plans',
       name: 'ProjectPlan',
       component: () => import('@/views/projects/ProjectPlan.vue'),
