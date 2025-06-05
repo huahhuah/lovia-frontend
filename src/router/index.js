@@ -46,7 +46,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/proposer/apply',
+      path: '/users/postApplication',
       name: 'Proposer',
       component: () => import('@/views/users/Proposer.vue'),
       meta: { requiresAuth: true },

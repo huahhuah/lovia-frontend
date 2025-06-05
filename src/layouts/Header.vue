@@ -206,7 +206,7 @@ const handlePropose = () =>{
     console.log(isProposer)
     router.push('projects/create')
   } else {
-    router.push('/proposer/apply')
+    router.push('/users/postApplication')
   }
 }
 
