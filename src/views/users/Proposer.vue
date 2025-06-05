@@ -66,10 +66,10 @@
   const handleSubmit = async () => {
     try {
       const res = await axios.post(
-        'https://lovia-backend-xl4e.onrender.com/api/v1/proposer/apply',
+        'https://lovia-backend-xl4e.onrender.com/api/v1/users/postApplication',
         {
-          campaignUrl: form.value.campaignUrl,
-          accountInfo: form.value.accountInfo,
+          url: form.value.campaignUrl,
+          funding_account: form.value.accountInfo,
         },
         {
           headers: {
@@ -83,7 +83,7 @@
   
       setTimeout(() => {
         router.push('/user')
-      }, 2500)
+      }, 3500)
     } catch (error) {
       message.value = error.response?.data?.message || '送出失敗，請稍後再試'
       messageType.value = 'alert-danger'
