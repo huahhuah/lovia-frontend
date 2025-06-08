@@ -149,6 +149,10 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         {
+          path: '',
+          redirect: '/user/sponsorships'  // ✅ 加這行
+        },
+        {
           path: 'edit',
           name: 'EditProfile',
           component: () => import('@/views/users/EditProfile.vue'),

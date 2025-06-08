@@ -23,7 +23,18 @@
     <div class="info-area d-flex flex-column justify-content-between ms-lg-4 col-12 col-lg-4">
       <!-- 上：標題／團隊／簡介 -->
       <div class="info-area-top">
-        <h5 class="fw-bold mb-2">{{ project?.title || '未命名提案' }}</h5>
+       <div class="d-flex justify-content-between align-items-start mb-2">
+         <h5 class="fw-bold mb-0">{{ project?.title || '未命名提案' }}</h5>
+
+         <!-- 手機版收藏按鈕 -->
+         <button
+          class="border-0 bg-transparent rounded-circle d-lg-none ms-2"
+          @click="handleToggleFavorite"
+          :style="{ backgroundColor: isFavorited ? '#ffe6e9' : '#fff0f2' }"
+         >
+            <img :src="favoriteIcon" alt="收藏" style="width: 38px; height: 38px" />
+          </button>
+        </div>
 
         <div class="d-flex align-items-center gap-2 mb-2">
           <img src="@/assets/icons/group.svg" alt="人 icon" style="width: 20px" />
@@ -87,24 +98,48 @@
           募資期間：{{ formatDate(project?.start_time) }} ~ {{ formatDate(project?.end_time) }}
         </p>
 
-        <div class="d-flex justify-content-between align-items-center gap-2 mt-2">
+        <div 
+        class="d-none d-lg-flex align-items-center gap-2 mt-2"
+        :class="{ 'justify-content-end': isMobile }"
+        >
           <button
             class="border-0 bg-transparent rounded-circle p-2"
             @click="handleToggleFavorite"
             :style="{ backgroundColor: isFavorited ? '#ffe6e9' : '#fff0f2' }"
           >
-            <img :src="favoriteIcon" alt="收藏" style="width: 24px; height: 24px" />
+            <img :src="favoriteIcon" alt="收藏" style="width: 38px; height: 38px" />
           </button>
 
           <button
+            v-if="!isMobile"
             class="btn rounded-pill flex-grow-1 py-2 fw-bold shadow-sm text-white"
             style="background-color: #FC5B53"
             @click="$emit('scrollToSponsor')"
           >
-            立即贊助 >>
+            立刻贊助 >>
           </button>
         </div>
       </div>
+    </div>
+  </div>
+  <!-- ✅ 手機版底部固定按鈕區 -->
+  <div class="mobile-bottom-bar d-lg-none">
+    <div class="container d-flex justify-content-between align-items-center gap-2 py-2">
+      <button
+        class="border-0 bg-transparent rounded-circle p-2"
+        @click="handleToggleFavorite"
+        :style="{ backgroundColor: isFavorited ? '#ffe6e9' : '#fff0f2' }"
+      >
+        <img :src="favoriteIcon" alt="收藏" style="width: 38px; height: 38px" />
+      </button>
+
+      <button
+        class="btn rounded-pill flex-grow-1 py-2 fw-bold shadow-sm text-white"
+        style="background-color: #FC5B53"
+        @click="$emit('scrollToSponsor')"
+      >
+        立刻贊助 >>
+      </button>
     </div>
   </div>
 </template>
@@ -116,11 +151,9 @@ import { useRoute } from 'vue-router'
 
 const emit = defineEmits(['scrollToSponsor'])
 const route = useRoute()
-
 const props = defineProps({
   project: Object,
 })
-
 const imgSrc = ref('')
 const isFavorited = ref(false)
 
@@ -173,9 +206,15 @@ function formatDate(dateStr) {
   const dd = String(date.getDate()).padStart(2, '0')
   return `${yyyy}/${mm}/${dd}`
 }
+
+const isMobile = window.innerWidth < 992
 </script>
 
 <style>
+.project-banner {
+  margin-top: -40px; 
+}
+
 .project-banner-img {
   object-fit: cover;
   aspect-ratio: 16 / 9;
@@ -228,7 +267,8 @@ function formatDate(dateStr) {
   .info-area-content {
     padding-top: 0.5rem;
     margin-top: 0;
-    padding-bottom: 2rem;
+    padding-bottom: 0.5rem !important; /* ✅ 保留按鈕空間但不太大 */
+    margin-bottom: 0 !important;     /* ✅ 去掉與下方的空白 */
   }
 
   .progress {
@@ -239,4 +279,34 @@ function formatDate(dateStr) {
     font-size: 14px;
   }
 }
+
+@media (min-width: 992px) {
+  .project-banner {
+    align-items: stretch; /* 左右對齊高 */
+  }
+
+  .banner-image-container,
+  .info-area {
+    min-height: 420px;
+  }
+
+  .info-area {
+    justify-content: space-between; /* 上下貼齊 */
+  }
+
+  .info-area-content {
+    margin-top: auto;
+  }
+}
+/* 手機版底部固定 bar */
+.mobile-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-image: linear-gradient(to right, #FFEDF2, #FFF6E3);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+}
+
 </style>

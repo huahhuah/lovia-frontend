@@ -4,17 +4,17 @@
       <!-- 左側插圖與標語 -->
       <div class="col-md-6 d-none d-md-flex flex-column align-items-center justify-content-center">
         <img
-          src="@/assets/images/login-illustration.png"
+          src="/login.png"
           alt="login愛心圖"
           class="mb-3"
           style="max-width: 75%; height: auto"
         />
-        <p class="text-center fw-semibold fs-5">你的善意，讓世界更有溫度</p>
+        <p class="text-center fw-semibold fs-4 mt-2" style="margin-top: -10px">你的善意，讓世界更有溫度</p>
       </div>
 
       <!-- 右側登入表單 -->
       <div class="col-md-6">
-        <div class="border rounded-4 p-4 shadow-sm bg-light">
+        <div class="border-0 rounded-4 p-5 shadow bg-white" style="background-color: #FFF9F5;">
           <div class="text-center mb-3">
             <i class="bi bi-person-circle fs-1"></i>
             <h3 class="fw-bold mt-2">登入</h3>
@@ -197,7 +197,7 @@ async function handleLogin() {
 <style scoped>
 .login-wrapper {
   min-height: 100vh;
-  background-image: url('@/assets/images/bg.png');
+  background-image: linear-gradient(to right, #FFEDF2, #FFF6E3);;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -211,5 +211,9 @@ async function handleLogin() {
   cursor: pointer;
   color: #666;
   font-size: 1.2rem;
+}
+
+.slogan-text {
+  margin-top: -10px;
 }
 </style>
