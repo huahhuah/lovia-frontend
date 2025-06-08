@@ -86,12 +86,23 @@ const nextPage = () => {
 }
 
 const submitReview = () => {
+  const token = localStorage.getItem('token')
   const payload = allData.value.map(item => ({
     user_id: item.user_id,
     new_status: item.selectedStatus,
   }))
   console.log("送出 PATCH payload:", payload)
-  // TODO: axios.patch(...)
+  axios.patch('https://lovia-backend-xl4e.onrender.com/api/v1/admins/proposerStatus',
+  payload,
+  {
+    headers:{
+      Authorization: `Bearer ${token}`,
+    }
+  }).then(response => {
+    console.log('更新成功', response.data)
+  }).catch(error =>{
+    console.log('更新失敗', error)
+  })
 }
 
 onMounted(async () => {
