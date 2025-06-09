@@ -1,12 +1,8 @@
-<!-- 建立訂單(確認訂單資料) -->
 <template>
   <SponsorshipLayout>
     <div class="container py-5">
-      <!-- 顯示 localStorage 儲存的訂單資訊 -->
       <div class="row">
-        <!-- 左側內容區 -->
         <div class="col-lg-8">
-          <!-- 訂單資訊 -->
           <section class="mb-5">
             <div class="row g-3">
               <div class="col-md-6">
@@ -18,7 +14,7 @@
                 <input type="text" class="form-control" :value="orderData.amount" disabled />
               </div>
               <div class="col-md-6">
-                <label class="form-label">真實姓名</label>
+                <label class="form-label">贊助人資料</label>
                 <input type="text" class="form-control" :value="orderData.name" disabled />
               </div>
               <div class="col-md-6">
@@ -28,7 +24,6 @@
             </div>
           </section>
 
-          <!-- 寄送資料 -->
           <section class="mb-5">
             <h5 class="fw-bold">確認寄送資料</h5>
             <div class="row g-3">
@@ -58,13 +53,12 @@
           <p class="text-muted small">確認內容無誤後請點選右側按鈕完成付款，我們將為您處理訂單。</p>
         </div>
 
-        <!-- 右側摘要區 -->
         <div class="col-lg-4">
           <div class="card p-4 shadow-sm">
             <h6 class="fw-bold">訂單摘要</h6>
-            <p class="mb-1">專案名稱: {{ sponsorData.project_title || '專案名稱載入中' }}</p>
+            <p class="mb-1">專案名稱: {{ sponsorData.project_title }}</p>
             <p class="text-muted small">
-              贊助方案：{{ sponsorData.feedback || '方案資訊載入中' }}（NT$ {{ baseAmount }}）
+              贊助方案：{{ sponsorData.feedback }}（NT$ {{ baseAmount }}）
             </p>
             <hr />
             <div class="d-flex justify-content-between">
@@ -94,130 +88,134 @@
   </SponsorshipLayout>
 </template>
 
-<script setup></script>
-
 <script setup>
 import SponsorshipLayout from '@/layouts/SponsorshipLayout.vue'
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-
 const orderData = ref({})
-const sponsorData = ref({
-  project_title: '',
-  feedback: '',
-})
-
-// baseAmount：回饋方案的原始金額
+const sponsorData = ref({ project_title: '', feedback: '' })
 const baseAmount = ref(0)
 
-// 計算額外贊助金額：總金額 - 回饋原始金額
 const extraAmount = computed(() => {
   const total = orderData.value.amount || 0
   return total > baseAmount.value ? total - baseAmount.value : 0
 })
 
+// 錯誤跳轉方法
+function redirectError(msg) {
+  alert(msg + '，請重新操作')
+  router.push('/checkout')
+}
+
+// 掛載時讀取 localStorage 資料
 onMounted(() => {
   const raw = localStorage.getItem('checkoutOrderData')
-  if (!raw) {
-    alert('找不到訂單資料，請重新操作')
-    router.push('/checkout')
-    return
-  }
+  if (!raw) return redirectError('找不到訂單資料')
 
   try {
     const parsed = JSON.parse(raw)
+    if (!parsed.orderId && !parsed.order_uuid) return redirectError('訂單編號遺失')
     orderData.value = parsed
     sponsorData.value.project_title = parsed.project_title || '未提供'
     sponsorData.value.feedback = parsed.feedback || '未提供'
-    baseAmount.value = parsed.base_amount || parsed.amount || 0
+    baseAmount.value = Number.isFinite(parsed.base_amount) ? parsed.base_amount : parsed.amount || 0
   } catch (err) {
-    alert('訂單資料格式錯誤，請重新操作')
-    router.push('/checkout')
+    redirectError('訂單資料格式錯誤')
   }
 })
 
 const isSubmitting = ref(false)
 
+// 安全處理商品名稱避免亂碼與 SHA 錯誤
+function safeEncodeProductName(name) {
+  if (!name || typeof name !== 'string') return 'donate_card'
+  try {
+    const encoded = encodeURIComponent(name)
+    const base64 = btoa(decodeURIComponent(encoded))
+    return base64.slice(0, 100) // 限制長度避免錯誤
+  } catch (e) {
+    return 'donate_card'
+  }
+}
+
+// 送出付款請求
 async function submitPayment() {
   isSubmitting.value = true
-
-  const token = localStorage.getItem('token')
-
-  const paymentType = (orderData.value.payment || '').toLowerCase()
-  if (!paymentType) {
-    alert('找不到付款方式，請回到上一頁重新選擇')
-    router.push('/checkout/order')
-    return
-  }
-
   try {
+    const token = localStorage.getItem('token')
+    if (!token) return redirectError('請先登入才能付款')
+
+    const rawType = (orderData.value.payment || '').toLowerCase()
+    const paymentType = rawType === 'card' ? 'credit' : rawType || 'credit'
+
     const orderId = orderData.value.order_uuid || orderData.value.orderId
-    const amount = orderData.value.amount
-    const email = orderData.value.email
+    const amount = Number(orderData.value.amount) || 0
+    const email = orderData.value.email?.trim() || 'test@example.com'
 
-    const requestBody = {
-      amount,
-      email,
-    }
+    // ⛑️ 安全抓取 sponsorFormData 中的 selectedPlan
+    const sponsorFormDataRaw = localStorage.getItem('sponsorFormData') || '{}'
+    const selectedPlan = JSON.parse(sponsorFormDataRaw)?.selectedPlan || {}
 
-    if (paymentType === 'line') {
-      requestBody.orderId = orderId
-      requestBody.productName = sponsorData.value.feedback || 'Loveia 專案贊助'
-    }
-    console.log('🧾 建立付款 requestBody：', requestBody)
+    const planName =
+      selectedPlan.plan_name?.trim() || selectedPlan.feedback?.trim() || '贊助支持方案'
 
-    let url = ''
-    const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1/users/orders/'
+    const productName = safeEncodeProductName(planName)
 
-    if (paymentType === 'line') {
-      url = `${baseURL}${orderId}/linepay`
-    } else if (paymentType === 'atm') {
-      url = `${baseURL}${orderId}/newebpay`
+    const baseURL =
+      import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1/users/orders/'
+    const url = `${baseURL}${orderId}/payment`
+
+    const payload = { amount, email, payment_type: paymentType, productName }
+
+    // 根據付款方式處理
+    if (paymentType === 'linepay') {
+      await handleLinePayPayment(payload, token, url)
     } else {
-      url = `${baseURL}${orderId}/ecpay`
-    }
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(requestBody),
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`建立付款失敗，HTTP ${response.status}：${errorText}`)
-    }
-
-    const data = await response.json()
-
-    if (paymentType === 'line') {
-      // LINE Pay 使用原頁面跳轉，保留 localStorage 登入狀態
-      if (!data?.data?.payment_url) {
-        throw new Error('付款連結建立失敗')
-      }
-      window.location.href = data.data.payment_url
-    } else {
-      // 其他（ATM / ECPay）使用新視窗
-      const paymentWindow = window.open('', '_blank')
-      if (!paymentWindow) {
-        alert('無法開啟付款視窗，請確認瀏覽器未封鎖彈出視窗')
-        return
-      }
-      paymentWindow.document.open()
-      paymentWindow.document.write(data)
-      paymentWindow.document.close()
+      await handleNewebPayPayment(payload, token, url)
     }
   } catch (err) {
     console.error('付款建立失敗：', err)
-    alert('付款建立失敗：' + err.message)
+    alert('付款建立失敗：\n' + (err.message || '未知錯誤'))
   } finally {
     isSubmitting.value = false
   }
+}
+
+// LINE Pay 付款處理
+async function handleLinePayPayment(payload, token, url) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  })
+  const json = await res.json()
+  if (!res.ok || !json?.data?.payment_url) {
+    console.error('LINE Pay 錯誤回應：', json)
+    throw new Error(json?.message || 'LINE Pay 建立失敗')
+  }
+  window.location.href = json.data.payment_url
+}
+
+// NewebPay 藍新付款處理
+async function handleNewebPayPayment(payload, token, url) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!res.ok) throw new Error(`藍新金流建立失敗：${res.status}`)
+
+  const formHTML = await res.text()
+
+  const blob = new Blob([formHTML], { type: 'text/html' })
+  const blobUrl = URL.createObjectURL(blob)
+  window.location.href = blobUrl
 }
 </script>
 

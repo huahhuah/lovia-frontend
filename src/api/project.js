@@ -2,7 +2,8 @@
 import axios from 'axios'
 
 //base_url
-const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
+//const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
+const BASE_URL = 'http://127.0.0.1:8080'
 
 // 新增專案
 export const createProject = (data, token) => {
@@ -87,18 +88,23 @@ export function createProjectComment(projectId, content, token) {
 }
 
 //贊助某個方案
-export async function sponsorProjectPlan(projectId, planId, payload, token) {
-  return axios.post(`${BASE_URL}/api/v1/projects/${projectId}/plans/${planId}/sponsor`, payload, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
+export async function sponsorProjectPlan(projectId, planId, data, token) {
+  const res = await axios.post(
+    `${BASE_URL}/api/v1/projects/${projectId}/plans/${planId}/sponsor`,
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+  return res.data
 }
 
 //建立訂單
 export async function createSponsorship(projectId, planId, payload, token) {
   const res = await axios.post(
-    `${BASE_URL}/api/v1/projects/${projectId}/plans/${planId}/sponsor`,
+    `${BASE_URL}/api/v1/projects/${projectId}/plans/${planId}/sponsor-entry`,
     payload,
     {
       headers: {
@@ -112,32 +118,32 @@ export async function createSponsorship(projectId, planId, payload, token) {
 // 更新專案資料
 export const updateProject = (projectId, data, token) => {
   return axios.put(`${BASE_URL}/api/v1/projects/${projectId}`, data, {
-    headers:{
+    headers: {
       Authorization: `Bearer ${token}`,
-    }
+    },
   })
 }
 
 // 更新專案方案資料
 export const updateProjectPlan = (projectId, planId, data, token) => {
   return axios.put(`${BASE_URL}/api/v1/projects/${projectId}/plans/${planId}`, data, {
-    headers:{
+    headers: {
       Authorization: `Bearer ${token}`,
-    }
+    },
   })
 }
 
 // 取得專案留言
-export async function getProjectCommets (projectId){
+export async function getProjectCommets(projectId) {
   return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/comments`)
 }
 
 // 取得專案FAQ
-export async function getProjectFaqs (projectId){
+export async function getProjectFaqs(projectId) {
   return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/faq`)
 }
 
 // 取得專案進度
-export async function getProjectProgresses (projectId){
+export async function getProjectProgresses(projectId) {
   return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/progresses`)
 }
