@@ -91,10 +91,8 @@ async function viewDetails (user){
         }
       }
     )
-    console.log('取得詳細資料:', res.data.data) // ✅ 這裡加 log
     selectedUser.value = res.data.data
     showDetailModal.value = true
-    console.log('modal 開啟:', showDetailModal.value) // ✅ 這裡加 log
   } catch (err){
     console.error('載入失敗', err)
   }
