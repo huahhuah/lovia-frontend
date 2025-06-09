@@ -1,11 +1,9 @@
-<!-- 贊助確認頁 -->
-<!-- pages/checkout.vue -->
 <template>
   <SponsorshipLayout>
     <div class="container py-5">
       <h3 class="fw-bold mb-4">贊助確認頁</h3>
-      <!-- 你的確認內容放這裡 -->
-      <div class="container py-5" v-if="project && selectedPlan">
+
+      <div v-if="project && selectedPlan" class="container py-5">
         <!-- 標題與金額 -->
         <div class="text-center mb-4">
           <h5 class="fw-bold">贊助專案名稱：{{ project.title }}</h5>
@@ -14,15 +12,19 @@
         </div>
 
         <div class="row">
-          <!-- 左側內容 -->
+          <!-- 左側 -->
           <div class="col-lg-8">
             <section class="mb-4">
               <h6 class="fw-bold">🎁 理念支持回饋品</h6>
               <p class="text-muted">{{ selectedPlan.feedback }}</p>
-              <img :src="imgSrc" class="img-fluid mb-3" style="max-width: 300px" />
+              <img
+                :src="imgSrc"
+                @error="onImageError"
+                class="img-fluid mb-3"
+                style="max-width: 300px"
+              />
             </section>
 
-            <!-- 表單 -->
             <section class="mb-3">
               <label class="form-label fw-bold">列名感謝顯示名稱</label>
               <input v-model="donorName" class="form-control" placeholder="請輸入希望公開的名稱" />
@@ -39,7 +41,7 @@
             </section>
           </div>
 
-          <!-- 右側卡片 -->
+          <!-- 右側 -->
           <div class="col-lg-4">
             <div class="border rounded-4 p-4 shadow-sm">
               <p class="mb-1 fw-bold">方案金額：NT$ {{ selectedPlan.amount }}</p>
@@ -74,13 +76,14 @@
 import SponsorshipLayout from '@/layouts/SponsorshipLayout.vue'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getProjectOverview, getProjectPlans, sponsorProjectPlan } from '../../api/project'
-import defaultImg from '../../assets/images/default.png'
+import { getProjectOverview, getProjectPlans, sponsorProjectPlan } from '@/api/project'
+import defaultImg from '@/assets/images/default.png'
 import { useUserStore } from '@/stores/auth'
 
-const router = useRouter()
 const route = useRoute()
+const router = useRouter()
 const authStore = useUserStore()
+const user = authStore.user
 
 const projectId = Number(route.query.projectId)
 const planId = Number(route.query.planId)
@@ -93,12 +96,12 @@ const imgSrc = ref(defaultImg)
 const isLongTerm = ref(false)
 
 const extraAmount = ref(0)
-const totalAmount = computed(() => {
-  return selectedPlan.value ? selectedPlan.value.amount + extraAmount.value : 0
-})
+const totalAmount = computed(() =>
+  selectedPlan.value ? selectedPlan.value.amount + extraAmount.value : 0
+)
 
-if (isNaN(projectId) || isNaN(planId)) {
-  console.error(' URL 參數不正確:', route.query)
+const onImageError = () => {
+  imgSrc.value = defaultImg
 }
 
 onMounted(async () => {
@@ -115,9 +118,18 @@ onMounted(async () => {
 
     const plansRes = await getProjectPlans(projectId)
     const plans = Array.isArray(plansRes.data.data) ? plansRes.data.data : []
-    selectedPlan.value = plans.find((p) => Number(p.plan_id) === planId)
 
-    if (selectedPlan.value?.feedback_img) {
+    selectedPlan.value = plans.find(
+      (p) => Number(p.plan_id) === planId && Number(p.project_id) === projectId
+    )
+
+    if (!selectedPlan.value) {
+      alert('找不到該專案對應的贊助方案，請重新選擇')
+      router.push('/')
+      return
+    }
+
+    if (selectedPlan.value.feedback_img) {
       const testImg = new Image()
       testImg.src = selectedPlan.value.feedback_img
       testImg.onload = () => (imgSrc.value = testImg.src)
@@ -130,17 +142,23 @@ onMounted(async () => {
 })
 
 async function confirmSponsorship() {
-  const token = useUserStore().token
-  if (!token) {
+  if (!authStore.token) {
     alert('請先登入才能贊助')
     router.push('/login')
     return
   }
 
-  const base = selectedPlan.value.amount
-  const extra = extraAmount.value
-  const amount = base + extra
+  if (!selectedPlan.value) {
+    alert('找不到對應的贊助方案，請重新操作')
+    return
+  }
 
+  if (!Number.isInteger(extraAmount.value) || extraAmount.value < 0) {
+    alert('額外贊助金額格式錯誤，請輸入正整數')
+    return
+  }
+
+  const amount = selectedPlan.value.amount + extraAmount.value
   if (!Number.isInteger(amount) || amount <= 0) {
     alert('贊助金額必須為正整數')
     return
@@ -159,7 +177,7 @@ async function confirmSponsorship() {
       tax_id: null,
     },
     shipping: {
-      name: authStore.user?.username || '匿名',
+      name: user?.username || '未提供姓名',
       phone: '0912345678',
       address: '未填地址',
       note: '',
@@ -169,25 +187,20 @@ async function confirmSponsorship() {
   console.log('傳送 payload:', JSON.stringify(payload, null, 2))
 
   try {
-    const res = await sponsorProjectPlan(projectId, planId, payload, token) // ✅ 接住回傳值
-
-    const base = selectedPlan.value.amount
-    const amount = base + extraAmount.value
+    const res = await sponsorProjectPlan(projectId, planId, payload, authStore.token)
 
     const sponsorData = {
       project_id: projectId,
       plan_id: selectedPlan.value.plan_id,
       display_name: payload.sponsorship.display_name,
       note: payload.sponsorship.note,
-      account: authStore.user?.account || '',
+      account: user?.account || '',
       feedback: selectedPlan.value.feedback,
-      base_amount: base,
+      base_amount: selectedPlan.value.amount,
       total_amount: amount,
       project_title: project.value.title,
       order_uuid: res.data?.order_uuid || '',
     }
-
-    localStorage.setItem('sponsorFormData', JSON.stringify(sponsorData))
 
     localStorage.setItem('sponsorFormData', JSON.stringify(sponsorData))
 
@@ -199,7 +212,7 @@ async function confirmSponsorship() {
       },
     })
   } catch (error) {
-    console.error(' 贊助失敗:', error)
+    console.error('贊助失敗:', error)
     alert(error.response?.data?.message || '贊助過程發生錯誤，請稍後再試')
   }
 }

@@ -126,21 +126,28 @@ const router = createRouter({
       name: 'OrderConfirm',
       component: () => import('@/views/projects/OrderConfirm.vue'),
     },
-
     {
-      path: '/checkout/linepay',
-      name: 'LinePayCheckout',
-      component: () => import('@/views/payment/linepay/Checkout.vue'),
+      //訂單交易結果
+      path: '/checkout/result',
+      name: 'PaymentResult',
+      component: () => import('@/views/payment/PaymentResult.vue'),
     },
     {
-      path: '/payment/linepay/success',
-      name: 'LinePaySuccess',
-      component: () => import('@/views/payment/linepay/PaymentSuccess.vue'),
+      path: '/payment/PaymentResult',
+      redirect: (to) => {
+        // 保留查詢參數並轉到正確頁面
+        return { path: '/checkout/result', query: to.query }
+      },
     },
     {
-      path: '/payment/linepay/cancel',
-      name: 'LinePayCancel',
-      component: () => import('@/views/payment/linepay/PaymentCancel.vue'),
+      path: '/checkout/cancel',
+      name: 'PaymentCancel',
+      component: () => import('@/views/payment/PaymentCancel.vue'),
+    },
+    {
+      path: '/payment/linepay/start',
+      name: 'LinePayStart',
+      component: () => import('@/views/payment/LinePayStart.vue'),
     },
 
     {

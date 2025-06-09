@@ -164,10 +164,10 @@
 
               <button
                 class="btn btn-outline-secondary"
-                :class="{ active: form.payment === 'line' }"
+                :class="{ active: form.payment === 'linepay' }"
                 @click="
                   () => {
-                    form.payment = 'line'
+                    form.payment = 'linepay'
                     errors.payment = ''
                   }
                 "
@@ -447,6 +447,7 @@ async function submitOrder() {
       'checkoutOrderData',
       JSON.stringify({
         orderId: res.data.order_uuid,
+        order_uuid: res.data.order_uuid,
         amount: amount,
         name: form.value.name,
         email: form.value.account,
@@ -459,12 +460,16 @@ async function submitOrder() {
         project_title: sponsorData.value.project_title,
         feedback: sponsorData.value.feedback,
         base_amount: baseAmountToSave,
-        payment: form.value.payment,
+        payment: form.value.payment || 'card',
       })
     )
-    console.log('使用付款方式:', form.value.payment)
 
+    console.log('使用付款方式:', form.value.payment)
     console.log(' 建立訂單成功：', res.data)
+    if (!res.data?.order_uuid) {
+      alert('建立訂單失敗,請稍後再試')
+      return
+    }
     router.push('/checkout/confirm')
   } catch (err) {
     console.error('建立訂單失敗:', err)
