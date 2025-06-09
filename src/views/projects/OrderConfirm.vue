@@ -168,9 +168,8 @@ async function submitPayment() {
 
     const productName = safeEncodeProductName(planName)
 
-    const baseURL =
-      import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1/users/orders/'
-    const url = `${baseURL}${orderId}/payment`
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
+    const url = `${baseURL}/users/orders/${orderId}/payment`
 
     const payload = { amount, email, payment_type: paymentType, productName }
 
