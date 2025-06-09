@@ -161,6 +161,12 @@ const usernameValid = computed(() => form.username.trim().length >= 2 && form.us
 const phonePattern = /^09\d{8}$/
 const phoneValid = computed(() => phonePattern.test(form.phone))
 
+//  新增生日格式驗證函式
+function isValidBirthday(dateString) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(dateString)
+}
+
+
 function showModal(msg, type = 'danger') {
   modalMessage.value = msg
   modalType.value = type
@@ -219,6 +225,11 @@ onMounted(async () => {
 async function submitForm() {
   if (!usernameValid.value) return showModalAndAutoClose('請輸入 2~50 字的使用者名稱')
   if (!phoneValid.value) return showModalAndAutoClose('請輸入正確的手機號碼')
+
+  if (form.birthday && !isValidBirthday(form.birthday)) {
+  return showModalAndAutoClose('生日格式錯誤，請使用 YYYY-MM-DD 格式')
+}
+
 
   if (form.avatar_url?.startsWith('data:image')) {
     return showModalAndAutoClose('圖片尚未上傳，請等待圖片上傳功能完成後再修改頭像')
