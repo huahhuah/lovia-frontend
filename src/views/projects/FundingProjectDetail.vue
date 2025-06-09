@@ -22,110 +22,74 @@
             </li>
           </ul>
 
-          <div class="project-content-box p-4 rounded-4 shadow-sm">
-            <div v-if="activeTab === '專案介紹'">
-              <div
-                class="text-muted project-description mb-4"
-                :class="{ collapsed: !isContentExpanded }"
-                style="white-space: pre-line"
-              >
-                {{ project.full_content || '尚無提案內容。' }}
-              </div>
+          <!-- ✅ 專案介紹使用背景框 -->
+          <div v-if="activeTab === '專案介紹'" class="project-content-box p-4 rounded-4 shadow-sm">
+            <div
+              class="text-muted project-description mb-4"
+              :class="{ collapsed: !isContentExpanded }"
+              style="white-space: pre-line"
+            >
+              {{ project.full_content || '尚無提案內容。' }}
+            </div>
 
-              <div class="text-center mt-3 d-lg-none">
-                <div class="divider-with-button">
-                  <hr class="dashed-line" />
-                  <button
-                    class="expand-btn btn btn-dark rounded-pill px-4 py-2 fw-bold shadow-sm"
-                    @click="isContentExpanded = !isContentExpanded"
-                  >
-                    {{ isContentExpanded ? '收起內容' : '查看完整內容' }}
-                  </button>
+            <div class="text-center mt-3 d-lg-none">
+              <div class="divider-with-button">
+                <hr class="dashed-line" />
+                <button
+                  class="expand-btn btn btn-dark rounded-pill px-4 py-2 fw-bold shadow-sm"
+                  @click="isContentExpanded = !isContentExpanded"
+                >
+                  {{ isContentExpanded ? '收起內容' : '查看完整內容' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ❌ 問與答：不加背景框 -->
+          <div v-else-if="activeTab === '問與答'">
+            <QnaBlock :projectId="projectId" :isLogin="isLogin" />
+          </div>
+
+          <!-- ❌ 常見問題 -->
+          <div v-else-if="activeTab === '常見問題'">
+            <div v-if="faqs.length > 0">
+              <div v-for="(faq, index) in faqs" :key="index" class="mb-3">
+                <strong> Q: {{ faq.question }}</strong>
+                <p> A: {{ faq.answer }}</p>
+              </div>
+            </div>
+            <p v-else class="text-muted">尚未提供 常見問題 資料。</p>
+          </div>
+
+          <!-- ❌ 進度分享 -->
+          <div v-else-if="activeTab === '進度分享'">
+            <div v-if="progresses.length > 0">
+              <div v-for="(progress, index) in progresses" :key="index" class="mb-3">
+                <strong> 標題： {{ progress.title }}</strong>
+                <p>發布日期：{{ progress.date }}<br />{{ progress.content }}</p>
+                <div v-if="progress.fund_usages?.length" class="table-responsive">
+                  <table class="table table-bordered text-center align-middle">
+                    <thead>
+                      <tr>
+                        <th>匯款對象</th>
+                        <th>資金用途</th>
+                        <th>金額</th>
+                        <th>狀態</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(usage, uIndex) in progress.fund_usages" :key="uIndex">
+                        <td>{{ usage.recipient }}</td>
+                        <td>{{ usage.usage }}</td>
+                        <td>{{ usage.amount.toLocaleString() }}</td>
+                        <td>{{ usage.status }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
-
-            <div v-else-if="activeTab === '問與答'">
-              <div
-                v-if="isLogin"
-                class="comment-box d-flex p-4 rounded-4 mb-4"
-                style="background-color: #fff8f5"
-              >
-                <img
-                  :src="user?.avatar || '/default-avatar.png'"
-                  alt="user avatar"
-                  class="rounded-circle me-3"
-                  style="width: 44px; height: 44px; object-fit: cover"
-                />
-                <div class="flex-grow-1">
-                  <textarea
-                    v-model="commentContent"
-                    rows="3"
-                    class="form-control border-0 rounded-4 px-3 py-2 mb-2"
-                    style="background-color: #fdf9f8"
-                    placeholder="歡迎留言提問"
-                  ></textarea>
-                  <div class="text-end">
-                    <button class="btn btn-dark rounded-pill px-4" @click="handleSubmitComment">
-                      提問
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div v-else class="text-muted fst-italic">請先登入後才能留言。</div>
-
-              <div class="comments-list mt-4">
-                <div v-if="comments.length === 0" class="text-muted">尚無留言</div>
-                <div v-for="comment in comments" :key="comment.id" class="comment-item mb-3">
-                  <strong>{{ comment.user.name }}</strong>：<br />
-                  <p>{{ comment.content }}</p>
-                  <small class="text-muted">{{ new Date(comment.created_at).toLocaleString() }}</small>
-                </div>
-              </div>
-            </div>
-
-            <div v-else-if="activeTab === '常見問題'">
-              <div v-if="faqs.length > 0">
-                <div v-for="(faq, index) in faqs" :key="index" class="mb-3">
-                  <strong> Q: {{ faq.question }}</strong>
-                  <p> A: {{ faq.answer }}</p>
-                </div>
-              </div>
-              <p v-else class="text-muted">尚未提供 常見問題 資料。</p>
-            </div>
-
-            <div v-else-if="activeTab === '進度分享'">
-              <div v-if="progresses.length > 0">
-                <div v-for="(progress, index) in progresses" :key="index" class="mb-3">
-                  <strong> 標題： {{ progress.title }}</strong>
-                  <p>發布日期：{{ progress.date }}<br />{{ progress.content }}</p>
-                  <div
-                    v-if="progress.fund_usages && progress.fund_usages.length > 0"
-                    class="table-responsive"
-                  >
-                    <table class="table table-bordered text-center align-middle">
-                      <thead>
-                        <tr>
-                          <th>匯款對象</th>
-                          <th>資金用途</th>
-                          <th>金額</th>
-                          <th>狀態</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="(usage, uIndex) in progress.fund_usages" :key="uIndex">
-                          <td>{{ usage.recipient }}</td>
-                          <td>{{ usage.usage }}</td>
-                          <td>{{ usage.amount.toLocaleString() }}</td>
-                          <td>{{ usage.status }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-              <p v-else class="text-muted">尚未發布任何更新內容。</p>
-            </div>
+            <p v-else class="text-muted">尚未發布任何更新內容。</p>
           </div>
         </div>
 
@@ -156,6 +120,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import ProjectBanner from '@/components/ProjectBanner.vue'
 import ProjectPlans from '@/components/ProjectPlans.vue'
+import QnaBlock from '@/components/QnaBlock.vue'
 import {
   createProjectComment,
   getProjectOverview,

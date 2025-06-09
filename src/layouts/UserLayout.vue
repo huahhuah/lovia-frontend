@@ -1,45 +1,35 @@
 <template>
   <div class="user-layout-wrapper">
-    <!-- 背景層 -->
+    <!-- ✅ 背景圖層（你說要改成 user-bg.png） -->
     <div class="background-layer"></div>
 
-    <!-- 使用者頭像 + 名稱 + 導覽列 -->
+    <!-- ✅ 使用者頭像、名稱、導覽列 -->
     <section class="user-header container">
+      <!-- ✅ 頭像與名稱 -->
       <div class="avatar-area">
         <img :src="user?.avatar || defaultAvatar" class="user-avatar" alt="avatar" />
         <h5 class="username-text">{{ user?.username || '使用者' }}</h5>
       </div>
 
+      <!-- ✅ 導覽列（會員中心、個人資料、修改密碼） -->
       <ul class="nav gap-4 user-nav">
-        <!-- 會員中心 -->
         <li class="nav-item">
-          <router-link to="/user" class="nav-link" exact-active-class="active"
-            >會員中心</router-link
-          >
+          <router-link to="/user" class="nav-link" active-class="active">會員中心</router-link>
         </li>
-        <!-- 個人資料 -->
         <li class="nav-item">
-          <router-link to="/user/edit" class="nav-link" exact-active-class="active"
-            >個人資料</router-link
-          >
+          <router-link to="/user/edit" class="nav-link" exact-active-class="active">個人資料</router-link>
         </li>
-        <!-- 修改密碼 -->
         <li class="nav-item">
-          <router-link to="/user/password" class="nav-link" exact-active-class="active"
-            >修改密碼</router-link
-          >
+          <router-link to="/user/password" class="nav-link" exact-active-class="active">修改密碼</router-link>
         </li>
 
-        <!--  訂單管理 dropdown-->
+        <!-- ✅ dropdown：訂單管理（若為贊助者時出現） -->
         <li class="nav-item dropdown-nav" v-if="isSponsor">
-          <div class="nav-link" @mouseover="showOrders = true" @mouseleave="showOrders = false">
-            訂單管理 ▾
-            <ul
-              class="dropdown-list"
-              v-show="showOrders"
-              @mouseenter="showOrders = true"
-              @mouseleave="showOrders = false"
-            >
+          <div class="nav-link dropdown-toggle" @mouseover="showOrders = true" @mouseleave="showOrders = false">
+            <span>訂單管理</span>
+            <span class="arrow">▾</span>
+            <ul class="dropdown-list" v-show="showOrders"
+              @mouseenter="showOrders = true" @mouseleave="showOrders = false">
               <li>
                 <router-link to="/user/sponsorships" class="dropdown-item">我的贊助</router-link>
               </li>
@@ -50,27 +40,18 @@
           </div>
         </li>
 
-        <!--  專案提問 dropdown-->
+        <!-- ✅ dropdown：專案提問（提問列表／提問管理） -->
         <li class="nav-item dropdown-nav" v-if="isSponsor || isProposer">
-          <div
-            class="nav-link"
-            @mouseover="showQuestions = true"
-            @mouseleave="showQuestions = false"
-          >
-            專案提問 ▾
-            <ul
-              class="dropdown-list"
-              v-show="showQuestions"
-              @mouseenter="showQuestions = true"
-              @mouseleave="showQuestions = false"
-            >
+          <div class="nav-link dropdown-toggle" @mouseover="showQuestions = true" @mouseleave="showQuestions = false">
+            <span>專案提問</span>
+            <span class="arrow">▾</span>
+            <ul class="dropdown-list" v-show="showQuestions"
+              @mouseenter="showQuestions = true" @mouseleave="showQuestions = false">
               <li>
                 <router-link to="/user/questions" class="dropdown-item">我的提問</router-link>
               </li>
               <li v-if="isProposer">
-                <router-link to="/user/questions/manage" class="dropdown-item"
-                  >提問管理</router-link
-                >
+                <router-link to="/user/questions/manage" class="dropdown-item">提問管理</router-link>
               </li>
             </ul>
           </div>
@@ -78,12 +59,13 @@
       </ul>
     </section>
 
-    <!-- 主內容區塊 -->
+    <!-- ✅ 頁面主要內容：會根據 router-view 換畫面 -->
     <main class="user-main container my-5">
       <router-view />
     </main>
   </div>
 </template>
+
 
 <script setup>
 import { ref } from 'vue'
@@ -105,7 +87,9 @@ const showQuestions = ref(false)
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  background-image: url('@/assets/images/user bg.png');
+  background-image: linear-gradient(to right, #FFEDF2, #FFF6E3);
+  background-size: cover;
+  background-position: center top;
 }
 
 .background-layer {
@@ -113,29 +97,44 @@ const showQuestions = ref(false)
   top: 0;
   left: 0;
   right: 0;
-  height: 200px;
+  height: 280px;
   z-index: 0;
-  background-image: url('@/assets/images/bg.png');
+  background-image: url('/user-bg.png');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center top;
 }
 
+.user-header,
+.user-main {
+  max-width: 1296px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 312 312px;
+}
+
 .user-header {
   position: relative;
   z-index: 1;
-  padding-top: 160px;
+  padding-top: 240px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* 導覽列與頭貼區的距離 */
 }
 
 .avatar-area {
   display: flex;
-  align-items: flex-end;
+  flex-direction: flex-end;       /* ✅ 讓頭像在上、名稱在下 */
+  align-items: center;          /* ✅ 水平置中 */
+  width: 235px;
+  height: 160px;
   gap: 16px;
 }
 
 .user-avatar {
-  width: 80px;
-  height: 80px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid #fff;
@@ -144,32 +143,33 @@ const showQuestions = ref(false)
 }
 
 .username-text {
-  font-size: 1rem;
+  font-size: 28px;
   font-weight: bold;
-  margin-bottom: 4px;
+  margin-bottom: -80px;
   white-space: nowrap;
   color: #222;
 }
 
 .user-nav .nav-link {
-  font-weight: 500;
+  display: inline-block;
+  width: 112px;
+  height: 48px;
+  padding: 12px 24px;
+  font-weight: 400;
+  font-size: 16px;
   color: #444;
-  padding: 8px 0;
-  position: relative;
+  text-decoration: none;      /* ✅ 不要底線 */
+  text-align: center;
+  line-height: 24px;
 }
 
 .user-nav .nav-link.active {
   color: #f45c7f;
+  background: transparent;
 }
 
 .user-nav .nav-link.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: #f45c7f;
+  content: none !important;
 }
 
 .user-main {
@@ -206,5 +206,20 @@ const showQuestions = ref(false)
 .dropdown-item:hover {
   background-color: #f8f9fa;
   text-decoration: none;
+}
+
+.nav-link.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* 文字和箭頭之間的間距 */
+  cursor: pointer;
+}
+
+.nav-link.dropdown-toggle::after {
+  content: none !important;
+}
+
+.arrow {
+  font-size: 16px;
 }
 </style>
