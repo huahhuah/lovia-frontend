@@ -154,7 +154,12 @@ async function submitPayment() {
     const amount = Number(orderData.value.amount) || 0
     const email = orderData.value.email?.trim() || 'test@example.com'
 
-    // ⛑️ 安全抓取 sponsorFormData 中的 selectedPlan
+    //  安全抓取 sponsorFormData 中的 selectedPlan
+    const requestBody = {
+      amount,
+      email,
+    }
+    // 安全抓取 sponsorFormData 中的 selectedPlan
     const sponsorFormDataRaw = localStorage.getItem('sponsorFormData') || '{}'
     const selectedPlan = JSON.parse(sponsorFormDataRaw)?.selectedPlan || {}
 
