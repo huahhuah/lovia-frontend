@@ -24,7 +24,7 @@
           <td>{{ user.gender || '-' }}</td>
           <td>{{ user.role }}</td>
           <td>{{ user.status }}</td>
-          <td><button @click="viewDetails(user)">圖示?!</button></td>
+          <td><button @click="viewDetails(user)">🔍</button></td>
         </tr>
       </tbody>
     </table>
@@ -36,17 +36,36 @@
     :class="{active: n === currentPage}"
     @click="changePage(n)">{{ n }}</button>
   </div>
+  <div v-if="showDetailModal" class="modal-overlay">
+    <div class="modal-card">
+      <button class="close-btn" @click="closeDetailModal"> ❌ </button>
+      <h2>會員詳細資料</h2>
+      <p><strong>帳號：</strong>{{selectedUser.account}}</p>
+      <p><strong>會員名稱：</strong>{{selectedUser.username}}</p>
+      <p><strong>會員ID：</strong>{{selectedUser.id}}</p>
+      <p><strong>電話：</strong>{{selectedUser?.phone || '-'}}</p>
+      <p><strong>生日：</strong>{{selectedUser?.birthday || '-'}}</p>
+      <p><strong>性別：</strong>{{selectedUser?.gender?.gender || '-'}}</p>
+      <p><strong>註冊時間：</strong>{{selectedUser.created_at}}</p>
+      <p><strong>前次登入時間：</strong>{{selectedUser?.last_login || '-'}}</p>
+      <p><strong>角色：</strong>{{selectedUser.role.role_type}}</p>
+      <p><strong>帳號狀態：</strong>{{selectedUser.status.status}}</p>
+    </div>
+  </div>
 </template>
 
 <script setup>
 import { useUserStore } from '@/stores/auth'
 import { ref, onMounted } from 'vue'
 import { allUsers as getUsers } from '@/api/admin'
+import axios from 'axios'
 
 const userStore = useUserStore()
 const users = ref([])
 const currentPage = ref(1) // 建立可追蹤變數，起始值為1，故預設第1頁
 const totalPages = ref(1)
+const showDetailModal = ref(false)
+const selectedUser = ref(null)
 
 async function getAllUsers( page = 1){
   try {
@@ -62,6 +81,30 @@ async function getAllUsers( page = 1){
   }
 }
 
+async function viewDetails (user){
+  try{
+    const token = userStore.token
+    const res = await axios.get(`https://lovia-backend-xl4e.onrender.com/api/v1/admins/users/${user.id}`,
+      {
+        headers:{
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+    console.log('取得詳細資料:', res.data.data) // ✅ 這裡加 log
+    selectedUser.value = res.data.data
+    showDetailModal.value = true
+    console.log('modal 開啟:', showDetailModal.value) // ✅ 這裡加 log
+  } catch (err){
+    console.error('載入失敗', err)
+  }
+}
+
+async function closeDetailModal (){
+  showDetailModal.value = false
+  selectedUser.value = null  
+}
+
 onMounted(() => {
   getAllUsers()
 })
@@ -70,10 +113,6 @@ const changePage = (page) =>{
   if (page >= 1 && page <= totalPages.value){
     getAllUsers(page)
   }
-}
-
-const viewDetails = (user) => {
-  console.log('查看詳情，我還沒寫', user)
 }
 </script>
 
@@ -121,4 +160,34 @@ const viewDetails = (user) => {
 .pagination button:hover {
   background-color: #e0e0e0;
 }
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* 半透明遮罩 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* 確保在最上層 */
+}
+
+.modal-card {
+  background-color: white;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
 </style>
