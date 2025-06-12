@@ -25,6 +25,10 @@
           <option value="3">駁回</option>
         </select>
       </label>
+      <p>
+        <strong>駁回理由：</strong>
+        <textarea v-model="item.reason" class="w-full border rounded p-1 mt-1" placeholder="請輸入駁回理由"></textarea>
+      </p>
     </div>
 
     <!-- 頁碼與送出按鈕同一排 -->
@@ -71,25 +75,12 @@ const updatePaginatedData = () => {
   paginatedData.value = allData.value.slice(start, start + perPage)
 }
 
-const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-    updatePaginatedData()
-  }
-}
-
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-    updatePaginatedData()
-  }
-}
-
 const submitReview = () => {
   const token = localStorage.getItem('token')
   const payload = allData.value.map(item => ({
     user_id: item.user_id,
     new_status: item.selectedStatus,
+    reason: item.reason || null,
   }))
   console.log("送出 PATCH payload:", payload)
   axios.patch('https://lovia-backend-xl4e.onrender.com/api/v1/admins/proposerStatus',
