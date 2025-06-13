@@ -1,11 +1,11 @@
 <template>
-  <div class="p-4 bg-gray-100 min-h-screen">
+  <div class="w-full mx-auto p-4 bg-gray-100 min-h-screen">
     <h2 class="text-xl font-bold mb-4">申請資料審核</h2>
 
     <div
       v-for="(item, index) in paginatedData"
       :key="item.user_id"
-      class="bg-white p-4 mb-2 rounded border"
+      class="bg-white p-4 mb-2 rounded border w-full"
     >
       <p><strong>申請人：</strong>{{ item.user.username }}</p>
       <p>
@@ -17,18 +17,25 @@
         <span v-html="formatFundingAccount(item.funding_account)"></span>
       </p>
 
-      <label class="block mt-2">
-        <strong>審核狀態：</strong>
-        <select v-model="item.selectedStatus" class="border rounded p-1">
+      <div class="mt-4">
+        <label class="block font-semibold mb-1">審核狀態：</label>
+        <select v-model="item.selectedStatus" class="w-full border rounded p-1">
           <option value="1">審核中</option>
           <option value="2">准許</option>
           <option value="3">駁回</option>
         </select>
-      </label>
-      <p>
-        <strong>駁回理由：</strong>
-        <textarea v-model="item.reason" class="w-full border rounded p-1 mt-1" placeholder="請輸入駁回理由"></textarea>
-      </p>
+      </div>
+
+      <div class="mt-4">
+        <label class="block font-semibold mb-1">駁回理由：</label>
+        <input
+          type="text"
+          v-model="item.reason"
+          class="w-full border rounded p-1"
+          placeholder="請輸入駁回理由"
+          style="width: 80%;"
+        />
+      </div>
     </div>
 
     <!-- 頁碼與送出按鈕同一排 -->
