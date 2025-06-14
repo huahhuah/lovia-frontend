@@ -48,6 +48,7 @@ import { ref, computed, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
+const token = localStorage.getItem('token') || sessionStorage.getItem('token')
 
 // 預設結果欄位，避免 undefined 報錯
 const result = ref({
@@ -84,15 +85,28 @@ watchEffect(async () => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     )
     const json = await res.json()
     console.log(' 付款成功資料：', json)
+
     if (!json.status || !json.data) throw new Error(json.message || '查無資料')
 
-    result.value = json.data
+    // 映射資料到前端 result 結構
+    result.value = {
+      transactionId: json.order_uuid,
+      amount: json.amount,
+      paidAt: json.paid_at,
+      paymentMethod: json.payment_method || 'NewebPay / LINE Pay',
+      display_name: json.display_name || '匿名',
+      email: json.email || '',
+      recipient: json.shipping?.name || '',
+      phone: json.shipping?.phone || '',
+      address: json.shipping?.address || '',
+      note: json.shipping?.note || '',
+    }
   } catch (err) {
     console.error(' 付款資料取得失敗:', err)
     error.value = err.message || '查詢付款結果失敗'

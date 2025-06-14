@@ -92,118 +92,139 @@
 import SponsorshipLayout from '@/layouts/SponsorshipLayout.vue'
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/auth'
 
+const authStore = useUserStore()
 const router = useRouter()
+
 const orderData = ref({})
 const sponsorData = ref({ project_title: '', feedback: '' })
 const baseAmount = ref(0)
+const isSubmitting = ref(false)
+const errorMsg = ref('')
 
 const extraAmount = computed(() => {
   const total = orderData.value.amount || 0
   return total > baseAmount.value ? total - baseAmount.value : 0
 })
 
-// 錯誤跳轉方法
 function redirectError(msg) {
   alert(msg + '，請重新操作')
   router.push('/checkout')
 }
 
-// 掛載時讀取 localStorage 資料
 onMounted(() => {
   const raw = localStorage.getItem('checkoutOrderData')
+  console.log('checkoutOrderData 原始值：', raw)
   if (!raw) return redirectError('找不到訂單資料')
 
   try {
     const parsed = JSON.parse(raw)
-    if (!parsed.orderId && !parsed.order_uuid) return redirectError('訂單編號遺失')
-    orderData.value = parsed
+    const id = parsed.order_uuid || parsed.orderId
+    console.log('解析出來的訂單 ID:', id)
+    if (!id || typeof id !== 'string' || id.length < 16) {
+      return redirectError('訂單編號格式錯誤（請重新發起贊助）')
+    }
+
+    const selectedPlan = parsed.selectedPlan
+    console.log('選擇的方案資料 selectedPlan:', selectedPlan)
+    if (!selectedPlan || (!selectedPlan.plan_name && !selectedPlan.feedback)) {
+      return redirectError('找不到贊助方案資料，請重新選擇方案，請重新操作')
+    }
+
+    orderData.value = {
+      orderId: id,
+      order_uuid: id,
+      amount: parsed.amount,
+      name: parsed.name,
+      email: parsed.email,
+      note: parsed.note || '',
+      recipient: parsed.recipient,
+      phone: parsed.phone,
+      zipcode: parsed.zipcode,
+      address: parsed.address,
+      payment: parsed.payment || 'credit',
+    }
     sponsorData.value.project_title = parsed.project_title || '未提供'
     sponsorData.value.feedback = parsed.feedback || '未提供'
     baseAmount.value = Number.isFinite(parsed.base_amount) ? parsed.base_amount : parsed.amount || 0
   } catch (err) {
+    console.error('checkoutOrderData 解析錯誤:', err)
     redirectError('訂單資料格式錯誤')
   }
 })
 
-const isSubmitting = ref(false)
-
-// 安全處理商品名稱避免亂碼與 SHA 錯誤
-function safeEncodeProductName(name) {
-  if (!name || typeof name !== 'string') return 'donate_card'
-  try {
-    const encoded = encodeURIComponent(name)
-    const base64 = btoa(decodeURIComponent(encoded))
-    return base64.slice(0, 100) // 限制長度避免錯誤
-  } catch (e) {
-    return 'donate_card'
-  }
-}
-
-// 送出付款請求
 async function submitPayment() {
   isSubmitting.value = true
   try {
     const token = localStorage.getItem('token')
     if (!token) return redirectError('請先登入才能付款')
-
-    const rawType = (orderData.value.payment || '').toLowerCase()
-    const paymentType = rawType === 'card' ? 'credit' : rawType || 'credit'
+    sessionStorage.setItem('token', token)
 
     const orderId = orderData.value.order_uuid || orderData.value.orderId
-    const amount = Number(orderData.value.amount) || 0
-    const email = orderData.value.email?.trim() || 'test@example.com'
-
-    //  安全抓取 sponsorFormData 中的 selectedPlan
-    const requestBody = {
-      amount,
-      email,
+    if (!orderId || typeof orderId !== 'string') {
+      return redirectError('訂單編號格式錯誤，請重新操作')
     }
-    // 安全抓取 sponsorFormData 中的 selectedPlan
+    console.log(' 最終 orderId:', orderId)
+    console.log(' orderData:', orderData.value)
+
+    const amount = Number(orderData.value.amount) || 0
+    if (!Number.isInteger(amount) || amount <= 0) {
+      return redirectError('金額不合法，請重新操作')
+    }
+    const email = orderData.value.email?.trim() || 'test@example.com'
+    const rawType = (orderData.value.payment || '').toLowerCase()
+    const paymentType = ['linepay', 'credit', 'atm'].includes(rawType) ? rawType : 'credit'
+
     const sponsorFormDataRaw = localStorage.getItem('sponsorFormData') || '{}'
     const selectedPlan = JSON.parse(sponsorFormDataRaw)?.selectedPlan || {}
-
     const planName =
-      selectedPlan.plan_name?.trim() || selectedPlan.feedback?.trim() || '贊助支持方案'
+      selectedPlan.plan_name?.trim() ||
+      selectedPlan.feedback?.trim() ||
+      sponsorData.value.feedback?.trim() ||
+      '贊助支持方案'
 
-    const productName = safeEncodeProductName(planName)
+    const productName = planName.slice(0, 100)
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
-    const url = `${baseURL}/users/orders/${orderId}/payment`
+    console.log(` 開始付款流程：${paymentType}，訂單 ID: ${orderId}，金額: ${amount}`)
 
-    const payload = { amount, email, payment_type: paymentType, productName }
+    const baseURL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(
+      /\/+$/,
+      ''
+    )
 
-    // 根據付款方式處理
+    const payload = {
+      amount,
+      email,
+      payment_type: paymentType,
+      productName,
+    }
+
+    let url = ''
+    if (paymentType === 'linepay') {
+      url = `${baseURL}/api/v1/users/orders/${orderId}/payment`
+    } else {
+      url = `${baseURL}/api/v1/users/orders/${orderId}/ecpay`
+    }
+
+    console.log(' 最終送出 payload：', payload)
+    console.log(' payment type:', paymentType)
+    console.log(' payment url:', url)
+
     if (paymentType === 'linepay') {
       await handleLinePayPayment(payload, token, url)
     } else {
-      await handleNewebPayPayment(payload, token, url)
+      await handleEcpayPayment(payload, token, url)
     }
   } catch (err) {
-    console.error('付款建立失敗：', err)
-    alert('付款建立失敗：\n' + (err.message || '未知錯誤'))
+    console.error(' submitPayment 錯誤:', err)
+    alert('付款建立失敗：' + (err.message || '未知錯誤'))
   } finally {
     isSubmitting.value = false
   }
 }
 
-// LINE Pay 付款處理
 async function handleLinePayPayment(payload, token, url) {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify(payload),
-  })
-  const json = await res.json()
-  if (!res.ok || !json?.data?.payment_url) {
-    console.error('LINE Pay 錯誤回應：', json)
-    throw new Error(json?.message || 'LINE Pay 建立失敗')
-  }
-  window.location.href = json.data.payment_url
-}
-
-// NewebPay 藍新付款處理
-async function handleNewebPayPayment(payload, token, url) {
   const res = await fetch(url, {
     method: 'POST',
     headers: {
@@ -213,13 +234,37 @@ async function handleNewebPayPayment(payload, token, url) {
     body: JSON.stringify(payload),
   })
 
-  if (!res.ok) throw new Error(`藍新金流建立失敗：${res.status}`)
+  const result = await res.json()
+  console.log(' LINE Pay 建立回應：', result)
+
+  if (!res.ok || !result?.data?.paymentUrl) {
+    console.error(' LINE Pay 回傳錯誤：', result)
+    throw new Error('LINE Pay 付款建立失敗')
+  }
+
+  window.location.href = result.data.paymentUrl
+}
+
+async function handleEcpayPayment(payload, token, url) {
+  console.log(' 正在使用內嵌方式呈現綠界表單')
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!res.ok) throw new Error(`綠界金流建立失敗：${res.status}`)
 
   const formHTML = await res.text()
 
-  const blob = new Blob([formHTML], { type: 'text/html' })
-  const blobUrl = URL.createObjectURL(blob)
-  window.location.href = blobUrl
+  //  直接覆蓋當前畫面，不使用新視窗
+  document.open()
+  document.write(formHTML)
+  document.close()
 }
 </script>
 

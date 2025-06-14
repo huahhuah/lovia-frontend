@@ -22,10 +22,10 @@ const props = defineProps({
 const router = useRouter()
 
 const steps = [
-  { label: '贊助專案確認', path: '/checkout' },
-  { label: '訂單填寫資料', path: '/checkout/order' },
-  { label: '確認訂單資料', path: '/checkout/confirm' },
-  { label: '交易結果', path: '/checkout/result' },
+  { label: '① 贊助專案確認', path: '/checkout' },
+  { label: '② 訂單填寫資料', path: '/checkout/order' },
+  { label: '③ 確認訂單資料', path: '/checkout/confirm' },
+  { label: '④ 交易結果', path: '/checkout/result' },
 ]
 
 function goToStep(step) {
@@ -37,13 +37,16 @@ function goToStep(step) {
 
 <style scoped>
 .step {
-  padding: 0.5rem 1rem;
+  padding: 3rem 1rem;
   border-bottom: 2px solid transparent;
   font-weight: bold;
   color: #888;
+  font-size: 25px;
+  background-color: #ffedf2;
 }
 .step.active {
-  border-color: #0d6efd;
-  color: #0d6efd;
+  border-color: #e1141b;
+  color: #e1141b;
+  background-color: #ffd2cf;
 }
 </style>
