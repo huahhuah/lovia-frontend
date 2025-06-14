@@ -48,7 +48,7 @@
           <div class="dropdown">
             <button class="btn d-flex align-items-center gap-2" @click="toggleDropdown">
               <img
-                :src="user.avatar || defaultAvatar"
+                :src="user.avatar_url || defaultAvatar"
                 class="rounded-circle"
                 width="36"
                 height="36"
@@ -197,10 +197,10 @@ const handleClickOutside = (event) => {
   }
 }
 
-const handlePropose = () =>{
+const handlePropose = () => {
   if (!user.value) {
     router.push('/login')
-    return 
+    return
   }
   if (isProposer.value) {
     console.log(isProposer)

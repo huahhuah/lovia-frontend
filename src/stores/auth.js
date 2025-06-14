@@ -29,6 +29,7 @@ export const useUserStore = defineStore('user', {
       this.user = {
         ...this.user, // 保留原本的屬性（特別是 role）
         ...user, // 用新資料更新
+        avatar_url: user.avatar_url || this.user?.avatar_url || null,
       }
       localStorage.setItem('user', JSON.stringify(this.user))
       console.log('已設置使用者:', this.user)

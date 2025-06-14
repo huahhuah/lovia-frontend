@@ -2,15 +2,14 @@
 <template>
   <SponsorshipLayout>
     <div class="container py-5">
-      <h3 class="fw-bold mb-4">填寫訂單資料</h3>
       <div class="row">
         <div class="col-lg-8">
           <section class="mb-5">
             <h5 class="fw-bold">購買人（贊助人）</h5>
             <div class="row g-3">
               <div class="col-md-6">
-                <label class="form-label">姓名</label>
-                <input v-model="form.name" class="form-control" placeholder="真實姓名" readonly />
+                <label class="form-label">會員名稱</label>
+                <input v-model="form.name" class="form-control" placeholder="會員名稱" readonly />
               </div>
               <div class="col-md-6">
                 <label class="form-label">電子信箱</label>
@@ -99,7 +98,7 @@
                 <input
                   v-model="form.phone"
                   class="form-control"
-                  placeholder="連絡電話"
+                  placeholder="聯絡電話"
                   @input="errors.phone = ''"
                 />
                 <p class="text-danger small" v-if="errors.phone">{{ errors.phone }}</p>
@@ -146,7 +145,12 @@
                   }
                 "
               >
-                💳 信用卡
+                <img
+                  src="/src/assets/images/credit.png"
+                  alt="信用卡"
+                  style="width: 40px; height: 40px"
+                />
+                信用卡
               </button>
 
               <button
@@ -159,7 +163,8 @@
                   }
                 "
               >
-                🏧 ATM
+                <img src="/src/assets/icons/atm.svg" alt="ATM" style="width: 40px; height: 40px" />
+                ATM
               </button>
 
               <button
@@ -172,7 +177,11 @@
                   }
                 "
               >
-                LINE Pay
+                <img
+                  src="/src/assets/icons/LINE_Pay.svg"
+                  alt="LinePay"
+                  style="width: 80px; height: auto"
+                />
               </button>
             </div>
             <p class="text-danger small mt-2" v-if="errors.payment">{{ errors.payment }}</p>
@@ -361,8 +370,42 @@ function validateOrderForm(form) {
     isValid = false
   }
 
+  const zipcodeMap = {
+    100: '中正區',
+    103: '大同區',
+    104: '中山區',
+    105: '松山區',
+    106: '大安區',
+    108: '萬華區',
+    110: '信義區',
+    111: '士林區',
+    112: '北投區',
+    114: '內湖區',
+    115: '南港區',
+    116: '文山區',
+    200: '基隆市',
+    220: '板橋區',
+    221: '汐止區',
+    231: '新店區',
+    241: '三重區',
+    242: '新莊區',
+    243: '泰山區',
+    244: '林口區',
+    247: '蘆洲區',
+    251: '淡水區',
+    300: '新竹市',
+    400: '台中市',
+    500: '彰化縣',
+    600: '嘉義市',
+    700: '台南市',
+    800: '高雄市',
+    900: '屏東縣',
+  }
   if (!form.zipcode.trim()) {
     errors.value.zipcode = '請填寫郵遞區號'
+    isValid = false
+  } else if (!/^\d{3}$/.test(form.zipcode) || !(form.zipcode in zipcodeMap)) {
+    errors.zipcode = '請輸入有效的郵遞區號'
     isValid = false
   }
 
@@ -404,7 +447,6 @@ async function submitOrder() {
 
   const amount = totalAmount.value
 
-  // 驗證金額為正整數
   if (!Number.isInteger(amount) || amount <= 0) {
     alert('贊助金額必須為正整數')
     return
@@ -415,7 +457,7 @@ async function submitOrder() {
       display_name: sponsorData.value.display_name || form.value.name || '匿名',
       note: sponsorData.value.note || '',
       quantity: 1,
-      amount, // 實際贊助金額
+      amount,
     },
     shipping: {
       name: form.value.recipient,
@@ -443,12 +485,18 @@ async function submitOrder() {
       ? sponsorData.value.base_amount
       : amount
 
+    //  組出 selectedPlan，提供給付款頁顯示用
+    const selectedPlan = {
+      plan_name: sponsorData.value.plan_name || '',
+      feedback: sponsorData.value.feedback || '',
+    }
+
+    //  儲存付款頁需要的訂單資料（含 plan 資訊）
     localStorage.setItem(
       'checkoutOrderData',
       JSON.stringify({
-        orderId: res.data.order_uuid,
         order_uuid: res.data.order_uuid,
-        amount: amount,
+        amount,
         name: form.value.name,
         email: form.value.account,
         recipient: form.value.recipient,
@@ -461,13 +509,14 @@ async function submitOrder() {
         feedback: sponsorData.value.feedback,
         base_amount: baseAmountToSave,
         payment: form.value.payment || 'card',
+        selectedPlan,
       })
     )
 
     console.log('使用付款方式:', form.value.payment)
-    console.log(' 建立訂單成功：', res.data)
+    console.log('建立訂單成功：', res.data)
     if (!res.data?.order_uuid) {
-      alert('建立訂單失敗,請稍後再試')
+      alert('建立訂單失敗，請稍後再試')
       return
     }
     router.push('/checkout/confirm')
@@ -483,9 +532,49 @@ async function submitOrder() {
 .card {
   border-radius: 1rem;
 }
+
 .btn.active {
-  background-color: #0d6efd;
+  background-color: #ffb6a7;
   color: white;
-  border-color: #0d6efd;
+  border-color: #0d0d0c;
+}
+
+/* 覆蓋 hover 時的灰色背景 */
+.btn-outline-secondary:hover {
+  background-color: #ffe1d9 !important; /* 自訂 hover 背景色 */
+  border-color: #ffb6a7 !important;
+  color: #0d0d0c !important;
+}
+
+/* 若已被選取（active）+ hover 狀態下的樣式 */
+.btn-outline-secondary.active:hover {
+  background-color: #ffa18f !important;
+  border-color: #ffa18f !important;
+  color: #0d0d0c !important;
+}
+
+/* 若按鈕是 active 狀態（選取後） */
+.btn-outline-secondary.active {
+  background-color: #ffb6a7 !important;
+  border-color: #ffb6a7 !important;
+  color: #0d0d0c !important;
+}
+
+.btn.btn-primary {
+  background-color: #fc5b53 !important;
+  border-color: #fc5b53 !important;
+  color: white !important;
+}
+
+.btn.btn-primary:hover {
+  background-color: #e0433b !important; /* 可選：hover 深一點 */
+  border-color: #e0433b !important;
+  color: white !important;
+}
+
+.btn.btn-primary:disabled {
+  background-color: #fc5b53 !important;
+  border-color: #fc5b53 !important;
+  opacity: 0.65;
 }
 </style>
