@@ -7,7 +7,7 @@
     <section class="user-header container">
       <!-- ✅ 頭像與名稱 -->
       <div class="avatar-area">
-        <img :src="user?.avatar || defaultAvatar" class="user-avatar" alt="avatar" />
+        <img :src="avatarUrl" class="user-avatar" alt="avatar" />
         <h5 class="username-text">{{ user?.username || '使用者' }}</h5>
       </div>
 
@@ -57,7 +57,7 @@
           </ul>
         </li>
       </ul>
-      </section>
+    </section>
 
     <!-- ✅ 頁面主要內容：會根據 router-view 換畫面 -->
     <main class="user-main container my-5">
@@ -66,16 +66,20 @@
   </div>
 </template>
 
-
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/stores/auth'
 import defaultAvatar from '@/assets/images/default-avatar.png'
 
 const userStore = useUserStore()
-const user = userStore.user
-const isProposer = userStore.isProposer
-const isSponsor = userStore.isSponsor
+const user = computed(() => userStore.user)
+const isProposer = computed(() => userStore.isProposer)
+const isSponsor = computed(() => userStore.isSponsor)
+
+const avatarUrl = computed(() => {
+  const avatar = user.value?.avatar_url
+  return avatar ? avatar : defaultAvatar
+})
 
 // 控制 dropdown 顯示
 const showOrders = ref(false)
@@ -104,7 +108,7 @@ const toggleQuestions = () => {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  background-image: linear-gradient(to right, #FFEDF2, #FFF6E3);
+  background-image: linear-gradient(to right, #ffedf2, #fff6e3);
   background-size: cover;
   background-position: center top;
   overflow-x: hidden;
@@ -142,8 +146,8 @@ const toggleQuestions = () => {
 
 .avatar-area {
   display: flex;
-  flex-direction: flex-end;       /* ✅ 讓頭像在上、名稱在下 */
-  align-items: center;          /* ✅ 水平置中 */
+  flex-direction: flex-end;
+  align-items: center;
   width: 235px;
   height: 160px;
   gap: 16px;
@@ -187,7 +191,7 @@ const toggleQuestions = () => {
   display: block;
   margin: 0 auto;
   margin-top: 4px;
-  width: 40px; /* ✅ 這裡改底線長度 */
+  width: 40px;
   border-bottom: 2px solid #FC5B53;
 }
 
@@ -230,7 +234,7 @@ const toggleQuestions = () => {
 .nav-link.dropdown-toggle {
   display: flex;
   align-items: center;
-  gap: 4px; /* 文字和箭頭之間的間距 */
+  gap: 4px;
   cursor: pointer;
 }
 
@@ -247,10 +251,9 @@ const toggleQuestions = () => {
   .user-header.container {
     padding-left: 12px;
     padding-right: 12px;
-    overflow-x: hidden; /* 限制內容 */
+    overflow-x: hidden;
   }
 
-  /* 背景圖層 */
   .background-layer {
     width: 100%;
     max-width: 375px;
@@ -259,18 +262,16 @@ const toggleQuestions = () => {
     transform: translateX(-50%);
   }
 
-  /* 外層 wrapper */
   .user-header,
   .user-main {
     padding-left: 16px;
     padding-right: 16px;
   }
 
-  /* 使用者頭像區塊 */
   .avatar-area {
-    width: 100px;         /* ✅ 原本是 120 */
-    height: 120px;        /* ✅ 原本是 150 */
-    margin-top: -60px;    /* ✅ 再往上移一點 */
+    width: 100px;
+    height: 120px;
+    margin-top: -60px;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -279,13 +280,11 @@ const toggleQuestions = () => {
     margin-right: auto;
   }
 
-  /* 頭貼圖片 */
   .user-avatar {
     width: 120px;
     height: 150px;
-}
+  }
 
-  /* 使用者名稱文字 */
   .username-text {
     width: 80px;
     height: 22px;
@@ -296,7 +295,6 @@ const toggleQuestions = () => {
     color: #222;
   }
 
-  /* 導覽列 tab menu */
   .user-nav {
     width: 100%;
     max-width: 343px;
@@ -304,36 +302,38 @@ const toggleQuestions = () => {
     display: flex;
     flex-direction: row;
     align-items: center;
-    overflow-x: auto;         /* ✅ 開啟橫向滾動 */
-    white-space: nowrap;      /* ✅ 不換行 */
+    overflow-x: auto;
+    white-space: nowrap;
     padding: 0 8px;
     gap: 8px;
     margin: 0 auto;
-    scrollbar-width: none;    /* ✅ 隱藏滾動條（Firefox） */
-    flex-wrap: nowrap; /* ✅ 這行很重要 */
+    scrollbar-width: none;
+    flex-wrap: nowrap;
     box-sizing: border-box;
   }
 
   .user-nav::-webkit-scrollbar {
-    display: none;            /* ✅ 隱藏滾動條（Chrome/Safari） */
+    display: none;
   }
 
   .user-nav .nav-link {
-    flex: none;               /* ✅ 每個項目不要被壓縮 */
+    flex: none;
     padding: 6px 10px;
     font-size: 14px;
     height: auto;
     width: auto;
     text-align: center;
   }
+
   .user-nav .nav-link.active::after {
     content: '';
     display: block;
     margin: 0 auto;
     margin-top: 4px;
-    width: 40px; /* ✅ 這裡改底線長度 */
+    width: 40px;
     border-bottom: 2px solid #FC5B53;
   }
+
   .dropdown-list {
     left: 50%;
     transform: translateX(-50%);
@@ -343,7 +343,7 @@ const toggleQuestions = () => {
     overflow-x: auto;
     box-sizing: border-box;
   }
-  
+
   .user-nav .nav-item:not(:last-child) {
     margin-right: 12px;
   }
