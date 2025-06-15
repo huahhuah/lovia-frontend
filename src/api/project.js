@@ -87,18 +87,23 @@ export function createProjectComment(projectId, content, token) {
 }
 
 //贊助某個方案
-export async function sponsorProjectPlan(projectId, planId, payload, token) {
-  return axios.post(`${BASE_URL}/api/v1/projects/${projectId}/plans/${planId}/sponsor`, payload, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
+export async function sponsorProjectPlan(projectId, planId, data, token) {
+  const res = await axios.post(
+    `${BASE_URL}/api/v1/projects/${projectId}/plans/${planId}/sponsor`,
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+  return res.data
 }
 
 //建立訂單
 export async function createSponsorship(projectId, planId, payload, token) {
   const res = await axios.post(
-    `${BASE_URL}/api/v1/projects/${projectId}/plans/${planId}/sponsor`,
+    `${BASE_URL}/api/v1/projects/${projectId}/plans/${planId}/sponsor-entry`,
     payload,
     {
       headers: {
@@ -163,3 +168,5 @@ export async function createOrderPaymentForm(orderId, amount, email, token) {
     responseType: 'document',
   })
 }
+
+

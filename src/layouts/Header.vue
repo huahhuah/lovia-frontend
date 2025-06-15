@@ -36,7 +36,10 @@
           </div>
         </form>
         <router-link to="/projects/explore-projects" class="nav-link text-dark">探索</router-link>
-        <router-link to="/projects/create" class="nav-link text-dark">提案</router-link>
+        <!-- <router-link to="/projects/create" class="nav-link text-dark">提案</router-link> -->
+        <span class="nav-link text-dark" style="cursor: pointer" @click="handlePropose">
+          提案
+        </span>
       </div>
 
       <!-- 桌機登入／使用者區 -->
@@ -45,7 +48,7 @@
           <div class="dropdown">
             <button class="btn d-flex align-items-center gap-2" @click="toggleDropdown">
               <img
-                :src="user.avatar || defaultAvatar"
+                :src="user.avatar_url || defaultAvatar"
                 class="rounded-circle"
                 width="36"
                 height="36"
@@ -138,7 +141,8 @@
       <img src="/homepageS1-logo.png" alt="Logo" width="150" @click="isMenuOpen = false" />
       <router-link to="/" class="menu-link" @click="isMenuOpen = false">首頁</router-link>
       <router-link to="/explore" class="menu-link" @click="isMenuOpen = false">探索</router-link>
-      <router-link to="/propose" class="menu-link" @click="isMenuOpen = false">提案</router-link>
+      <!-- <router-link to="/propose" class="menu-link" @click="isMenuOpen = false">提案</router-link> -->
+      <span class="menu-link" @click="handlePropose">提案</span>
       <router-link v-if="!user" to="/register" class="menu-link" @click="isMenuOpen = false"
         >註冊</router-link
       >
@@ -190,6 +194,19 @@ const handleClickOutside = (event) => {
   const dropdown = document.querySelector('.dropdown')
   if (dropdown && !dropdown.contains(event.target)) {
     isDropdownOpen.value = false
+  }
+}
+
+const handlePropose = () => {
+  if (!user.value) {
+    router.push('/login')
+    return
+  }
+  if (isProposer.value) {
+    console.log(isProposer)
+    router.push('projects/create')
+  } else {
+    router.push('/users/postApplication')
   }
 }
 

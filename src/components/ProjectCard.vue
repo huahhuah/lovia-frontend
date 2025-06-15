@@ -33,7 +33,7 @@
             :to="`/projects/funding/${project.id}`"
             class="btn btn-sm btn-danger rounded-pill px-3"
           >
-            立即贊助 >
+            立刻贊助 >
           </router-link>
         </div>
       </div>
@@ -50,7 +50,7 @@ defineProps({
 })
 </script>
 
-<style scoped>
+<style>
 .card {
   width: 100%;
   max-width: 320px;
@@ -80,8 +80,8 @@ defineProps({
   position: absolute;
   top: 12px;
   right: 12px;
-  width: 36px;
-  height: 36px;
+  width: 48px;  /* 放大 */
+  height: 48px;
   background-color: rgba(26, 26, 26, 0.2);
   border-radius: 50%;
   display: flex;
@@ -91,8 +91,8 @@ defineProps({
   cursor: pointer;
 }
 .favorite-icon {
-  width: 18px;
-  height: 18px;
+  width: 24x;
+  height: 24px;
   filter: brightness(0) invert(1);
 }
 

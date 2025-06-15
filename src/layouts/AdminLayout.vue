@@ -6,6 +6,7 @@
       <ul class="nav flex-column gap-2">
         <li><router-link to="/admin/dashboard" class="nav-link text-white">總覽</router-link></li>
         <li><router-link to="/admin/users" class="nav-link text-white">使用者管理</router-link></li>
+        <li><router-link to="/admin/proposerReview" class="nav-link text-white">權限審核</router-link></li>
         <li>
           <router-link to="/admin/projects" class="nav-link text-white">專案管理</router-link>
         </li>

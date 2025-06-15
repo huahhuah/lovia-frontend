@@ -24,6 +24,17 @@ const router = createRouter({
       component: () => import('../views/RegisterForm.vue'),
     },
     {
+      path: '/forgot-password',
+      name: 'ForgotPassword',
+      component: () => import('../views/users/ForgotPasswordView.vue'),
+    },
+    {
+      path: '/reset-password/:token',
+      name: 'ResetPassword',
+      component: () => import('../views/users/ResetPasswordView.vue'),
+      props: true, // 讓 token 可透過 props 傳入元件
+    },
+    {
       path: '/projects/:id',
       name: 'ProjectDetail',
       component: () => import('../views/ProjectDetailView.vue'),
@@ -35,6 +46,14 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+
+      path: '/users/postApplication',
+      name: 'Proposer',
+      component: () => import('@/views/users/Proposer.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+
       path: '/projects/:project_id/plans',
       name: 'ProjectPlan',
       component: () => import('@/views/projects/ProjectPlan.vue'),
@@ -110,9 +129,27 @@ const router = createRouter({
       component: () => import('@/views/projects/OrderConfirm.vue'),
     },
     {
+      //訂單交易結果
       path: '/checkout/result',
-      name: 'OrderResult',
-      component: () => import('@/views/projects/OrderResult.vue'),
+      name: 'PaymentResult',
+      component: () => import('@/views/payment/PaymentResult.vue'),
+    },
+    {
+      path: '/payment/PaymentResult',
+      redirect: (to) => {
+        // 保留查詢參數並轉到正確頁面
+        return { path: '/checkout/result', query: to.query }
+      },
+    },
+    {
+      path: '/checkout/cancel',
+      name: 'PaymentCancel',
+      component: () => import('@/views/payment/PaymentCancel.vue'),
+    },
+    {
+      path: '/payment/linepay/start',
+      name: 'LinePayStart',
+      component: () => import('@/views/payment/LinePayStart.vue'),
     },
 
     {
@@ -120,6 +157,10 @@ const router = createRouter({
       component: () => import('@/layouts/UserLayout.vue'),
       meta: { requiresAuth: true },
       children: [
+        {
+          path: '',
+          redirect: '/user/sponsorships' 
+        },
         {
           path: 'edit',
           name: 'EditProfile',
@@ -177,6 +218,11 @@ const router = createRouter({
           name: 'AdminProjects',
           component: () => import('../views/admin/AdminProjects.vue'),
         },
+        {
+          path: 'proposerReview',
+          name: 'AdminProposersReview',
+          component:() => import(`@/views/admin/AdminProposerReview.vue`)
+        }
       ],
     },
     {
@@ -190,6 +236,14 @@ const router = createRouter({
 //  全域守衛: 驗證登入狀態 & 親級權限
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
+
+  // 排除不需要認證檢查的頁面
+  const publicPages = ['/login', '/register', '/forgot-password', '/reset-password']
+  const isPublicPage = publicPages.some((page) => to.path.startsWith(page))
+
+  if (isPublicPage) {
+    return next() // 直接通過，不做認證檢查
+  }
 
   const isLoggedIn = userStore.isLoggedIn
 

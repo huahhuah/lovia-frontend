@@ -26,7 +26,7 @@ const currentStep = stepMap[route.path] ?? 0
 
 <style scoped>
 .sponsorship-layout {
-  background: #f8f9fa;
+  background: #ffecec;
   min-height: 100vh;
   padding-top: 100px;
 }

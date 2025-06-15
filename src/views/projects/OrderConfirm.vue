@@ -1,11 +1,8 @@
-<!-- 建立訂單(確認訂單資料) -->
 <template>
   <SponsorshipLayout>
     <div class="container py-5">
       <div class="row">
-        <!-- 左側內容區 -->
         <div class="col-lg-8">
-          <!-- 訂單資訊 -->
           <section class="mb-5">
             <div class="row g-3">
               <div class="col-md-6">
@@ -17,7 +14,7 @@
                 <input type="text" class="form-control" :value="orderData.amount" disabled />
               </div>
               <div class="col-md-6">
-                <label class="form-label">真實姓名</label>
+                <label class="form-label">贊助人資料</label>
                 <input type="text" class="form-control" :value="orderData.name" disabled />
               </div>
               <div class="col-md-6">
@@ -27,7 +24,6 @@
             </div>
           </section>
 
-          <!-- 寄送資料 -->
           <section class="mb-5">
             <h5 class="fw-bold">確認寄送資料</h5>
             <div class="row g-3">
@@ -57,13 +53,12 @@
           <p class="text-muted small">確認內容無誤後請點選右側按鈕完成付款，我們將為您處理訂單。</p>
         </div>
 
-        <!-- 右側摘要區 -->
         <div class="col-lg-4">
           <div class="card p-4 shadow-sm">
             <h6 class="fw-bold">訂單摘要</h6>
-            <p class="mb-1">專案名稱: {{ sponsorData.project_title || '專案名稱載入中' }}</p>
+            <p class="mb-1">專案名稱: {{ sponsorData.project_title }}</p>
             <p class="text-muted small">
-              贊助方案：{{ sponsorData.feedback || '方案資訊載入中' }}（NT$ {{ baseAmount }}）
+              贊助方案：{{ sponsorData.feedback }}（NT$ {{ baseAmount }}）
             </p>
             <hr />
             <div class="d-flex justify-content-between">
@@ -97,91 +92,149 @@
 import SponsorshipLayout from '@/layouts/SponsorshipLayout.vue'
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '@/stores/auth'
 
 const router = useRouter()
-const userStore = useUserStore()
-const token = userStore.token
-
 const orderData = ref({})
-const sponsorData = ref({
-  project_title: '',
-  feedback: '',
-})
-
+const sponsorData = ref({ project_title: '', feedback: '' })
 const baseAmount = ref(0)
+const isSubmitting = ref(false)
 
 const extraAmount = computed(() => {
   const total = orderData.value.amount || 0
   return total > baseAmount.value ? total - baseAmount.value : 0
 })
 
+function redirectError(msg) {
+  alert(msg + '，請重新操作')
+  router.push('/checkout')
+}
+
 onMounted(() => {
   const raw = localStorage.getItem('checkoutOrderData')
-  if (!raw) {
-    alert('找不到訂單資料，請重新操作')
-    router.push('/checkout')
-    return
-  }
+  if (!raw) return redirectError('找不到訂單資料')
 
-  let parsed
   try {
-    parsed = JSON.parse(raw)
+    const parsed = JSON.parse(raw)
+    const id = parsed.order_uuid || parsed.orderId
+    if (!id || typeof id !== 'string' || id.length < 16) {
+      return redirectError('訂單編號格式錯誤（請重新發起贊助）')
+    }
+
+    const selectedPlan = parsed.selectedPlan
+    if (!selectedPlan || (!selectedPlan.plan_name && !selectedPlan.feedback)) {
+      return redirectError('找不到贊助方案資料，請重新操作')
+    }
+
+    orderData.value = {
+      orderId: id,
+      order_uuid: id,
+      amount: parsed.amount,
+      name: parsed.name,
+      email: parsed.email,
+      note: parsed.note || '',
+      recipient: parsed.recipient,
+      phone: parsed.phone,
+      zipcode: parsed.zipcode,
+      address: parsed.address,
+      payment: parsed.payment || 'credit',
+    }
+    sponsorData.value.project_title = parsed.project_title || '未提供'
+    sponsorData.value.feedback = parsed.feedback || '未提供'
+    baseAmount.value = Number.isFinite(parsed.base_amount) ? parsed.base_amount : parsed.amount || 0
   } catch (err) {
-    alert('訂單資料格式錯誤，請重新操作')
-    router.push('/checkout')
-    return
+    console.error('checkoutOrderData 解析錯誤:', err)
+    redirectError('訂單資料格式錯誤')
   }
-
-  orderData.value = parsed
-  sponsorData.value.project_title = parsed.project_title || '未提供'
-  sponsorData.value.feedback = parsed.feedback || '未提供'
-  baseAmount.value = parsed.base_amount || parsed.amount || 0
 })
-
-const isSubmitting = ref(false)
 
 async function submitPayment() {
   isSubmitting.value = true
   try {
+    const token = localStorage.getItem('token')
+    if (!token) return redirectError('請先登入才能付款')
+    sessionStorage.setItem('token', token)
+
     const orderId = orderData.value.order_uuid
-    const amount = orderData.value.amount
-    const email = orderData.value.email
-
-    const response = await fetch(
-      `https://lovia-backend-xl4e.onrender.com/api/v1/users/orders/${orderId}/ecpay`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ amount, email }),
-      }
-    )
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`建立付款失敗，HTTP ${response.status}：${errorText}`)
+    if (!orderId || typeof orderId !== 'string') {
+      return redirectError('訂單編號格式錯誤，請重新操作')
     }
 
-    const html = await response.text()
-
-    const paymentWindow = window.open('', '_blank')
-    if (!paymentWindow) {
-      alert('無法開啟付款視窗，請確認瀏覽器未封鎖彈出視窗')
-      return
+    const amount = Number(orderData.value.amount) || 0
+    if (!Number.isInteger(amount) || amount <= 0) {
+      return redirectError('金額不合法，請重新操作')
     }
 
-    paymentWindow.document.open()
-    paymentWindow.document.write(html)
-    paymentWindow.document.close()
+    const email = orderData.value.email?.trim() || 'test@example.com'
+    const rawType = (orderData.value.payment || '').toLowerCase()
+    const paymentType = ['linepay', 'credit', 'atm'].includes(rawType) ? rawType : 'credit'
+
+    const sponsorFormDataRaw = localStorage.getItem('sponsorFormData') || '{}'
+    const selectedPlan = JSON.parse(sponsorFormDataRaw)?.selectedPlan || {}
+    const planName =
+      selectedPlan.plan_name?.trim() ||
+      selectedPlan.feedback?.trim() ||
+      sponsorData.value.feedback?.trim() ||
+      '贊助支持方案'
+
+    const productName = planName.slice(0, 100)
+
+    const baseURL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/+$/, '')
+
+    const payload = { amount, email, payment_type: paymentType, productName }
+
+    const url =
+      paymentType === 'linepay'
+        ? `${baseURL}/api/v1/users/orders/${orderId}/payment`
+        : `${baseURL}/api/v1/users/orders/${orderId}/ecpay`
+
+    if (paymentType === 'linepay') {
+      await handleLinePayPayment(payload, token, url)
+    } else {
+      await handleEcpayPayment(payload, token, url)
+    }
   } catch (err) {
-    console.error('付款建立失敗：', err)
-    alert('付款建立失敗：' + err.message)
+    console.error('submitPayment 錯誤:', err)
+    alert('付款建立失敗：' + (err.message || '未知錯誤'))
   } finally {
     isSubmitting.value = false
   }
+}
+
+async function handleLinePayPayment(payload, token, url) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  })
+
+  const result = await res.json()
+  if (!res.ok || !result?.data?.paymentUrl) {
+    console.error('LINE Pay 回傳錯誤：', result)
+    throw new Error('LINE Pay 付款建立失敗')
+  }
+
+  window.location.href = result.data.paymentUrl
+}
+
+async function handleEcpayPayment(payload, token, url) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  })
+
+  if (!res.ok) throw new Error(`綠界金流建立失敗：${res.status}`)
+
+  const formHTML = await res.text()
+  document.open()
+  document.write(formHTML)
+  document.close()
 }
 </script>
 
