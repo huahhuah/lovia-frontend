@@ -83,14 +83,15 @@ async function getAllUsers( page = 1){
 
 async function viewDetails (user){
   try{
-    const token = userStore.token
-    const res = await axios.get(`https://lovia-backend-xl4e.onrender.com/api/v1/admins/users/${user.id}`,
-      {
-        headers:{
-          Authorization: `Bearer ${token}`
-        }
-      }
-    )
+    const res = await axios.get(`https://lovia-backend-xl4e.onrender.com/api/v1/admins/users/${user.id}`)
+    // const token = userStore.token
+    // const res = await axios.get(`https://lovia-backend-xl4e.onrender.com/api/v1/admins/users/${user.id}`,
+    //   {
+    //     headers:{
+    //       Authorization: `Bearer ${token}`
+    //     }
+    //   }
+    // )
     selectedUser.value = res.data.data
     showDetailModal.value = true
   } catch (err){
