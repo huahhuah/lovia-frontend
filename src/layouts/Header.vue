@@ -48,7 +48,7 @@
           <div class="dropdown">
             <button class="btn d-flex align-items-center gap-2" @click="toggleDropdown">
               <img
-                :src="user.avatar_url || defaultAvatar"
+                :src="avatarUrl || defaultAvatar"
                 class="rounded-circle"
                 width="36"
                 height="36"
