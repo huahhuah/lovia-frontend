@@ -122,10 +122,8 @@ import ProjectBanner from '@/components/ProjectBanner.vue'
 import ProjectPlans from '@/components/ProjectPlans.vue'
 import QnaBlock from '@/components/QnaBlock.vue'
 import {
-  createProjectComment,
   getProjectOverview,
   getProjectPlans,
-  getProjectCommets,
   getProjectFaqs,
   getProjectProgresses,
 } from '@/api/project'
