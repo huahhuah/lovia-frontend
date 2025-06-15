@@ -1,5 +1,5 @@
 <template>
-  <div class="container py-5">
+  <div class="proposal-section">
     <h2>我的專案</h2>
     <!-- TODO: 專案清單放這裡 -->
   </div>

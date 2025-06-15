@@ -12,9 +12,9 @@
       </div>
 
       <!-- ✅ 導覽列（會員中心、個人資料、修改密碼） -->
-      <ul class="nav gap-4 user-nav">
-        <li class="nav-item">
-          <router-link to="/user" class="nav-link" active-class="active">會員中心</router-link>
+      <ul class="nav user-nav">
+        <li class="nav-item" :class="{ 'active-tab': $route.path === '/user' }">
+          <router-link to="/user/sponsorships" class="nav-link" exact-active-class="active">會員中心</router-link>
         </li>
         <li class="nav-item">
           <router-link to="/user/edit" class="nav-link" exact-active-class="active">個人資料</router-link>
@@ -25,39 +25,39 @@
 
         <!-- ✅ dropdown：訂單管理（若為贊助者時出現） -->
         <li class="nav-item dropdown-nav" v-if="isSponsor">
-          <div class="nav-link dropdown-toggle" @mouseover="showOrders = true" @mouseleave="showOrders = false">
+          <div
+            class="nav-link dropdown-toggle"
+            @click="toggleOrders"
+            @mouseover="!isMobile && (showOrders = true)"
+            @mouseleave="!isMobile && (showOrders = false)"
+          >
             <span>訂單管理</span>
             <span class="arrow">▾</span>
-            <ul class="dropdown-list" v-show="showOrders"
-              @mouseenter="showOrders = true" @mouseleave="showOrders = false">
-              <li>
-                <router-link to="/user/sponsorships" class="dropdown-item">我的贊助</router-link>
-              </li>
-              <li v-if="isProposer">
-                <router-link to="/user/projects/mine" class="dropdown-item">我的專案</router-link>
-              </li>
-            </ul>
           </div>
+          <ul class="dropdown-list" v-show="showOrders">
+            <li><router-link to="/user/sponsorships" class="dropdown-item">我的贊助</router-link></li>
+            <li v-if="isProposer"><router-link to="/user/projects/mine" class="dropdown-item">我的專案</router-link></li>
+          </ul>
         </li>
 
         <!-- ✅ dropdown：專案提問（提問列表／提問管理） -->
         <li class="nav-item dropdown-nav" v-if="isSponsor || isProposer">
-          <div class="nav-link dropdown-toggle" @mouseover="showQuestions = true" @mouseleave="showQuestions = false">
+          <div
+            class="nav-link dropdown-toggle"
+            @click="toggleQuestions"
+            @mouseover="!isMobile && (showQuestions = true)"
+            @mouseleave="!isMobile && (showQuestions = false)"
+          >
             <span>專案提問</span>
             <span class="arrow">▾</span>
-            <ul class="dropdown-list" v-show="showQuestions"
-              @mouseenter="showQuestions = true" @mouseleave="showQuestions = false">
-              <li>
-                <router-link to="/user/questions" class="dropdown-item">我的提問</router-link>
-              </li>
-              <li v-if="isProposer">
-                <router-link to="/user/questions/manage" class="dropdown-item">提問管理</router-link>
-              </li>
-            </ul>
           </div>
+          <ul class="dropdown-list" v-show="showQuestions">
+            <li><router-link to="/user/questions" class="dropdown-item">我的提問</router-link></li>
+            <li v-if="isProposer"><router-link to="/user/questions/manage" class="dropdown-item">提問管理</router-link></li>
+          </ul>
         </li>
       </ul>
-    </section>
+      </section>
 
     <!-- ✅ 頁面主要內容：會根據 router-view 換畫面 -->
     <main class="user-main container my-5">
@@ -68,7 +68,7 @@
 
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useUserStore } from '@/stores/auth'
 import defaultAvatar from '@/assets/images/default-avatar.png'
 
@@ -80,6 +80,23 @@ const isSponsor = userStore.isSponsor
 // 控制 dropdown 顯示
 const showOrders = ref(false)
 const showQuestions = ref(false)
+const isMobile = ref(false)
+
+onMounted(() => {
+  isMobile.value = window.innerWidth <= 768
+})
+
+const toggleOrders = () => {
+  if (isMobile.value) {
+    showOrders.value = !showOrders.value
+  }
+}
+
+const toggleQuestions = () => {
+  if (isMobile.value) {
+    showQuestions.value = !showQuestions.value
+  }
+}
 </script>
 
 <style scoped>
@@ -90,6 +107,7 @@ const showQuestions = ref(false)
   background-image: linear-gradient(to right, #FFEDF2, #FFF6E3);
   background-size: cover;
   background-position: center top;
+  overflow-x: hidden;
 }
 
 .background-layer {
@@ -110,7 +128,6 @@ const showQuestions = ref(false)
   max-width: 1296px;
   margin-left: auto;
   margin-right: auto;
-  padding: 312 312px;
 }
 
 .user-header {
@@ -152,15 +169,12 @@ const showQuestions = ref(false)
 
 .user-nav .nav-link {
   display: inline-block;
-  width: 112px;
-  height: 48px;
   padding: 12px 24px;
-  font-weight: 400;
   font-size: 16px;
   color: #444;
-  text-decoration: none;      /* ✅ 不要底線 */
-  text-align: center;
-  line-height: 24px;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
 }
 
 .user-nav .nav-link.active {
@@ -169,7 +183,12 @@ const showQuestions = ref(false)
 }
 
 .user-nav .nav-link.active::after {
-  content: none !important;
+  content: '';
+  display: block;
+  margin: 0 auto;
+  margin-top: 4px;
+  width: 40px; /* ✅ 這裡改底線長度 */
+  border-bottom: 2px solid #FC5B53;
 }
 
 .user-main {
@@ -221,5 +240,112 @@ const showQuestions = ref(false)
 
 .arrow {
   font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .user-main.container,
+  .user-header.container {
+    padding-left: 12px;
+    padding-right: 12px;
+    overflow-x: hidden; /* 限制內容 */
+  }
+
+  /* 背景圖層 */
+  .background-layer {
+    width: 100%;
+    max-width: 375px;
+    height: 243px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* 外層 wrapper */
+  .user-header,
+  .user-main {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* 使用者頭像區塊 */
+  .avatar-area {
+    width: 100px;         /* ✅ 原本是 120 */
+    height: 120px;        /* ✅ 原本是 150 */
+    margin-top: -60px;    /* ✅ 再往上移一點 */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* 頭貼圖片 */
+  .user-avatar {
+    width: 120px;
+    height: 150px;
+}
+
+  /* 使用者名稱文字 */
+  .username-text {
+    width: 80px;
+    height: 22px;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 22px;
+    margin: 0;
+    color: #222;
+  }
+
+  /* 導覽列 tab menu */
+  .user-nav {
+    width: 100%;
+    max-width: 343px;
+    height: 48px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;         /* ✅ 開啟橫向滾動 */
+    white-space: nowrap;      /* ✅ 不換行 */
+    padding: 0 8px;
+    gap: 8px;
+    margin: 0 auto;
+    scrollbar-width: none;    /* ✅ 隱藏滾動條（Firefox） */
+    flex-wrap: nowrap; /* ✅ 這行很重要 */
+    box-sizing: border-box;
+  }
+
+  .user-nav::-webkit-scrollbar {
+    display: none;            /* ✅ 隱藏滾動條（Chrome/Safari） */
+  }
+
+  .user-nav .nav-link {
+    flex: none;               /* ✅ 每個項目不要被壓縮 */
+    padding: 6px 10px;
+    font-size: 14px;
+    height: auto;
+    width: auto;
+    text-align: center;
+  }
+  .user-nav .nav-link.active::after {
+    content: '';
+    display: block;
+    margin: 0 auto;
+    margin-top: 4px;
+    width: 40px; /* ✅ 這裡改底線長度 */
+    border-bottom: 2px solid #FC5B53;
+  }
+  .dropdown-list {
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: auto;
+    width: max-content;
+    max-width: 90vw;
+    overflow-x: auto;
+    box-sizing: border-box;
+  }
+  
+  .user-nav .nav-item:not(:last-child) {
+    margin-right: 12px;
+  }
 }
 </style>

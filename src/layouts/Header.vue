@@ -143,12 +143,14 @@
       <router-link to="/explore" class="menu-link" @click="isMenuOpen = false">探索</router-link>
       <!-- <router-link to="/propose" class="menu-link" @click="isMenuOpen = false">提案</router-link> -->
       <span class="menu-link" @click="handlePropose">提案</span>
-      <router-link v-if="!user" to="/register" class="menu-link" @click="isMenuOpen = false"
-        >註冊</router-link
-      >
-      <router-link v-if="!user" to="/login" class="menu-link" @click="isMenuOpen = false"
-        >登入</router-link
-      >
+      <template v-if="user">
+        <router-link to="/user" class="menu-link" @click="isMenuOpen = false">會員中心</router-link>
+        <span class="menu-link" @click="handleLogout">登出</span>
+      </template>
+      <template v-else>
+        <router-link to="/register" class="menu-link" @click="isMenuOpen = false">註冊</router-link>
+         <router-link to="/login" class="menu-link" @click="isMenuOpen = false">登入</router-link>
+      </template>
       <button @click="isMenuOpen = false" class="btn p-0 border-0">
         <img src="/close.png" alt="Close" width="24" />
       </button>
@@ -344,7 +346,9 @@ const handleLogout = () => {
   text-decoration: none;
   border-bottom: 1px solid #eaeaea;
   padding-bottom: 8px;
-  width: 400px;
+  width: 100%;
+  max-width: 343px; /* 根據你手機版 layout 可自行調整 */
+  margin: 0 auto;
   text-align: center;
 }
 
@@ -372,20 +376,24 @@ const handleLogout = () => {
     padding: 6px 10px;
   }
 }
-.dropdown-submenu {
-  position: relative;
-}
+  .dropdown-submenu {
+    position: relative;
+  }
 
-.dropdown-submenu > .dropdown-menu {
-  top: 0;
-  left: 100%;
-  margin-left: 0;
-  margin-right: 0;
-  display: none;
-  position: absolute;
-}
+  .dropdown-submenu > .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    display: none;
+    position: absolute;
+  }
 
-.dropdown-submenu:hover > .dropdown-menu {
-  display: block;
-}
+  .dropdown-submenu:hover > .dropdown-menu {
+    display: block;
+  }
+  .mobile-menu-overlay {
+  max-width: 100vw;
+  overflow-x: hidden;
+  }
 </style>

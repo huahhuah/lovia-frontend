@@ -36,7 +36,7 @@
               <div class="divider-with-button">
                 <hr class="dashed-line" />
                 <button
-                  class="expand-btn btn btn-dark rounded-pill px-4 py-2 fw-bold shadow-sm"
+                  class="expand-btn btn btn-dark rounded-pill px-4 py-2 shadow-sm"
                   @click="isContentExpanded = !isContentExpanded"
                 >
                   {{ isContentExpanded ? '收起內容' : '查看完整內容' }}
@@ -282,7 +282,7 @@ onMounted(async () => {
 }
 
 .dashed-line {
-  border-top: 1px dashed #ccc;
+  border-top: 1px dashed #222;
   margin: 0;
 }
 
@@ -291,7 +291,10 @@ onMounted(async () => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 1;
+  min-width: 180px;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  font-weight: 400; /* 或改為 300 更細 */
   background-color: #000;
   color: #fff;
 }
