@@ -202,10 +202,10 @@ const handleClickOutside = (event) => {
   }
 }
 
-const handlePropose = () =>{
+const handlePropose = () => {
   if (!user.value) {
     router.push('/login')
-    return 
+    return
   }
   if (isProposer.value) {
     console.log(isProposer)

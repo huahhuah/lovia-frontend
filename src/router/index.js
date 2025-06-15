@@ -46,12 +46,14 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+
       path: '/users/postApplication',
       name: 'Proposer',
       component: () => import('@/views/users/Proposer.vue'),
       meta: { requiresAuth: true },
     },
     {
+
       path: '/projects/:project_id/plans',
       name: 'ProjectPlan',
       component: () => import('@/views/projects/ProjectPlan.vue'),
@@ -157,7 +159,7 @@ const router = createRouter({
       children: [
         {
           path: '',
-          redirect: '/user/sponsorships'  // ✅ 加這行
+          redirect: '/user/sponsorships' 
         },
         {
           path: 'edit',

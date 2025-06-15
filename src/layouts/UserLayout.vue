@@ -8,7 +8,6 @@
       <!-- ✅ 頭像與名稱 -->
       <div class="avatar-area">
         <img :src="avatarUrl" class="user-avatar" alt="avatar" />
-
         <h5 class="username-text">{{ user?.username || '使用者' }}</h5>
       </div>
 
@@ -18,19 +17,31 @@
           <router-link to="/user" class="nav-link" active-class="active">會員中心</router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/user/edit" class="nav-link" exact-active-class="active">個人資料</router-link>
+          <router-link to="/user/edit" class="nav-link" exact-active-class="active"
+            >個人資料</router-link
+          >
         </li>
         <li class="nav-item">
-          <router-link to="/user/password" class="nav-link" exact-active-class="active">修改密碼</router-link>
+          <router-link to="/user/password" class="nav-link" exact-active-class="active"
+            >修改密碼</router-link
+          >
         </li>
 
         <!-- ✅ dropdown：訂單管理（若為贊助者時出現） -->
         <li class="nav-item dropdown-nav" v-if="isSponsor">
-          <div class="nav-link dropdown-toggle" @mouseover="showOrders = true" @mouseleave="showOrders = false">
+          <div
+            class="nav-link dropdown-toggle"
+            @mouseover="showOrders = true"
+            @mouseleave="showOrders = false"
+          >
             <span>訂單管理</span>
             <span class="arrow">▾</span>
-            <ul class="dropdown-list" v-show="showOrders"
-              @mouseenter="showOrders = true" @mouseleave="showOrders = false">
+            <ul
+              class="dropdown-list"
+              v-show="showOrders"
+              @mouseenter="showOrders = true"
+              @mouseleave="showOrders = false"
+            >
               <li>
                 <router-link to="/user/sponsorships" class="dropdown-item">我的贊助</router-link>
               </li>
@@ -43,16 +54,26 @@
 
         <!-- ✅ dropdown：專案提問（提問列表／提問管理） -->
         <li class="nav-item dropdown-nav" v-if="isSponsor || isProposer">
-          <div class="nav-link dropdown-toggle" @mouseover="showQuestions = true" @mouseleave="showQuestions = false">
+          <div
+            class="nav-link dropdown-toggle"
+            @mouseover="showQuestions = true"
+            @mouseleave="showQuestions = false"
+          >
             <span>專案提問</span>
             <span class="arrow">▾</span>
-            <ul class="dropdown-list" v-show="showQuestions"
-              @mouseenter="showQuestions = true" @mouseleave="showQuestions = false">
+            <ul
+              class="dropdown-list"
+              v-show="showQuestions"
+              @mouseenter="showQuestions = true"
+              @mouseleave="showQuestions = false"
+            >
               <li>
                 <router-link to="/user/questions" class="dropdown-item">我的提問</router-link>
               </li>
               <li v-if="isProposer">
-                <router-link to="/user/questions/manage" class="dropdown-item">提問管理</router-link>
+                <router-link to="/user/questions/manage" class="dropdown-item"
+                  >提問管理</router-link
+                >
               </li>
             </ul>
           </div>
@@ -66,7 +87,6 @@
     </main>
   </div>
 </template>
-
 
 <script setup>
 import { ref, computed } from 'vue'
@@ -93,7 +113,7 @@ const showQuestions = ref(false)
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  background-image: linear-gradient(to right, #FFEDF2, #FFF6E3);
+  background-image: linear-gradient(to right, #ffedf2, #fff6e3);
   background-size: cover;
   background-position: center top;
 }
@@ -131,8 +151,8 @@ const showQuestions = ref(false)
 
 .avatar-area {
   display: flex;
-  flex-direction: flex-end;       /* ✅ 讓頭像在上、名稱在下 */
-  align-items: center;          /* ✅ 水平置中 */
+  flex-direction: flex-end; /* ✅ 讓頭像在上、名稱在下 */
+  align-items: center; /* ✅ 水平置中 */
   width: 235px;
   height: 160px;
   gap: 16px;
@@ -164,7 +184,7 @@ const showQuestions = ref(false)
   font-weight: 400;
   font-size: 16px;
   color: #444;
-  text-decoration: none;      /* ✅ 不要底線 */
+  text-decoration: none; /* ✅ 不要底線 */
   text-align: center;
   line-height: 24px;
 }

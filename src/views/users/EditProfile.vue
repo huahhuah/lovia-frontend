@@ -57,7 +57,13 @@
 
               <div class="mb-3">
                 <label class="form-label">生日</label>
-                <input v-model="form.birthday" type="date" class="form-control" />
+                <input
+                  id="birthday"
+                  v-model="form.birthday"
+                  type="date"
+                  class="form-control"
+                  :max="maxBirthday"
+                />
               </div>
 
               <div class="mb-3">
@@ -106,12 +112,34 @@
         </div>
       </div>
     </div>
+
+    <!-- Bootstrap Toast -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
+      <div
+        class="toast align-items-center text-white bg-success border-0"
+        ref="toastRef"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body">{{ toastMessage }}</div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { onMounted, reactive, ref, computed, nextTick } from 'vue'
 import { Modal } from 'bootstrap'
+
 import axios from 'axios'
 import router from '@/router'
 import defaultAvatar from '@/assets/images/default-avatar.png'
@@ -119,37 +147,7 @@ import { useUserStore } from '@/stores/auth'
 
 const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
 const userStore = useUserStore()
-
-const genderOptions = [
-  { value: 1, label: '男性' },
-  { value: 2, label: '女性' },
-  { value: 3, label: '其他' },
-  { value: 4, label: '不願透露' },
-]
-
-const genderReverseMap = {
-  male: 1,
-  female: 2,
-  other: 3,
-  undisclosed: 4,
-  男性: 1,
-  女性: 2,
-  其他: 3,
-  不願透露: 4,
-  1: 1,
-  2: 2,
-  3: 3,
-  4: 4,
-}
-
-const form = reactive({
-  username: '',
-  phone: '',
-  avatar_url: '',
-  birthday: '',
-  gender: '',
-})
-
+const form = reactive({ username: '', phone: '', avatar_url: '', birthday: '', gender: '' })
 const isLoading = ref(true)
 const isSubmitting = ref(false)
 const modalRef = ref(null)
@@ -157,15 +155,37 @@ const modalMessage = ref('')
 const modalType = ref('success')
 let modalInstance = null
 
-const usernameValid = computed(() => form.username.trim().length >= 2 && form.username.length <= 50)
-const phonePattern = /^09\d{8}$/
-const phoneValid = computed(() => phonePattern.test(form.phone))
+const toastRef = ref(null)
+const toastMessage = ref('')
+let toastInstance = null
 
-//  新增生日格式驗證函式
-function isValidBirthday(dateString) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(dateString)
+function showToast(msg = '操作成功') {
+  toastMessage.value = msg
+  if (!toastInstance) toastInstance = new Toast(toastRef.value)
+  toastInstance.show()
 }
 
+const maxBirthday = new Date().toISOString().split('T')[0]
+const usernameValid = computed(() => form.username.trim().length >= 2 && form.username.length <= 50)
+const phoneValid = computed(() => /^09\d{8}$/.test(form.phone))
+
+function isValidBirthday(dateStr) {
+  const regex = /^\d{4}-\d{2}-\d{2}$/
+  if (!regex.test(dateStr)) return false
+
+  const [year, month, day] = dateStr.split('-').map(Number)
+  const date = new Date(year, month - 1, day)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  date.setHours(0, 0, 0, 0)
+
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day &&
+    date <= today
+  )
+}
 
 function showModal(msg, type = 'danger') {
   modalMessage.value = msg
@@ -243,15 +263,19 @@ async function submitForm() {
   if (!usernameValid.value) return showModalAndAutoClose('請輸入 2~50 字的使用者名稱')
   if (!phoneValid.value) return showModalAndAutoClose('請輸入正確的手機號碼')
 
-  if (form.birthday && !isValidBirthday(form.birthday)) {
-  return showModalAndAutoClose('生日格式錯誤，請使用 YYYY-MM-DD 格式')
-}
+  if (form.birthday?.includes('/')) {
+    form.birthday = form.birthday.replace(/\//g, '-')
+  }
 
+  if (form.birthday && !isValidBirthday(form.birthday)) {
+    return showModalAndAutoClose('生日格式錯誤，請使用 YYYY-MM-DD 格式')
+  }
 
   if (form.avatar_url?.startsWith('data:image')) {
     return showModalAndAutoClose('圖片尚未上傳，請等待圖片上傳功能完成後再修改頭像')
   }
 
+  // ✅ payload 組裝：不傳 null 給 avatar_url，避免後端報錯
   const payload = {
     username: form.username.trim(),
     phone: form.phone.trim(),
@@ -260,11 +284,14 @@ async function submitForm() {
     avatar_url: form.avatar_url ? form.avatar_url.split('?t')[0] : null,
   }
 
+  console.log('🔍 PATCH payload：', payload)
+
   try {
     isSubmitting.value = true
     const response = await axios.patch(`${baseUrl}/api/v1/users/profile`, payload, {
       headers: { Authorization: `Bearer ${userStore.token}` },
     })
+
     showModal('修改成功！', 'success')
     userStore.setUser(response.data.data.user)
     setTimeout(() => {
@@ -273,22 +300,11 @@ async function submitForm() {
       if (backdrop) backdrop.remove()
     }, 1500)
   } catch (error) {
-    console.error('修改個人資料失敗:', error)
+    console.error('修改失敗:', error)
     showModal(error.response?.data?.message || '修改失敗')
   } finally {
     isSubmitting.value = false
   }
-}
-
-function showModalAndAutoClose(msg, type = 'danger', delay = 1500) {
-  showModal(msg, type)
-  setTimeout(() => {
-    modalInstance.hide()
-    const backdrop = document.querySelector('.modal-backdrop')
-    if (backdrop) backdrop.remove()
-    document.body.classList.remove('modal-open')
-    document.body.style = ''
-  }, delay)
 }
 </script>
 

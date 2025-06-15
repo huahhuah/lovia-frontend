@@ -146,3 +146,27 @@ export async function getProjectFaqs(projectId) {
 export async function getProjectProgresses(projectId) {
   return axios.get(`${BASE_URL}/api/v1/projects/${projectId}/progresses`)
 }
+
+// 建立付款連結
+export async function createOrderPaymentLink(orderId, paymentType = 'credit', token) {
+  return axios.post(
+    `${BASE_URL}/api/v1/users/orders/${orderId}/payment`,
+    { payment_type: paymentType },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+}
+
+export async function createOrderPaymentForm(orderId, amount, email, token) {
+  return axios.post(`${BASE_URL}/api/v1/users/ecpay/orders/${orderId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    responseType: 'document',
+  })
+}
+
+
