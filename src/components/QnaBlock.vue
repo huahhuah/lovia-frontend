@@ -1,12 +1,12 @@
 <template>
   <div class="qna-wrapper">
     <!-- 🟢 提問區 -->
-    <div class="comment-box border p-4 mb-4 rounded-4">
+    <div v-if="props.isLogin" class="comment-box border p-4 mb-4 rounded-4">
       <div class="d-flex mb-2">
         <!-- 使用者大頭貼 -->
         <img
-          src="/使用者.png"
-          alt="avatar"
+          :src="user?.avatar_url || '/default-avatar.png'"
+          alt="使用者頭像"
           class="rounded-circle me-3"
           style="width: 44px; height: 44px; object-fit: cover"
         />
@@ -46,21 +46,45 @@
         :key="reply.id"
       >
         <div class="d-flex align-items-center mb-1">
-          <img :src="reply.adminAvatar || '/default-admin.png'" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover" />
+          <img :src="reply.avatar_url || '/default-admin.png'" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover" />
           <strong>{{ reply.adminName }}</strong>
           <small class="text-muted ms-auto">{{ reply.date }}</small>
         </div>
         <p class="mb-0">{{ reply.content }}</p>
       </div>
     </div>
+    <p v-if="questions.length === 0" class="text-muted text-center">尚無留言，歡迎提出您的問題！</p>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { createProjectComment, getProjectCommets } from '@/api/project'
+
+const props = defineProps({
+  projectId: {
+    type: Number,
+    require: true
+  }, 
+  isLogin: {
+    type: Boolean,
+    require: true
+  }
+})
 
 const newQuestion = ref('')
+const questions = ref([])
+const user = ref({})
 
+try {
+  const raw = localStorage.getItem('user')
+  user.value = raw ? JSON.parse(raw) : {}
+} catch (e) {
+  console.error('localStorage user parse 錯誤', e)
+  user.value = {}
+}
+
+/* 假資料
 const questions = ref([
   {
     id: 1,
@@ -80,21 +104,39 @@ const questions = ref([
     ],
   },
 ])
+*/
+async function fetchComments() {
+  try {
+    const res = await getProjectCommets(props.projectId)
+    questions.value = res.data.data.map(comment => ({
+      id: comment.comment_id,
+      userName: comment.user.name,
+      userAvatar: comment.user.avatar_url || '/default-avatar.png', // 假設後端有 avatar_url
+      date: new Date(comment.created_at).toLocaleString(),
+      content: comment.content,
+      replies: comment.replies || [] // 後端尚未提供回覆，預設為空陣列
+    }))
+  } catch (err) {
+    console.error('取得留言失敗', err)
+    questions.value = []
+  }
+}
 
-function handleSubmit() {
+async function handleSubmit() {
   if (!newQuestion.value.trim()) return
 
-  questions.value.push({
-    id: Date.now(),
-    userName: '匿名使用者',
-    userAvatar: '',
-    date: new Date().toLocaleString(),
-    content: newQuestion.value,
-    replies: [],
-  })
-
-  newQuestion.value = ''
+try {
+    await createProjectComment(props.projectId, newQuestion.value, localStorage.getItem('token'))
+    newQuestion.value = ''
+    await fetchComments() // 提交後重新獲取留言
+  } catch (err) {
+    console.error('留言失敗', err)
+  }
 }
+
+onMounted(() => {
+  fetchComments()
+})
 </script>
 
 <style scoped>

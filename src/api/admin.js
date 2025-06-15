@@ -3,7 +3,7 @@ import axios from 'axios'
 //base_url
 const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
 
-// ¨ú±o¥ş³¡¨Ï¥ÎªÌ¸ê®Æ
+// å–å¾—å…¨éƒ¨ä½¿ç”¨è€…è³‡æ–™
 export const allUsers = ( token, page = 1 ) => {
   return axios.get(`${BASE_URL}/api/v1/admins/users`, {
     headers: {

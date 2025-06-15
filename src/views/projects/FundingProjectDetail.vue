@@ -131,16 +131,17 @@ import {
 } from '@/api/project'
 
 const route = useRoute()
-const projectId = parseInt(route.params.id)
+const projectId = ref(parseInt(route.params.id) || 0)
 const user = ref(JSON.parse(localStorage.getItem('user') || '{}'))
 const isLogin = !!localStorage.getItem('token')
 
 const project = ref(null)
 const plans = ref([])
-const commentContent = ref('')
 const activeTab = ref('專案介紹')
 const tabs = ['專案介紹', '問與答', '常見問題', '進度分享']
 const isContentExpanded = ref(false)
+const faqs = ref([])
+const progresses = ref([])
 
 const sponsorSection = ref(null)
 function scrollToSponsorSection() {
@@ -156,66 +157,31 @@ function scrollToSponsorSection() {
   }, 300)
 }
 
-const handleSubmitComment = async () => {
-  if (!commentContent.value.trim()) return
-  try {
-    await createProjectComment(projectId, commentContent.value, localStorage.getItem('token'))
-    commentContent.value = ''
-    await existingComments()
-  } catch (err) {
-    console.error('留言失敗', err)
-  }
-}
-
-const comments = ref([])
-async function existingComments() {
-  try {
-    const res = await getProjectCommets(projectId)
-    comments.value = res.data.data || []
-  } catch (err) {
-    console.log('取得留言失敗', err)
-  }
-}
-
-const faqs = ref([])
-async function allFaqs() {
-  try {
-    const res = await getProjectFaqs(projectId)
-    faqs.value = res.data?.data || []
-  } catch (err) {
-    console.log('取得FAQ失敗', err)
-  }
-}
-
-const progresses = ref([])
-async function allProgresses() {
-  try {
-    const res = await getProjectProgresses(projectId)
-    progresses.value = res.data?.data || []
-  } catch (err) {
-    console.log('無法取得進度', err)
-  }
-}
-
-onMounted(async () => {
-  if (isNaN(projectId)) {
+async function loadData() {
+  if (isNaN(projectId.value)) {
     console.error('無效的 route.params.id:', route.params.id)
     return
   }
 
   try {
-    const resOverview = await getProjectOverview(projectId)
-    project.value = resOverview.data.data
+    const [resOverview, resPlans, resFaqs, resProgresses] = await Promise.all([
+      getProjectOverview(projectId.value),
+      getProjectPlans(projectId.value),
+      getProjectFaqs(projectId.value),
+      getProjectProgresses(projectId.value),
+    ])
 
-    const resPlans = await getProjectPlans(projectId)
+    project.value = resOverview.data.data || null
     plans.value = resPlans.data.data || []
-
-    await existingComments()
-    await allFaqs()
-    await allProgresses()
+    faqs.value = resFaqs.data?.data || []
+    progresses.value = resProgresses.data?.data || []
   } catch (err) {
     console.error('讀取專案資料失敗', err)
   }
+}
+
+onMounted(() => {
+  loadData()
 })
 </script>
 
