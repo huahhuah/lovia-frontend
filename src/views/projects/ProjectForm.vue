@@ -162,7 +162,7 @@
                   <img src="/layers.png" width="16" />
                   <input
                     v-if = "faq.isEditing"
-                    v-model = "fag.question"
+                    v-model = "faq.question"
                     type = "text"
                     class = "form-control bg-light"
                     placeholder="請輸入問題"

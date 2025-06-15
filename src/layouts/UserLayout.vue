@@ -14,7 +14,9 @@
       <!-- ✅ 導覽列（會員中心、個人資料、修改密碼） -->
       <ul class="nav user-nav">
         <li class="nav-item" :class="{ 'active-tab': $route.path === '/user' }">
-          <router-link to="/user/sponsorships" class="nav-link" exact-active-class="active">會員中心</router-link>
+          <router-link to="/user/sponsorships" class="nav-link" exact-active-class="active"
+            >會員中心</router-link
+          >
         </li>
         <li class="nav-item">
           <router-link to="/user/edit" class="nav-link" exact-active-class="active"
@@ -37,28 +39,19 @@
           >
             <span>訂單管理</span>
             <span class="arrow">▾</span>
-            @mouseover="showOrders = true"
+          </div>
+          <ul
+            class="dropdown-list"
+            v-show="showOrders"
+            @mouseenter="showOrders = true"
             @mouseleave="showOrders = false"
           >
-            <span>訂單管理</span>
-            <span class="arrow">▾</span>
-            <ul
-              class="dropdown-list"
-              v-show="showOrders"
-              @mouseenter="showOrders = true"
-              @mouseleave="showOrders = false"
-            >
-              <li>
-                <router-link to="/user/sponsorships" class="dropdown-item">我的贊助</router-link>
-              </li>
-              <li v-if="isProposer">
-                <router-link to="/user/projects/mine" class="dropdown-item">我的專案</router-link>
-              </li>
-            </ul>
-          </div>
-          <ul class="dropdown-list" v-show="showOrders">
-            <li><router-link to="/user/sponsorships" class="dropdown-item">我的贊助</router-link></li>
-            <li v-if="isProposer"><router-link to="/user/projects/mine" class="dropdown-item">我的專案</router-link></li>
+            <li>
+              <router-link to="/user/sponsorships" class="dropdown-item">我的贊助</router-link>
+            </li>
+            <li v-if="isProposer">
+              <router-link to="/user/projects/mine" class="dropdown-item">我的專案</router-link>
+            </li>
           </ul>
         </li>
 
@@ -72,30 +65,19 @@
           >
             <span>專案提問</span>
             <span class="arrow">▾</span>
-            @mouseover="showQuestions = true"
+          </div>
+          <ul
+            class="dropdown-list"
+            v-show="showQuestions"
+            @mouseenter="showQuestions = true"
             @mouseleave="showQuestions = false"
           >
-            <span>專案提問</span>
-            <span class="arrow">▾</span>
-            <ul
-              class="dropdown-list"
-              v-show="showQuestions"
-              @mouseenter="showQuestions = true"
-              @mouseleave="showQuestions = false"
-            >
-              <li>
-                <router-link to="/user/questions" class="dropdown-item">我的提問</router-link>
-              </li>
-              <li v-if="isProposer">
-                <router-link to="/user/questions/manage" class="dropdown-item"
-                  >提問管理</router-link
-                >
-              </li>
-            </ul>
-          </div>
-          <ul class="dropdown-list" v-show="showQuestions">
-            <li><router-link to="/user/questions" class="dropdown-item">我的提問</router-link></li>
-            <li v-if="isProposer"><router-link to="/user/questions/manage" class="dropdown-item">提問管理</router-link></li>
+            <li>
+              <router-link to="/user/questions" class="dropdown-item">我的提問</router-link>
+            </li>
+            <li v-if="isProposer">
+              <router-link to="/user/questions/manage" class="dropdown-item">提問管理</router-link>
+            </li>
           </ul>
         </li>
       </ul>
@@ -239,7 +221,7 @@ const toggleQuestions = () => {
   margin: 0 auto;
   margin-top: 4px;
   width: 40px;
-  border-bottom: 2px solid #FC5B53;
+  border-bottom: 2px solid #fc5b53;
 }
 
 .user-main {
@@ -378,7 +360,7 @@ const toggleQuestions = () => {
     margin: 0 auto;
     margin-top: 4px;
     width: 40px;
-    border-bottom: 2px solid #FC5B53;
+    border-bottom: 2px solid #fc5b53;
   }
 
   .dropdown-list {
