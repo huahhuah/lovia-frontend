@@ -139,59 +139,79 @@
           </div>
 
           <!-- (3) 提案說明 -->
-          <div class="form-section mb-5">
-            <h3 class="section-title mb-4">提案說明</h3>
-            <div class="mb-3 position-relative">
-              <label class="form-label">摘要說明<span class="text-danger">*</span></label>
-              <textarea v-model="form.summary" maxlength="100" @input="summaryCount = form.summary.length" class="form-control bg-light rounded" placeholder="請簡要介紹您的提案，讓支持者了解計畫初衷，並將希望與支持帶給需要的人。" rows="3" required></textarea>
-              <small class="char-count text-muted">{{ summaryCount }}/100</small>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">詳細介紹<span class="text-danger">*</span></label>
-              <textarea v-model="form.full_content" class="form-control bg-light rounded" placeholder="請補充完整專案內容，說明創新性、社會影響力及可持續性，建議包括背景、執行方式、經費用途及預期成果。" rows="6" required></textarea>
-            </div>
-          </div>
+<div class="form-section mb-5">
+  <h3 class="section-title mb-4">提案說明</h3>
+  <div class="mb-3 position-relative">
+    <label class="form-label">摘要說明<span class="text-danger">*</span></label>
+    <textarea
+      v-model="form.summary"
+      maxlength="100"
+      @input="summaryCount = form.summary.length"
+      class="form-control bg-light rounded"
+      placeholder="請簡要介紹您的提案，讓支持者了解計畫初衷，並將希望與支持帶給需要的人。"
+      rows="3"
+      required
+    ></textarea>
+    <small class="char-count text-muted">{{ summaryCount }}/100</small>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">詳細介紹<span class="text-danger">*</span></label>
+    <textarea
+      v-model="form.full_content"
+      class="form-control bg-light rounded"
+      placeholder="請補充完整專案內容，說明創新性、社會影響力及可持續性，建議包括背景、執行方式、經費用途及預期成果。"
+      rows="6"
+      required
+    ></textarea>
+  </div>
+</div>
 
-          <!-- 常見問題區塊 -->
-          <div class="form-section mb-5">
-            <h3 class="section-title mb-4">常見問題</h3>
-            <div v-for="(faq, index) in formFaqs" :key="index" class="faq-box mb-4 shadow-sm">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <div class="d-flex align-items-center gap-2">
-                  <img src="/vector.png" width="16" />
-                  <img src="/layers.png" width="16" />
-                  <input
-                    v-if = "faq.isEditing"
-                    v-model = "faq.question"
-                    type = "text"
-                    class = "form-control bg-light"
-                    placeholder="請輸入問題"
-                  />
-                  <span style="font-weight: 300; color: #000000;">{{ faq.question }}</span>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                  <img
-                    src="/edit.png"
-                    width="16"
-                    alt="edit"
-                    style="cursor: pointer;"
-                    @click="faq.isEditing = !faq.isEditing"
-                  />
-                  <img
-                    src="/delete.png"
-                    width="16"
-                    alt="delete"
-                    style="cursor: pointer;"
-                    @click="formFaqs.splice(index, 1)"
-                  />
-                  <img src="/edit.png" width="16" alt="edit" style="cursor: pointer;" />
-                  <img src="/delete.png" width="16" alt="delete" style="cursor: pointer;" @click="formFaqs.splice(index, 1)" />
-                </div>
-              </div>
-              <div class="faq-divider"></div>
-              <p class="faq-answer">{{ faq.answer }}</p>
-            </div>
-          </div>
+<!-- 常見問題區塊 -->
+<div class="form-section mb-5">
+  <h3 class="section-title mb-4">常見問題</h3>
+  <div v-for="(faq, index) in formFaqs" :key="index" class="faq-box mb-4 shadow-sm">
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <div class="d-flex align-items-center gap-2 w-100">
+        <img src="/vector.png" width="16" />
+        <img src="/layers.png" width="16" />
+        <input
+          v-if="faq.isEditing"
+          v-model="faq.question"
+          type="text"
+          class="form-control bg-light"
+          placeholder="請輸入問題"
+        />
+        <span v-else style="font-weight: 300; color: #000000">{{ faq.question }}</span>
+      </div>
+      <div class="d-flex align-items-center gap-2 ms-2">
+        <img
+          src="/edit.png"
+          width="16"
+          alt="edit"
+          style="cursor: pointer"
+          @click="faq.isEditing = !faq.isEditing"
+        />
+        <img
+          src="/delete.png"
+          width="16"
+          alt="delete"
+          style="cursor: pointer"
+          @click="formFaqs.splice(index, 1)"
+        />
+      </div>
+    </div>
+    <div class="faq-divider"></div>
+    <div v-if="faq.isEditing">
+      <textarea
+        v-model="faq.answer"
+        class="form-control bg-light"
+        rows="3"
+        placeholder="請輸入答案"
+      ></textarea>
+    </div>
+    <p v-else class="faq-answer">{{ faq.answer }}</p>
+  </div>
+</div>
 
           <!-- 新增常見問題 -->
           <div class="form-section mb-5">
