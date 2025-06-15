@@ -137,8 +137,9 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, computed } from 'vue'
-import { Modal, Toast } from 'bootstrap'
+import { onMounted, reactive, ref, computed, nextTick } from 'vue'
+import { Modal } from 'bootstrap'
+
 import axios from 'axios'
 import router from '@/router'
 import defaultAvatar from '@/assets/images/default-avatar.png'
@@ -192,42 +193,28 @@ function showModal(msg, type = 'danger') {
   modalInstance?.show()
 }
 
-function showModalAndAutoClose(msg, type = 'danger', delay = 1500) {
-  showModal(msg, type)
-  setTimeout(() => {
-    modalInstance.hide()
-    const backdrop = document.querySelector('.modal-backdrop')
-    if (backdrop) backdrop.remove()
-    document.body.classList.remove('modal-open')
-    document.body.style = ''
-  }, delay)
-}
-
 async function onImageChange(event) {
   const file = event.target.files[0]
-  if (!file) return
+  if (!file) return 
+  if (file.size > 10*1024*1024 ) {
+      return showModalAndAutoClose('檔案太大，請選擇10MB以下的圖片')
+    }
+  try{
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('type', 'avatar')
 
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    form.avatar_url = e.target.result
-  }
-  reader.readAsDataURL(file)
-
-  const formData = new FormData()
-  formData.append('file', file)
-  formData.append('type', 'avatar')
-
-  try {
     const res = await axios.post(`${baseUrl}/api/v1/uploads/image`, formData, {
       headers: {
-        Authorization: `Bearer ${userStore.token}`,
-        'Content-Type': 'multipart/form-data',
+        Authorization:`Bearer ${userStore.token}`,
+        'Content-Type' : 'multipart/form-data',
       },
     })
-    form.avatar_url = res.data.url
-  } catch (err) {
-    console.error('上傳頭像失敗:', err)
-    showModal('圖片上傳失敗，請稍後重試')
+  const { url } = res.data
+  form.avatar_url = url
+  } catch (error){
+    console.error('圖片上傳失敗', error)
+    showModalAndAutoClose('圖片上傳失敗', error)
   }
 }
 
@@ -239,9 +226,9 @@ async function fetchUserProfile() {
     const user = res.data.user
     form.username = user.username || ''
     form.phone = user.phone || ''
-    form.avatar_url = user.avatar_url || ''
-    form.birthday = user.birthday?.split('T')[0] || ''
-    form.gender = [1, 2, 3, 4].includes(user.gender?.id) ? user.gender.id : ''
+    form.avatar_url = user.avatar_url ? `${user.avatar_url}?t=${Date.now()}` : ''
+    form.birthday = user.birthday || ''
+    form.gender = genderReverseMap[user.gender?.gender ?? user.gender] ?? ''
     userStore.setUser(user)
   } catch (err) {
     console.error('取得個人資料失敗:', err)
@@ -265,7 +252,10 @@ async function fetchUserProfile() {
 }
 
 onMounted(async () => {
-  modalInstance = new Modal(modalRef.value)
+  await nextTick()
+  if(modalRef.value){
+    modalInstance = new Modal(modalRef.value)
+    }
   await fetchUserProfile()
 })
 
@@ -291,7 +281,7 @@ async function submitForm() {
     phone: form.phone.trim(),
     birthday: form.birthday || null,
     gender: form.gender || null,
-    ...(form.avatar_url ? { avatar_url: form.avatar_url } : {}),
+    avatar_url: form.avatar_url ? form.avatar_url.split('?t')[0] : null,
   }
 
   console.log('🔍 PATCH payload：', payload)
@@ -301,8 +291,14 @@ async function submitForm() {
     const response = await axios.patch(`${baseUrl}/api/v1/users/profile`, payload, {
       headers: { Authorization: `Bearer ${userStore.token}` },
     })
-    userStore.setUser(response.data.user)
-    showToast('個人資料修改成功！')
+
+    showModal('修改成功！', 'success')
+    userStore.setUser(response.data.data.user)
+    setTimeout(() => {
+      modalInstance.hide()
+      const backdrop = document.querySelector('.modal-backdrop')
+      if (backdrop) backdrop.remove()
+    }, 1500)
   } catch (error) {
     console.error('修改失敗:', error)
     showModal(error.response?.data?.message || '修改失敗')

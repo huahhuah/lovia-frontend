@@ -172,6 +172,11 @@ const isSearchOpen = ref(false)
 const isDropdownOpen = ref(false)
 const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
 
+const avatarUrl = computed(() => {
+  const avatar = user.value?.avatar_url
+  return avatar ? avatar : defaultAvatar
+})
+
 const isAdmin = computed(() => userStore.isAdmin)
 const isProposer = computed(() => userStore.isProposer)
 const isSponsor = computed(() => userStore.isSponsor)
