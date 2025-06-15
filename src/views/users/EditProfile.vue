@@ -57,7 +57,13 @@
 
               <div class="mb-3">
                 <label class="form-label">生日</label>
-                <input v-model="form.birthday" type="date" class="form-control" />
+                <input
+                  id="birthday"
+                  v-model="form.birthday"
+                  type="date"
+                  class="form-control"
+                  :max="maxBirthday"
+                />
               </div>
 
               <div class="mb-3">
@@ -106,12 +112,34 @@
         </div>
       </div>
     </div>
+
+    <!-- Bootstrap Toast -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
+      <div
+        class="toast align-items-center text-white bg-success border-0"
+        ref="toastRef"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body">{{ toastMessage }}</div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, computed } from 'vue'
+import { onMounted, reactive, ref, computed, nextTick } from 'vue'
 import { Modal } from 'bootstrap'
+
 import axios from 'axios'
 import router from '@/router'
 import defaultAvatar from '@/assets/images/default-avatar.png'
@@ -119,37 +147,7 @@ import { useUserStore } from '@/stores/auth'
 
 const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
 const userStore = useUserStore()
-
-const genderOptions = [
-  { value: 1, label: '男性' },
-  { value: 2, label: '女性' },
-  { value: 3, label: '其他' },
-  { value: 4, label: '不願透露' },
-]
-
-const genderReverseMap = {
-  male: 1,
-  female: 2,
-  other: 3,
-  undisclosed: 4,
-  男性: 1,
-  女性: 2,
-  其他: 3,
-  不願透露: 4,
-  1: 1,
-  2: 2,
-  3: 3,
-  4: 4,
-}
-
-const form = reactive({
-  username: '',
-  phone: '',
-  avatar_url: '',
-  birthday: '',
-  gender: '',
-})
-
+const form = reactive({ username: '', phone: '', avatar_url: '', birthday: '', gender: '' })
 const isLoading = ref(true)
 const isSubmitting = ref(false)
 const modalRef = ref(null)
@@ -157,15 +155,37 @@ const modalMessage = ref('')
 const modalType = ref('success')
 let modalInstance = null
 
-const usernameValid = computed(() => form.username.trim().length >= 2 && form.username.length <= 50)
-const phonePattern = /^09\d{8}$/
-const phoneValid = computed(() => phonePattern.test(form.phone))
+const toastRef = ref(null)
+const toastMessage = ref('')
+let toastInstance = null
 
-//  新增生日格式驗證函式
-function isValidBirthday(dateString) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(dateString)
+function showToast(msg = '操作成功') {
+  toastMessage.value = msg
+  if (!toastInstance) toastInstance = new Toast(toastRef.value)
+  toastInstance.show()
 }
 
+const maxBirthday = new Date().toISOString().split('T')[0]
+const usernameValid = computed(() => form.username.trim().length >= 2 && form.username.length <= 50)
+const phoneValid = computed(() => /^09\d{8}$/.test(form.phone))
+
+function isValidBirthday(dateStr) {
+  const regex = /^\d{4}-\d{2}-\d{2}$/
+  if (!regex.test(dateStr)) return false
+
+  const [year, month, day] = dateStr.split('-').map(Number)
+  const date = new Date(year, month - 1, day)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  date.setHours(0, 0, 0, 0)
+
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day &&
+    date <= today
+  )
+}
 
 function showModal(msg, type = 'danger') {
   modalMessage.value = msg
@@ -173,14 +193,55 @@ function showModal(msg, type = 'danger') {
   modalInstance?.show()
 }
 
-function onImageChange(event) {
+async function onImageChange(event) {
   const file = event.target.files[0]
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      form.avatar_url = e.target.result
+  if (!file) return 
+  if (file.size > 10*1024*1024 ) {
+      return showModalAndAutoClose('檔案太大，請選擇10MB以下的圖片')
     }
-    reader.readAsDataURL(file)
+  try{
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('type', 'avatar')
+
+    const res = await axios.post(`${baseUrl}/api/v1/uploads/image`, formData, {
+      headers: {
+        Authorization:`Bearer ${userStore.token}`,
+        'Content-Type' : 'multipart/form-data',
+      },
+    })
+  const { url } = res.data
+  form.avatar_url = url
+  } catch (error){
+    console.error('圖片上傳失敗', error)
+    showModalAndAutoClose('圖片上傳失敗', error)
+  }
+}
+
+function convertGender(gender){
+   switch (gender) {
+    case 1:
+    case '1':
+    case 'male':
+    case '男性':
+      return 1
+    case 2:
+    case '2':
+    case 'female':
+    case '女性':
+      return 2
+    case 3:
+    case '3':
+    case 'other':
+    case '其他':
+      return 3
+    case 4:
+    case '4':
+    case 'undisclosed':
+    case '不願透露':
+      return 4
+    default:
+      return ''
   }
 }
 
@@ -192,9 +253,9 @@ async function fetchUserProfile() {
     const user = res.data.user
     form.username = user.username || ''
     form.phone = user.phone || ''
-    form.avatar_url = user.avatar_url || ''
+    form.avatar_url = user.avatar_url ? `${user.avatar_url}?t=${Date.now()}` : ''
     form.birthday = user.birthday || ''
-    form.gender = genderReverseMap[user.gender?.gender ?? user.gender] ?? ''
+    form.gender = convertGender(user.gender?.gender ?? user.gender) 
     userStore.setUser(user)
   } catch (err) {
     console.error('取得個人資料失敗:', err)
@@ -218,7 +279,10 @@ async function fetchUserProfile() {
 }
 
 onMounted(async () => {
-  modalInstance = new Modal(modalRef.value)
+  await nextTick()
+  if(modalRef.value){
+    modalInstance = new Modal(modalRef.value)
+    }
   await fetchUserProfile()
 })
 
@@ -226,51 +290,48 @@ async function submitForm() {
   if (!usernameValid.value) return showModalAndAutoClose('請輸入 2~50 字的使用者名稱')
   if (!phoneValid.value) return showModalAndAutoClose('請輸入正確的手機號碼')
 
-  if (form.birthday && !isValidBirthday(form.birthday)) {
-  return showModalAndAutoClose('生日格式錯誤，請使用 YYYY-MM-DD 格式')
-}
+  if (form.birthday?.includes('/')) {
+    form.birthday = form.birthday.replace(/\//g, '-')
+  }
 
+  if (form.birthday && !isValidBirthday(form.birthday)) {
+    return showModalAndAutoClose('生日格式錯誤，請使用 YYYY-MM-DD 格式')
+  }
 
   if (form.avatar_url?.startsWith('data:image')) {
     return showModalAndAutoClose('圖片尚未上傳，請等待圖片上傳功能完成後再修改頭像')
   }
 
+  // ✅ payload 組裝：不傳 null 給 avatar_url，避免後端報錯
   const payload = {
     username: form.username.trim(),
     phone: form.phone.trim(),
     birthday: form.birthday || null,
     gender: form.gender || null,
+    avatar_url: form.avatar_url ? form.avatar_url.split('?t')[0] : null,
   }
+
+  console.log('🔍 PATCH payload：', payload)
 
   try {
     isSubmitting.value = true
     const response = await axios.patch(`${baseUrl}/api/v1/users/profile`, payload, {
       headers: { Authorization: `Bearer ${userStore.token}` },
     })
+
     showModal('修改成功！', 'success')
-    userStore.setUser(response.data.user)
+    userStore.setUser(response.data.data.user)
     setTimeout(() => {
       modalInstance.hide()
       const backdrop = document.querySelector('.modal-backdrop')
       if (backdrop) backdrop.remove()
     }, 1500)
   } catch (error) {
-    console.error('修改個人資料失敗:', error)
+    console.error('修改失敗:', error)
     showModal(error.response?.data?.message || '修改失敗')
   } finally {
     isSubmitting.value = false
   }
-}
-
-function showModalAndAutoClose(msg, type = 'danger', delay = 1500) {
-  showModal(msg, type)
-  setTimeout(() => {
-    modalInstance.hide()
-    const backdrop = document.querySelector('.modal-backdrop')
-    if (backdrop) backdrop.remove()
-    document.body.classList.remove('modal-open')
-    document.body.style = ''
-  }, delay)
 }
 </script>
 

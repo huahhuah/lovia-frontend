@@ -1,12 +1,10 @@
 <template>
   <SponsorshipLayout>
     <div class="container py-5">
-      <h3 class="fw-bold mb-4">贊助確認頁</h3>
-
       <div v-if="project && selectedPlan" class="container py-5">
         <!-- 標題與金額 -->
         <div class="text-center mb-4">
-          <h5 class="fw-bold">贊助專案名稱：{{ project.title }}</h5>
+          <h3 class="fw-bold">贊助專案名稱：{{ project.title }}</h3>
           <p class="fs-5 mt-2">方案金額 NT$ {{ selectedPlan.amount }}</p>
           <hr />
         </div>
@@ -217,3 +215,26 @@ async function confirmSponsorship() {
   }
 }
 </script>
+<style>
+.btn.btn-primary {
+  background-color: #fc5b53 !important;
+  border-color: #fc5b53 !important;
+  color: white !important;
+}
+
+.btn.btn-primary:hover {
+  background-color: #e0433b !important; /* 可選：hover 深一點 */
+  border-color: #e0433b !important;
+  color: white !important;
+}
+
+.btn.btn-primary:disabled {
+  background-color: #fc5b53 !important;
+  border-color: #fc5b53 !important;
+  opacity: 0.65;
+}
+
+.p-4 {
+  background-color: #fff;
+}
+</style>

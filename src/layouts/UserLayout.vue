@@ -17,10 +17,14 @@
           <router-link to="/user/sponsorships" class="nav-link" exact-active-class="active">會員中心</router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/user/edit" class="nav-link" exact-active-class="active">個人資料</router-link>
+          <router-link to="/user/edit" class="nav-link" exact-active-class="active"
+            >個人資料</router-link
+          >
         </li>
         <li class="nav-item">
-          <router-link to="/user/password" class="nav-link" exact-active-class="active">修改密碼</router-link>
+          <router-link to="/user/password" class="nav-link" exact-active-class="active"
+            >修改密碼</router-link
+          >
         </li>
 
         <!-- ✅ dropdown：訂單管理（若為贊助者時出現） -->
@@ -33,6 +37,24 @@
           >
             <span>訂單管理</span>
             <span class="arrow">▾</span>
+            @mouseover="showOrders = true"
+            @mouseleave="showOrders = false"
+          >
+            <span>訂單管理</span>
+            <span class="arrow">▾</span>
+            <ul
+              class="dropdown-list"
+              v-show="showOrders"
+              @mouseenter="showOrders = true"
+              @mouseleave="showOrders = false"
+            >
+              <li>
+                <router-link to="/user/sponsorships" class="dropdown-item">我的贊助</router-link>
+              </li>
+              <li v-if="isProposer">
+                <router-link to="/user/projects/mine" class="dropdown-item">我的專案</router-link>
+              </li>
+            </ul>
           </div>
           <ul class="dropdown-list" v-show="showOrders">
             <li><router-link to="/user/sponsorships" class="dropdown-item">我的贊助</router-link></li>
@@ -50,6 +72,26 @@
           >
             <span>專案提問</span>
             <span class="arrow">▾</span>
+            @mouseover="showQuestions = true"
+            @mouseleave="showQuestions = false"
+          >
+            <span>專案提問</span>
+            <span class="arrow">▾</span>
+            <ul
+              class="dropdown-list"
+              v-show="showQuestions"
+              @mouseenter="showQuestions = true"
+              @mouseleave="showQuestions = false"
+            >
+              <li>
+                <router-link to="/user/questions" class="dropdown-item">我的提問</router-link>
+              </li>
+              <li v-if="isProposer">
+                <router-link to="/user/questions/manage" class="dropdown-item"
+                  >提問管理</router-link
+                >
+              </li>
+            </ul>
           </div>
           <ul class="dropdown-list" v-show="showQuestions">
             <li><router-link to="/user/questions" class="dropdown-item">我的提問</router-link></li>
@@ -68,6 +110,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/auth'
 import defaultAvatar from '@/assets/images/default-avatar.png'
 
@@ -148,6 +191,8 @@ const toggleQuestions = () => {
   display: flex;
   flex-direction: flex-end;
   align-items: center;
+  flex-direction: flex-end; /* ✅ 讓頭像在上、名稱在下 */
+  align-items: center; /* ✅ 水平置中 */
   width: 235px;
   height: 160px;
   gap: 16px;
@@ -179,6 +224,9 @@ const toggleQuestions = () => {
   text-decoration: none;
   border-bottom: 2px solid transparent;
   transition: all 0.3s ease;
+  text-decoration: none; /* ✅ 不要底線 */
+  text-align: center;
+  line-height: 24px;
 }
 
 .user-nav .nav-link.active {
