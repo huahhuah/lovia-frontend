@@ -110,7 +110,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/auth'
 import defaultAvatar from '@/assets/images/default-avatar.png'
 
