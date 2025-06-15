@@ -218,6 +218,33 @@ async function onImageChange(event) {
   }
 }
 
+function convertGender(gender){
+   switch (gender) {
+    case 1:
+    case '1':
+    case 'male':
+    case '男性':
+      return 1
+    case 2:
+    case '2':
+    case 'female':
+    case '女性':
+      return 2
+    case 3:
+    case '3':
+    case 'other':
+    case '其他':
+      return 3
+    case 4:
+    case '4':
+    case 'undisclosed':
+    case '不願透露':
+      return 4
+    default:
+      return ''
+  }
+}
+
 async function fetchUserProfile() {
   try {
     const res = await axios.get(`${baseUrl}/api/v1/users/profile`, {
@@ -228,7 +255,7 @@ async function fetchUserProfile() {
     form.phone = user.phone || ''
     form.avatar_url = user.avatar_url ? `${user.avatar_url}?t=${Date.now()}` : ''
     form.birthday = user.birthday || ''
-    form.gender = genderReverseMap[user.gender?.gender ?? user.gender] ?? ''
+    form.gender = convertGender(user.gender?.gender ?? user.gender) 
     userStore.setUser(user)
   } catch (err) {
     console.error('取得個人資料失敗:', err)
