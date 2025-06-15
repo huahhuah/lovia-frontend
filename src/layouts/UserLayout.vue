@@ -7,7 +7,8 @@
     <section class="user-header container">
       <!-- ✅ 頭像與名稱 -->
       <div class="avatar-area">
-        <img :src="user?.avatar || defaultAvatar" class="user-avatar" alt="avatar" />
+        <img :src="avatarUrl" class="user-avatar" alt="avatar" />
+
         <h5 class="username-text">{{ user?.username || '使用者' }}</h5>
       </div>
 
@@ -68,14 +69,19 @@
 
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/auth'
 import defaultAvatar from '@/assets/images/default-avatar.png'
 
 const userStore = useUserStore()
-const user = userStore.user
-const isProposer = userStore.isProposer
-const isSponsor = userStore.isSponsor
+const user = computed(() => userStore.user)
+const isProposer = computed(() => userStore.isProposer)
+const isSponsor = computed(() => userStore.isSponsor)
+
+const avatarUrl = computed(() => {
+  const avatar = user.value?.avatar_url
+  return avatar ? avatar : defaultAvatar
+})
 
 // 控制 dropdown 顯示
 const showOrders = ref(false)

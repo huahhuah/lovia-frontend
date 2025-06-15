@@ -48,7 +48,7 @@
           <div class="dropdown">
             <button class="btn d-flex align-items-center gap-2" @click="toggleDropdown">
               <img
-                :src="user.avatar || defaultAvatar"
+                :src="user.avatar_url || defaultAvatar"
                 class="rounded-circle"
                 width="36"
                 height="36"
@@ -171,6 +171,11 @@ const isMenuOpen = ref(false)
 const isSearchOpen = ref(false)
 const isDropdownOpen = ref(false)
 const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
+
+const avatarUrl = computed(() => {
+  const avatar = user.value?.avatar_url
+  return avatar ? avatar : defaultAvatar
+})
 
 const isAdmin = computed(() => userStore.isAdmin)
 const isProposer = computed(() => userStore.isProposer)

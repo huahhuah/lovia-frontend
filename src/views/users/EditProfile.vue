@@ -110,7 +110,7 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, computed } from 'vue'
+import { onMounted, reactive, ref, computed, nextTick } from 'vue'
 import { Modal } from 'bootstrap'
 import axios from 'axios'
 import router from '@/router'
@@ -173,14 +173,28 @@ function showModal(msg, type = 'danger') {
   modalInstance?.show()
 }
 
-function onImageChange(event) {
+async function onImageChange(event) {
   const file = event.target.files[0]
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      form.avatar_url = e.target.result
+  if (!file) return 
+  if (file.size > 10*1024*1024 ) {
+      return showModalAndAutoClose('檔案太大，請選擇10MB以下的圖片')
     }
-    reader.readAsDataURL(file)
+  try{
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('type', 'avatar')
+
+    const res = await axios.post(`${baseUrl}/api/v1/uploads/image`, formData, {
+      headers: {
+        Authorization:`Bearer ${userStore.token}`,
+        'Content-Type' : 'multipart/form-data',
+      },
+    })
+  const { url } = res.data
+  form.avatar_url = url
+  } catch (error){
+    console.error('圖片上傳失敗', error)
+    showModalAndAutoClose('圖片上傳失敗', error)
   }
 }
 
@@ -192,7 +206,7 @@ async function fetchUserProfile() {
     const user = res.data.user
     form.username = user.username || ''
     form.phone = user.phone || ''
-    form.avatar_url = user.avatar_url || ''
+    form.avatar_url = user.avatar_url ? `${user.avatar_url}?t=${Date.now()}` : ''
     form.birthday = user.birthday || ''
     form.gender = genderReverseMap[user.gender?.gender ?? user.gender] ?? ''
     userStore.setUser(user)
@@ -218,7 +232,10 @@ async function fetchUserProfile() {
 }
 
 onMounted(async () => {
-  modalInstance = new Modal(modalRef.value)
+  await nextTick()
+  if(modalRef.value){
+    modalInstance = new Modal(modalRef.value)
+    }
   await fetchUserProfile()
 })
 
@@ -240,6 +257,7 @@ async function submitForm() {
     phone: form.phone.trim(),
     birthday: form.birthday || null,
     gender: form.gender || null,
+    avatar_url: form.avatar_url ? form.avatar_url.split('?t')[0] : null,
   }
 
   try {
@@ -248,7 +266,7 @@ async function submitForm() {
       headers: { Authorization: `Bearer ${userStore.token}` },
     })
     showModal('修改成功！', 'success')
-    userStore.setUser(response.data.user)
+    userStore.setUser(response.data.data.user)
     setTimeout(() => {
       modalInstance.hide()
       const backdrop = document.querySelector('.modal-backdrop')
