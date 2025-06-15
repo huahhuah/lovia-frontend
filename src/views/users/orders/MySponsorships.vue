@@ -1,7 +1,7 @@
 <template>
   <div class="user-dashboard-content">
     <!-- ✅ 已贊助專案 -->
-    <div class="section">
+    <div class="donate-section">
       <h5 class="section-title">已贊助專案</h5>
       <div class="project-list">
         <!-- ✅ 卡片列表（示意兩筆資料） -->
@@ -91,8 +91,9 @@ const projectList = [
 
 .section-title {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 400;
   color: #1a1a1a;
+  margin-left: 18px;
 }
 
 .project-list {
@@ -175,6 +176,7 @@ const projectList = [
 .no-proposal-text {
   font-size: 14px;
   color: #5f6368;
+  margin-left: 18px;
 }
 
 .link {
@@ -234,4 +236,152 @@ const projectList = [
 .meta-top .tag:nth-child(2) {
   margin-left: 12px; /* 或 16px 看你要多寬 */
 }
+
+@media (max-width: 768px) {
+  .user-dashboard-content {
+    width: 100%;
+    padding: 0;
+    gap: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .donate-section {
+    width: 100%;
+    max-width: 375px;
+    margin: -35px auto 0 auto;
+  }
+
+  .section-title {
+    width: 311px;
+    height: 27px;
+    font-family: 'Noto Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    display: flex;
+    align-items: center;
+    color: #1A1A1A;
+    margin-bottom: 8px;
+    margin-top: 0;
+    margin-left: 18px;
+  }
+
+  .project-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .project-card {
+    width: 343px;
+    height: 395.33px;
+    padding: 16px;
+    gap: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    background: #FFF8F9;
+    border-radius: 20px;
+    margin: 0 auto;
+  }
+
+  .project-img {
+    width: 311px;
+    height: 207.33px;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  .project-info {
+    width: 311px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .project-name {
+    width: 311px;
+    height: 27px;
+    font-size: 18px;
+    line-height: 27px;
+    font-weight: 400;
+    color: #1A1A1A;
+    margin: 0;
+  }
+
+  .meta-top {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 311px;
+    font-size: 13px;
+    color: #5f6368;
+    gap: 12px;
+  }
+
+  .meta-top .tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .meta-top .percent {
+    margin-left: auto;
+    color: #fc5b53;
+    font-weight: 500;
+  }
+
+  .meta-top {
+    margin-bottom: 4px; /* 避免把進度條推掉 */
+  }
+
+  .progress-bar {
+    width: 311px;
+    height: 6px;
+    background-color: #D5DAE0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-inner {
+    height: 100%;
+    background-image: linear-gradient(to right, #fc7c9d, #ffc443);
+    border-radius: 4px;
+  }
+
+  .amount {
+    font-size: 13px;
+    color: #1a1a1a;
+    width: 311px;
+  }
+
+  .date {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: #a0a0a0;
+    width: 311px;
+    height: 18px;
+  }
+
+  .target-text {
+  color: #A0A0A0;
+}
+  .no-proposal-text {
+    margin-left: 18px;
+    width: 311px;
+  }
+}
+
 </style>

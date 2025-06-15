@@ -37,7 +37,7 @@
         </div>
 
         <div class="d-flex align-items-center gap-2 mb-2">
-          <img src="@/assets/icons/group.svg" alt="人 icon" style="width: 20px" />
+          <img src="/協會.png" alt="人 icon" style="width: 20px" />
           <span class="badge bg-light text-secondary fw-normal px-2 py-1">
             {{ project?.project_team || '提案者' }}
           </span>
