@@ -75,7 +75,7 @@
                   <ul class="dropdown-menu">
                     <li><router-link to="/orders" class="dropdown-item">我的贊助</router-link></li>
                     <li>
-                      <router-link to="/projects/mine" class="dropdown-item">我的專案</router-link>
+                      <router-link to="/user/projects/mine" class="dropdown-item">我的專案</router-link>
                     </li>
                   </ul>
                 </li>

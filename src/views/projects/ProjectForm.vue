@@ -64,7 +64,7 @@
                 <!-- 團隊介紹 -->
                 <div class="mb-3">
                   <label class="form-label">團隊介紹</label>
-                  <textarea 
+                  <textarea
                     v-model = "form.project_team"
                     class="form-control bg-light rounded" placeholder="請介紹團隊成員與專業背景，讓支持者更安心地了解您們如何實現這項計畫。"></textarea>
                 </div>
@@ -164,24 +164,24 @@
                     v-if = "faq.isEditing"
                     v-model = "fag.question"
                     type = "text"
-                    class = "form-control bg-light" 
-                    placeholder="請輸入問題" 
+                    class = "form-control bg-light"
+                    placeholder="請輸入問題"
                   />
                   <span style="font-weight: 300; color: #000000;">{{ faq.question }}</span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                  <img 
-                    src="/edit.png" 
-                    width="16" 
-                    alt="edit" 
-                    style="cursor: pointer;" 
+                  <img
+                    src="/edit.png"
+                    width="16"
+                    alt="edit"
+                    style="cursor: pointer;"
                     @click="faq.isEditing = !faq.isEditing"
                   />
-                  <img 
-                    src="/delete.png" 
-                    width="16" 
-                    alt="delete" 
-                    style="cursor: pointer;" 
+                  <img
+                    src="/delete.png"
+                    width="16"
+                    alt="delete"
+                    style="cursor: pointer;"
                     @click="formFaqs.splice(index, 1)"
                   />
                   <img src="/edit.png" width="16" alt="edit" style="cursor: pointer;" />
