@@ -131,6 +131,11 @@ function handleSubmit() {
   margin-bottom: 0.5rem;
 }
 
+.qa-question {
+  position: relative;
+  padding-bottom: 1rem;
+}
+
 /* 回覆區塊：無背景無框線，僅左側色條 */
 .qa-reply {
   margin-left: 30px;
@@ -144,7 +149,7 @@ function handleSubmit() {
   position: absolute;
   left: 18px; /* 頭貼一半寬度 + 邊距微調 */
   top: 48px;  /* 頭貼底部 + 一點距離 */
-  bottom: -6rem;
+   height: calc(100% - -50px);
   width: 1px;
   border-left: 1px dashed #ccc;
 }
@@ -153,4 +158,5 @@ function handleSubmit() {
   position: relative;
   padding-bottom: 1rem; /* 預留空間讓虛線不會太短 */
 }
+
 </style>
