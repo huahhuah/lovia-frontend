@@ -128,7 +128,7 @@ import axios from 'axios'
 import { Modal } from 'bootstrap'
 import { useUserStore } from '@/stores/auth'
 
-const baseUrl = 'http://localhost:8080' // 請替換成你的後端API根網址
+const baseUrl = 'https://lovia-backend-xl4e.onrender.com' 
 const userStore = useUserStore()
 
 const form = reactive({

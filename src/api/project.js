@@ -169,4 +169,20 @@ export async function createOrderPaymentForm(orderId, amount, email, token) {
   })
 }
 
+// 取得提案者自己的所有提案
+export const getMyProjects = (token) => {
+  return axios.get(`${BASE_URL}/api/v1/projects/my-projects`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+}
 
+// 刪除專案
+export const deleteProject = (projectId, token) => {
+  return axios.delete(`${BASE_URL}/api/v1/projects/${projectId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+}
