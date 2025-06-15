@@ -209,7 +209,7 @@ const handlePropose = () => {
   }
   if (isProposer.value) {
     console.log(isProposer)
-    router.push('projects/create')
+    router.push('/projects/create')
   } else {
     router.push('/users/postApplication')
   }
