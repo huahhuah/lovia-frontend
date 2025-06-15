@@ -84,27 +84,6 @@ try {
   user.value = {}
 }
 
-/* 假資料
-const questions = ref([
-  {
-    id: 1,
-    userName: '李子北',
-    userAvatar: '/使用者1.png',
-    date: '2025/4/18 7:44',
-    content: '回饋品裡的感謝卡真的是孩子親手寫的嗎？還是印製出來的呢？',
-    replies: [
-      {
-        id: 1,
-        adminName: '晨曦希望協會',
-        adminAvatar: '/協會.png',
-        date: '2025/4/18 15:25',
-        content:
-          '感謝您提問！每張感謝卡的插圖都是孩子們親手繪製的，我們會統一掃描印製，讓每位贊助者都能收到孩子的畫作。文字部分由協會統一編寫，內容會根據孩子的想法做調整。',
-      },
-    ],
-  },
-])
-*/
 async function fetchComments() {
   try {
     const res = await getProjectCommets(props.projectId)
