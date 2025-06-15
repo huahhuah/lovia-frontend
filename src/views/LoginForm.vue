@@ -136,7 +136,7 @@ const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
 
-//Modal 控制
+// Modal 控制
 const modalRef = ref(null)
 const modalMessage = ref('')
 const modalType = ref('success') // 'success' or 'danger'
@@ -165,7 +165,7 @@ async function handleLogin() {
 
   try {
     const res = await axios.post(`${baseUrl}/api/v1/users/signin`, payload)
-    const { token, user } = res.data.data
+    const { token, users: user } = res.data.data
 
     if (!token || typeof token !== 'string') throw new Error('回傳 token 格式錯誤')
     if (!user || typeof user !== 'object' || !user.username) throw new Error('回傳 user 格式錯誤')
@@ -179,9 +179,9 @@ async function handleLogin() {
     showModal('登入成功', 'success')
 
     setTimeout(() => {
-      modalInstance.hide() //關閉 Modal
+      modalInstance.hide() // 關閉 Modal
       const backdrop = document.querySelector('.modal-backdrop')
-      if (backdrop) backdrop.remove() //清除殘留遮罩
+      if (backdrop) backdrop.remove() // 清除殘留遮罩
       router.push('/')
     }, 1500)
   } catch (err) {
