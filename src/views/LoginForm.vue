@@ -3,18 +3,15 @@
     <div class="row w-100" style="max-width: 960px">
       <!-- 左側插圖與標語 -->
       <div class="col-md-6 d-none d-md-flex flex-column align-items-center justify-content-center">
-        <img
-          src="/login.png"
-          alt="login愛心圖"
-          class="mb-3"
-          style="max-width: 75%; height: auto"
-        />
-        <p class="text-center fw-semibold fs-4 mt-2" style="margin-top: -10px">你的善意，讓世界更有溫度</p>
+        <img src="/login.png" alt="login愛心圖" class="mb-3" style="max-width: 75%; height: auto" />
+        <p class="text-center fw-semibold fs-4 mt-2" style="margin-top: -10px">
+          你的善意，讓世界更有溫度
+        </p>
       </div>
 
       <!-- 右側登入表單 -->
       <div class="col-md-6">
-        <div class="border-0 rounded-4 p-5 shadow bg-white" style="background-color: #FFF9F5;">
+        <div class="border-0 rounded-4 p-5 shadow bg-white" style="background-color: #fff9f5">
           <div class="text-center mb-3">
             <i class="bi bi-person-circle fs-1"></i>
             <h3 class="fw-bold mt-2">登入</h3>
@@ -168,7 +165,7 @@ async function handleLogin() {
 
   try {
     const res = await axios.post(`${baseUrl}/api/v1/users/signin`, payload)
-    const { token, users: user } = res.data.data
+    const { token, user } = res.data.data
 
     if (!token || typeof token !== 'string') throw new Error('回傳 token 格式錯誤')
     if (!user || typeof user !== 'object' || !user.username) throw new Error('回傳 user 格式錯誤')
@@ -197,7 +194,7 @@ async function handleLogin() {
 <style scoped>
 .login-wrapper {
   min-height: 100vh;
-  background-image: linear-gradient(to right, #FFEDF2, #FFF6E3);;
+  background-image: linear-gradient(to right, #ffedf2, #fff6e3);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
