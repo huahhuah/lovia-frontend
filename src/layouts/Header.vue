@@ -45,8 +45,8 @@
       <!-- 桌機登入／使用者區 -->
       <div class="d-none d-lg-flex align-items-center gap-3">
         <template v-if="user">
-          <div class="dropdown">
-            <button class="btn d-flex align-items-center gap-2" @click="toggleDropdown">
+          <div class="dropdown" ref="dropdownRef">
+            <button class="btn d-flex align-items-center gap-2" @click.stop="toggleDropdown">
               <img
                 :src="avatarUrl || defaultAvatar"
                 class="rounded-circle"
@@ -75,7 +75,9 @@
                   <ul class="dropdown-menu">
                     <li><router-link to="/orders" class="dropdown-item">我的贊助</router-link></li>
                     <li>
-                      <router-link to="/user/projects/mine" class="dropdown-item">我的專案</router-link>
+                      <router-link to="/user/projects/mine" class="dropdown-item"
+                        >我的專案</router-link
+                      >
                     </li>
                   </ul>
                 </li>
@@ -143,14 +145,12 @@
       <router-link to="/explore" class="menu-link" @click="isMenuOpen = false">探索</router-link>
       <!-- <router-link to="/propose" class="menu-link" @click="isMenuOpen = false">提案</router-link> -->
       <span class="menu-link" @click="handlePropose">提案</span>
-      <template v-if="user">
-        <router-link to="/user" class="menu-link" @click="isMenuOpen = false">會員中心</router-link>
-        <span class="menu-link" @click="handleLogout">登出</span>
-      </template>
-      <template v-else>
-        <router-link to="/register" class="menu-link" @click="isMenuOpen = false">註冊</router-link>
-         <router-link to="/login" class="menu-link" @click="isMenuOpen = false">登入</router-link>
-      </template>
+      <router-link v-if="!user" to="/register" class="menu-link" @click="isMenuOpen = false"
+        >註冊</router-link
+      >
+      <router-link v-if="!user" to="/login" class="menu-link" @click="isMenuOpen = false"
+        >登入</router-link
+      >
       <button @click="isMenuOpen = false" class="btn p-0 border-0">
         <img src="/close.png" alt="Close" width="24" />
       </button>
@@ -197,9 +197,10 @@ const closeDropdown = () => {
   isDropdownOpen.value = false
 }
 
+const dropdownRef = ref(null)
+
 const handleClickOutside = (event) => {
-  const dropdown = document.querySelector('.dropdown')
-  if (dropdown && !dropdown.contains(event.target)) {
+  if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
     isDropdownOpen.value = false
   }
 }
@@ -381,24 +382,20 @@ const handleLogout = () => {
     padding: 6px 10px;
   }
 }
-  .dropdown-submenu {
-    position: relative;
-  }
+.dropdown-submenu {
+  position: relative;
+}
 
-  .dropdown-submenu > .dropdown-menu {
-    top: 0;
-    left: 100%;
-    margin-left: 0;
-    margin-right: 0;
-    display: none;
-    position: absolute;
-  }
+.dropdown-submenu > .dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  display: none;
+  position: absolute;
+}
 
-  .dropdown-submenu:hover > .dropdown-menu {
-    display: block;
-  }
-  .mobile-menu-overlay {
-  max-width: 100vw;
-  overflow-x: hidden;
-  }
+.dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+}
 </style>

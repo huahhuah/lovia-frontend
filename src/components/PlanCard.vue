@@ -16,7 +16,7 @@
           class="me-1"
           style="width: 16px; height: 16px"
         />
-        <span style="color: #FD7269">{{ plan.quantity }}</span>
+        <span style="color: #fd7269">{{ plan.sponsor_count || 0 }}</span>
         <span style="color: #000"> 人已贊助</span>
       </div>
     </div>
@@ -40,7 +40,7 @@
     <!-- 贊助按鈕 -->
     <button
       class="btn w-100 mt-3 fw-bold rounded-pill py-2 text-white"
-      style="background-color: #FC5B53"
+      style="background-color: #fc5b53"
       @click="handleSponsor"
       :disabled="projectType === '歷年專案'"
       :title="projectType === '歷年專案' ? '此為歷年專案，無法再贊助' : '立即贊助此方案'"
@@ -49,7 +49,6 @@
     </button>
   </div>
 </template>
-
 
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -78,11 +77,11 @@ function handleSponsor() {
   const planId = Number(props.plan.plan_id)
 
   if (isNaN(numericProjectId) || isNaN(planId)) {
-    console.error('❌ 無效參數', { projectId: props.projectId, planId })
+    console.error(' 無效參數', { projectId: props.projectId, planId })
     return
   }
 
-  console.log('🧭 導頁參數：', { projectId: numericProjectId, planId })
+  console.log(' 導頁參數：', { projectId: numericProjectId, planId })
 
   router.push({
     name: 'SponsorshipConfirm',
@@ -97,7 +96,7 @@ function handleSponsor() {
 <style scoped>
 .plan-card {
   background-color: transparent;
-  border: 1px solid #FD7269 !important; /* ✅ 強制紅色外框 */
+  border: 1px solid #fd7269 !important; /*  強制紅色外框 */
 }
 .plan-card.opacity-50 {
   pointer-events: none;

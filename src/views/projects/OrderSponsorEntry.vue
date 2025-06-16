@@ -225,6 +225,7 @@ import { ref, onMounted, computed, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { createSponsorship } from '@/api/project'
 import { useUserStore } from '@/stores/auth'
+import { zipcodeMap, getDistrictByZipcode } from '@/utils/zipcodeMap'
 
 const authStore = useUserStore()
 const router = useRouter()

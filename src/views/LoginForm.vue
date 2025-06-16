@@ -81,34 +81,26 @@
       </div>
     </div>
 
-    <!-- ✅ Modal 登入提示框 -->
-    <div
-      class="modal fade"
-      id="loginModal"
-      tabindex="-1"
-      aria-labelledby="loginModalLabel"
-      aria-hidden="true"
-      ref="modalRef"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header" :class="modalType === 'success' ? 'bg-success' : 'bg-danger'">
-            <h5 class="modal-title text-white" id="loginModalLabel">
-              {{ modalType === 'success' ? '登入成功' : '登入失敗' }}
-            </h5>
-            <button
-              type="button"
-              class="btn-close btn-close-white"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
+    <!--  Toast 通知提示 -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
+      <div
+        class="toast align-items-center text-white"
+        :class="toastType === 'success' ? 'bg-success' : 'bg-danger'"
+        ref="toastRef"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body">
+            {{ toastMessage }}
           </div>
-          <div class="modal-body">
-            {{ modalMessage }}
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
-          </div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
         </div>
       </div>
     </div>
@@ -120,7 +112,7 @@ import { reactive, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { useUserStore } from '@/stores/auth'
-import { Modal } from 'bootstrap'
+import { Toast } from 'bootstrap'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -136,25 +128,25 @@ const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
 
-// Modal 控制
-const modalRef = ref(null)
-const modalMessage = ref('')
-const modalType = ref('success') // 'success' or 'danger'
-let modalInstance = null
+//  Toast 控制
+const toastRef = ref(null)
+const toastInstance = ref(null)
+const toastMessage = ref('')
+const toastType = ref('success')
 
 onMounted(() => {
-  modalInstance = new Modal(modalRef.value)
+  toastInstance.value = new Toast(toastRef.value, { delay: 2500, autohide: true })
 })
 
-function showModal(msg, type = 'danger') {
-  modalMessage.value = msg
-  modalType.value = type
-  modalInstance?.show()
+function showToast(msg, type = 'success') {
+  toastMessage.value = msg
+  toastType.value = type
+  toastInstance.value?.show()
 }
 
 async function handleLogin() {
   if (!form.email || !form.password) {
-    showModal('請輸入帳號與密碼', 'danger')
+    showToast('請輸入帳號與密碼', 'danger')
     return
   }
 
@@ -176,17 +168,16 @@ async function handleLogin() {
       account: form.email,
     })
 
-    showModal('登入成功', 'success')
+    localStorage.setItem('token', token)
+    sessionStorage.setItem('token', token)
+    showToast('登入成功', 'success')
 
     setTimeout(() => {
-      modalInstance.hide() // 關閉 Modal
-      const backdrop = document.querySelector('.modal-backdrop')
-      if (backdrop) backdrop.remove() // 清除殘留遮罩
       router.push('/')
-    }, 1500)
+    }, 1600)
   } catch (err) {
     const msg = err.response?.data?.message || err.message || '登入失敗，請確認帳密是否正確'
-    showModal(msg, 'danger')
+    showToast(msg, 'danger')
   }
 }
 </script>
@@ -208,9 +199,5 @@ async function handleLogin() {
   cursor: pointer;
   color: #666;
   font-size: 1.2rem;
-}
-
-.slogan-text {
-  margin-top: -10px;
 }
 </style>

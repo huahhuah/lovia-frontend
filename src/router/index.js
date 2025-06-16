@@ -46,14 +46,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-
       path: '/users/postApplication',
       name: 'Proposer',
       component: () => import('@/views/users/Proposer.vue'),
       meta: { requiresAuth: true },
     },
     {
-
       path: '/projects/:project_id/plans',
       name: 'ProjectPlan',
       component: () => import('@/views/projects/ProjectPlan.vue'),
@@ -135,23 +133,10 @@ const router = createRouter({
       component: () => import('@/views/payment/PaymentResult.vue'),
     },
     {
-      path: '/payment/PaymentResult',
-      redirect: (to) => {
-        // 保留查詢參數並轉到正確頁面
-        return { path: '/checkout/result', query: to.query }
-      },
-    },
-    {
       path: '/checkout/cancel',
       name: 'PaymentCancel',
       component: () => import('@/views/payment/PaymentCancel.vue'),
     },
-    {
-      path: '/payment/linepay/start',
-      name: 'LinePayStart',
-      component: () => import('@/views/payment/LinePayStart.vue'),
-    },
-
     {
       path: '/user',
       component: () => import('@/layouts/UserLayout.vue'),
@@ -159,7 +144,7 @@ const router = createRouter({
       children: [
         {
           path: '',
-          redirect: '/user/sponsorships' 
+          redirect: '/user/sponsorships',
         },
         {
           path: 'edit',
@@ -221,8 +206,8 @@ const router = createRouter({
         {
           path: 'proposerReview',
           name: 'AdminProposersReview',
-          component:() => import(`@/views/admin/AdminProposerReview.vue`)
-        }
+          component: () => import(`@/views/admin/AdminProposerReview.vue`),
+        },
       ],
     },
     {
