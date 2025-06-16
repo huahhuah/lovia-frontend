@@ -60,14 +60,6 @@
                   <label class="form-label">提案團隊<span class="text-danger">*</span></label>
                   <input v-model="form.project_team" type="text" class="form-control bg-light rounded" placeholder="請輸入提案人姓名或團隊名稱" required />
                 </div>
-
-                <!-- 團隊介紹 -->
-                <div class="mb-3">
-                  <label class="form-label">團隊介紹</label>
-                  <textarea
-                    v-model = "form.project_team"
-                    class="form-control bg-light rounded" placeholder="請介紹團隊成員與專業背景，讓支持者更安心地了解您們如何實現這項計畫。"></textarea>
-                </div>
               </div>
 
               <!-- 封面 -->

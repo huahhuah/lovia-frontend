@@ -14,52 +14,7 @@
       <div class="container" style="padding-left: 10rem; padding-right: 10rem">
         <div class="row justify-content-center g-4">
           <div class="col-md-4" v-for="(card, index) in visibleCards" :key="index">
-            <div class="card shadow-sm rounded-5 h-100 d-flex flex-column overflow-hidden">
-              <!-- 封面區 -->
-              <div class="position-relative">
-                <img
-                  :src="card.cover"
-                  class="card-img-top rounded-top-4 grayscale"
-                  :alt="card.title"
-                />
-                <img
-                  :src="card.category_img || '/default.png'"
-                  alt="分類標籤"
-                  class="category-badge"
-                />
-                <div class="overlay-dark"></div>
-                <img :src="card.status_img" class="status-stamp" alt="狀態印章" />
-                <div class="favorite-wrapper">
-                  <img src="/favorite.png" alt="收藏" class="favorite-icon" />
-                </div>
-              </div>
-
-              <!-- 內容區 -->
-              <div class="card-body text-start px-3 pb-4 d-flex flex-column flex-grow-1">
-                <h5 class="card-title fw-bold text-ellipsis-2">{{ card.title }}</h5>
-                <p class="card-text small mb-1 text-ellipsis-3">{{ card.summary }}</p>
-                <p class="text-proposer mb-2">提案單位：{{ card.proposer }}</p>
-
-                <div class="mt-auto">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted">已結束</small>
-                    <small>達成率 {{ card.percentage }}%</small>
-                  </div>
-                  <div class="progress my-2 progress-custom">
-                    <div class="progress-bar" :style="{ width: card.percentage + '%' }"></div>
-                  </div>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <strong>NT$ {{ card.amount.toLocaleString() }}</strong>
-                    <router-link
-                      :to="`/projects/funding/${card.id}`"
-                      class="btn btn-sm btn-danger rounded-pill px-3"
-                    >
-                      查看專案 >
-                    </router-link>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ProjectCard :project="card" isArchived />
           </div>
         </div>
 
@@ -80,6 +35,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { getAllProjects } from '@/api/project'
+import ProjectCard from '@/components/ProjectCard.vue'
 
 const archivedProjects = ref([])
 const showAll = ref(false)
@@ -97,6 +53,8 @@ onMounted(async () => {
       per_page: 99,
     })
 
+    console.log('📦 歷年專案 API 原始資料：', res.data.data)
+
     if (res.data?.status && Array.isArray(res.data.data)) {
       archivedProjects.value = res.data.data.map((p) => {
         const percentage = p.total_amount === 0 ? 0 : (p.amount / p.total_amount) * 100
@@ -106,6 +64,7 @@ onMounted(async () => {
           status_img: percentage >= 100 ? '/募資達標.png' : '/募資結束.png',
         }
       })
+      console.log('✅ 加工後資料：', archivedProjects.value)
     } else {
       console.warn('沒有符合條件的歷年專案資料')
     }
@@ -131,42 +90,6 @@ onMounted(async () => {
   opacity: 0.8;
 }
 
-.card {
-  height: 100%;
-  max-width: 300px;
-  margin: 0 auto;
-}
-
-.text-ellipsis-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.5em;
-  min-height: 3em;
-}
-
-.text-ellipsis-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.5em;
-  min-height: 4.5em;
-}
-
-.progress-custom {
-  height: 6px;
-  background-color: #f3f3f3;
-  border-radius: 100px;
-  overflow: hidden;
-}
-.progress-custom .progress-bar {
-  background-image: linear-gradient(to right, #fc7c9d, #ffc443);
-}
-
 .text-proposer {
   color: #c4c4c4;
   font-size: 14px;
@@ -177,20 +100,6 @@ onMounted(async () => {
   top: 12px;
   left: 12px;
   width: 60px;
-  z-index: 2;
-}
-
-.favorite-wrapper {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 36px;
-  height: 36px;
-  background-color: rgba(26, 26, 26, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 2;
 }
 
