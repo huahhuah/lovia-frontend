@@ -55,27 +55,23 @@
 </template>
 
 <script setup>
-import SponsorshipLayout from '@/layouts/SponsorshipLayout.vue'
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/auth'
+import SponsorshipLayout from '@/layouts/SponsorshipLayout.vue'
 
 const route = useRoute()
 const userStore = useUserStore()
-const orderId = route.params.orderId
 
-//  嘗試從 localStorage/sessionStorage 還原 token
-onMounted(() => {
-  const storedToken = sessionStorage.getItem('token') || localStorage.getItem('token')
-  if (storedToken && !userStore.token) {
-    userStore.setToken(storedToken)
-    console.log(' token 已還原至 userStore')
-  }
-})
+const orderId = route.query.orderId
+const method = route.query.method
+const transactionId = route.query.transactionId
 
-const token = computed(() => userStore.token || '') //  動態取得 token，避免為空
+const token = computed(() => userStore.token || '')
+const loading = ref(true)
+const error = ref('')
 
-// 預設結果欄位，避免 undefined 報錯
+// 結果欄位
 const result = ref({
   transactionId: '',
   amount: '',
@@ -89,14 +85,25 @@ const result = ref({
   note: '',
 })
 
-const loading = ref(true)
-const error = ref('')
+// 嘗試還原 token
+onMounted(() => {
+  const storedToken = sessionStorage.getItem('token') || localStorage.getItem('token')
+  if (storedToken && !userStore.token) {
+    userStore.setToken(storedToken)
+    console.log('token 已還原至 userStore')
+  }
+})
 
-// 當 token 有值時觸發 API 請求
+// 取得付款成功資料
 watch(
   () => token.value,
   async (val) => {
     if (!val) return
+    if (!orderId) {
+      error.value = '找不到訂單編號，請重新操作'
+      loading.value = false
+      return
+    }
 
     await nextTick()
     loading.value = true
@@ -115,6 +122,7 @@ watch(
       )
       const json = await res.json()
       console.log('付款成功資料：', json)
+
       if (!json.status || !json.data) throw new Error(json.message || '查無資料')
 
       result.value = {
@@ -138,8 +146,9 @@ watch(
   }
 )
 
+// 遮罩信箱
 const maskedEmail = computed(() => {
   const email = result.value?.email || ''
-  return email.replace(/^(.{3})(.*)(@.*)$/, (_, a, b, c) => `${a}***${c}`)
+  return email.replace(/^(.{3})(.*)(@.*)$/, (_, a, _b, c) => `${a}***${c}`)
 })
 </script>

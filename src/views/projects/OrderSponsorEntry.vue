@@ -371,42 +371,11 @@ function validateOrderForm(form) {
     isValid = false
   }
 
-  const zipcodeMap = {
-    100: '中正區',
-    103: '大同區',
-    104: '中山區',
-    105: '松山區',
-    106: '大安區',
-    108: '萬華區',
-    110: '信義區',
-    111: '士林區',
-    112: '北投區',
-    114: '內湖區',
-    115: '南港區',
-    116: '文山區',
-    200: '基隆市',
-    220: '板橋區',
-    221: '汐止區',
-    231: '新店區',
-    241: '三重區',
-    242: '新莊區',
-    243: '泰山區',
-    244: '林口區',
-    247: '蘆洲區',
-    251: '淡水區',
-    300: '新竹市',
-    400: '台中市',
-    500: '彰化縣',
-    600: '嘉義市',
-    700: '台南市',
-    800: '高雄市',
-    900: '屏東縣',
-  }
   if (!form.zipcode.trim()) {
     errors.value.zipcode = '請填寫郵遞區號'
     isValid = false
   } else if (!/^\d{3}$/.test(form.zipcode) || !(form.zipcode in zipcodeMap)) {
-    errors.zipcode = '請輸入有效的郵遞區號'
+    errors.value.zipcode = '請輸入有效的郵遞區號'
     isValid = false
   }
 
