@@ -486,7 +486,8 @@ async function submitOrder() {
   try {
     const res = await createSponsorship(projectId.value, planId.value, payload, token)
 
-    if (!res.data?.order_uuid) {
+    const orderId = res.data?.orderId || res.data?.order_uuid
+    if (!orderId) {
       alert('建立訂單失敗，請稍後再試')
       return
     }
@@ -494,7 +495,7 @@ async function submitOrder() {
     localStorage.setItem(
       'checkoutOrderData',
       JSON.stringify({
-        order_uuid: res.data.order_uuid,
+        order_uuid: orderId,
         amount,
         name: form.value.name,
         email: form.value.account,
