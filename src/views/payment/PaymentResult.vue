@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/auth'
 import SponsorshipLayout from '@/layouts/SponsorshipLayout.vue'
@@ -67,11 +67,10 @@ const orderId = route.query.orderId
 const method = route.query.method
 const transactionId = route.query.transactionId
 
-const token = computed(() => userStore.token || '')
+const token = ref('')
 const loading = ref(true)
 const error = ref('')
 
-// 結果欄位
 const result = ref({
   transactionId: '',
   amount: '',
@@ -85,70 +84,74 @@ const result = ref({
   note: '',
 })
 
-// 嘗試還原 token
-onMounted(() => {
+const maskedEmail = computed(() => {
+  const email = result.value?.email || ''
+  return email.replace(/^(.{3})(.*)(@.*)$/, (_, a, _b, c) => `${a}***${c}`)
+})
+
+onMounted(async () => {
   const storedToken = sessionStorage.getItem('token') || localStorage.getItem('token')
   if (storedToken && !userStore.token) {
     userStore.setToken(storedToken)
     console.log('token 已還原至 userStore')
   }
-})
 
-// 取得付款成功資料
-watch(
-  () => token.value,
-  async (val) => {
-    if (!val) return
-    if (!orderId) {
-      error.value = '找不到訂單編號，請重新操作'
-      loading.value = false
-      return
-    }
-
-    await nextTick()
-    loading.value = true
-    error.value = ''
-
-    try {
-      const res = await fetch(
-        `https://lovia-backend-xl4e.onrender.com/api/v1/users/orders/${orderId}/payment/success`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${val}`,
-          },
-        }
-      )
-      const json = await res.json()
-      console.log('付款成功資料：', json)
-
-      if (!json.status || !json.data) throw new Error(json.message || '查無資料')
-
-      result.value = {
-        transactionId: json.order_uuid,
-        amount: json.amount,
-        paidAt: json.paid_at,
-        paymentMethod: json.payment_method || '綠界 / LINE Pay',
-        display_name: json.display_name || '匿名',
-        email: json.email || '',
-        recipient: json.shipping?.name || '',
-        phone: json.shipping?.phone || '',
-        address: json.shipping?.address || '',
-        note: json.note || '',
-      }
-    } catch (err) {
-      console.error('付款資料取得失敗:', err)
-      error.value = err.message || '查詢付款結果失敗'
-    } finally {
-      loading.value = false
-    }
+  token.value = userStore.token || ''
+  if (!token.value) {
+    error.value = '登入憑證不存在，請重新登入'
+    loading.value = false
+    return
   }
-)
 
-// 遮罩信箱
-const maskedEmail = computed(() => {
-  const email = result.value?.email || ''
-  return email.replace(/^(.{3})(.*)(@.*)$/, (_, a, _b, c) => `${a}***${c}`)
+  if (!orderId) {
+    error.value = '找不到訂單編號，請重新操作'
+    loading.value = false
+    return
+  }
+
+  await fetchResult()
 })
+
+async function fetchResult() {
+  loading.value = true
+  error.value = ''
+
+  try {
+    const res = await fetch(
+      `https://lovia-backend-xl4e.onrender.com/api/v1/users/orders/${orderId}/payment/success`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token.value}`,
+        },
+      }
+    )
+
+    const json = await res.json()
+    console.log('付款成功資料：', json)
+
+    const data = json.data // <-- 這裡注意要確認後端格式
+
+    if (!json.status || !data) throw new Error(json.message || '查無資料')
+
+    result.value = {
+      transactionId: data.order_uuid,
+      amount: data.amount,
+      paidAt: data.paid_at,
+      paymentMethod: data.payment_method || '綠界 / LINE Pay',
+      display_name: data.display_name || '匿名',
+      email: data.email || '',
+      recipient: data.shipping?.name || '',
+      phone: data.shipping?.phone || '',
+      address: data.shipping?.address || '',
+      note: data.note || '',
+    }
+  } catch (err) {
+    console.error('付款資料取得失敗:', err)
+    error.value = err.message || '查詢付款結果失敗'
+  } finally {
+    loading.value = false
+  }
+}
 </script>
