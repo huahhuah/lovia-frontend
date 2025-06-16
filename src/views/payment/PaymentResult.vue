@@ -10,14 +10,28 @@
       <div v-else-if="error" class="text-center text-danger py-5">
         ⚠️ {{ error }}
         <div class="mt-4">
-          <a href="/" class="btn btn-outline-secondary me-2">返回首頁</a>
-          <a href="/#/checkout" class="btn btn-primary">重新贊助</a>
+          <router-link to="/" class="btn btn-outline-secondary me-2">返回首頁</router-link>
+          <router-link to="/checkout" class="btn btn-primary">重新贊助</router-link>
         </div>
       </div>
 
       <!-- 成功畫面 -->
       <div v-else>
-        <div class="bg-light p-4 text-center mb-4 border rounded">
+        <!-- ATM 未付款提示 -->
+        <div
+          v-if="result.paymentMethod === 'ATM' && result.status !== 'paid'"
+          class="bg-warning bg-opacity-25 p-4 text-center mb-4 border rounded"
+        >
+          <h4 class="fw-bold text-warning mb-3">⚠️ 此筆交易尚未完成付款</h4>
+          <p class="mb-3">請依下列虛擬帳號資訊於期限內完成轉帳：</p>
+          <p><strong>銀行代碼：</strong>{{ result.bank_code || '未提供' }}</p>
+          <p><strong>虛擬帳號：</strong>{{ result.v_account || '未提供' }}</p>
+          <p><strong>繳費期限：</strong>{{ result.expire_date || '未提供' }}</p>
+          <p class="mt-3 text-muted">轉帳完成後，系統會自動確認付款並寄出通知。</p>
+        </div>
+
+        <!-- 已付款成功區塊 -->
+        <div v-else class="bg-light p-4 text-center mb-4 border rounded">
           <h4 class="fw-bold text-success mb-3">🎉 感謝您的贊助！</h4>
           <p class="text-muted">
             一封確認信已寄送至 <strong>{{ maskedEmail }}</strong
@@ -30,7 +44,7 @@
           <h5 class="fw-bold mb-3">💳 付款資訊</h5>
           <p><strong>交易編號：</strong>{{ result.transactionId || '未提供' }}</p>
           <p><strong>付款金額：</strong>NT$ {{ result.amount || '未提供' }}</p>
-          <p><strong>付款時間：</strong>{{ result.paidAt || '未提供' }}</p>
+          <p><strong>付款時間：</strong>{{ result.paidAt || '尚未付款' }}</p>
           <p><strong>付款方式：</strong>{{ result.paymentMethod || '未提供' }}</p>
         </div>
 
@@ -64,9 +78,6 @@ const route = useRoute()
 const userStore = useUserStore()
 
 const orderId = route.query.orderId
-const method = route.query.method
-const transactionId = route.query.transactionId
-
 const token = ref('')
 const loading = ref(true)
 const error = ref('')
@@ -82,6 +93,10 @@ const result = ref({
   phone: '',
   address: '',
   note: '',
+  status: '',
+  bank_code: '',
+  v_account: '',
+  expire_date: '',
 })
 
 const maskedEmail = computed(() => {
@@ -128,10 +143,12 @@ async function fetchResult() {
       }
     )
 
-    const json = await res.json()
-    console.log('付款成功資料：', json)
+    if (!res.ok) {
+      throw new Error(`錯誤 ${res.status}：${res.statusText}`)
+    }
 
-    const data = json.data // <-- 這裡注意要確認後端格式
+    const json = await res.json()
+    const data = json.data
 
     if (!json.status || !data) throw new Error(json.message || '查無資料')
 
@@ -146,6 +163,10 @@ async function fetchResult() {
       phone: data.shipping?.phone || '',
       address: data.shipping?.address || '',
       note: data.note || '',
+      status: data.status || '',
+      bank_code: data.bank_code || '',
+      v_account: data.v_account || '',
+      expire_date: data.expire_date || '',
     }
   } catch (err) {
     console.error('付款資料取得失敗:', err)

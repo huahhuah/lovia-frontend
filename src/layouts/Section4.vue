@@ -141,13 +141,52 @@ onMounted(async () => {
   left: 0;
   width: 300px;
   z-index: 0;
+  opacity: 0;
+  transform: scale(1.05);
+  animation: fadeZoomIn 2s ease-out forwards;
 }
+
+@keyframes fadeZoomIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .section4-illustration {
   position: absolute;
   bottom: 0;
   right: 0;
   width: 800px;
   z-index: 0;
+  opacity: 0;
+  transform: translateY(20px);
+  animation:
+    fadeFloatIn 1s ease-out 0.5s forwards,
+    floatUpDown 3s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+.section4-illustration:hover {
+  transform: scale(1.05);
+}
+
+/* 初次進場浮現動畫 */
+@keyframes fadeFloatIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 上下浮動動畫 */
+@keyframes floatUpDown {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 @media (max-width: 991.98px) {
