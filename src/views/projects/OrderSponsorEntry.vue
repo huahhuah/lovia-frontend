@@ -284,6 +284,28 @@ const totalAmount = computed(() => {
 })
 
 onMounted(() => {
+  //  強制還原 token（若沒有）以防刷新後失效
+  if (!authStore.token) {
+    const storedToken = localStorage.getItem('token')
+    if (storedToken) {
+      authStore.setToken(storedToken)
+      console.log(' token 還原成功：', storedToken)
+    }
+  }
+
+  //  還原 user（optional，加強保險）
+  if (!authStore.user) {
+    const rawUser = localStorage.getItem('user')
+    if (rawUser) {
+      try {
+        authStore.setUser(JSON.parse(rawUser))
+        console.log(' user 還原成功')
+      } catch (e) {
+        console.warn(' user 還原失敗:', e)
+      }
+    }
+  }
+
   // 取得 localStorage 贊助資料
   const raw = localStorage.getItem('sponsorFormData')
   if (!raw) {
