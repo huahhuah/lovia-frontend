@@ -55,7 +55,7 @@
             <div v-if="faqs.length > 0">
               <div v-for="(faq, index) in faqs" :key="index" class="mb-3">
                 <strong> Q: {{ faq.question }}</strong>
-                <p> A: {{ faq.answer }}</p>
+                <p>A: {{ faq.answer }}</p>
               </div>
             </div>
             <p v-else class="text-muted">尚未提供 常見問題 資料。</p>
@@ -95,6 +95,7 @@
 
         <!-- 右側回饋方案 -->
         <div class="col-lg-4 mt-5 mt-lg-0 ps-3">
+          <!-- 無回饋方案時顯示 placeholder -->
           <div v-if="!plans || plans.length === 0">
             <div
               v-for="n in 2"
@@ -103,6 +104,7 @@
               style="height: 180px"
             ></div>
           </div>
+          <!-- 有回饋方案時，渲染 ProjectPlans 元件 -->
           <ProjectPlans
             v-else
             :plans="plans"
@@ -186,7 +188,7 @@ onMounted(() => {
 <style>
 .page-wrapper {
   padding-top: 100px;
-  background-image: linear-gradient(to right, #FFEDF2, #FFF6E3);
+  background-image: linear-gradient(to right, #ffedf2, #fff6e3);
   min-height: 100vh;
 }
 
@@ -209,7 +211,7 @@ onMounted(() => {
 }
 
 .tab-item.active {
-  color: #FC5B53;
+  color: #fc5b53;
   font-weight: 400;
 }
 
@@ -221,7 +223,7 @@ onMounted(() => {
   transform: translateX(-50%);
   width: 70%;
   height: 3px;
-  background-color: #FC5B53;
+  background-color: #fc5b53;
 }
 
 .comment-box {

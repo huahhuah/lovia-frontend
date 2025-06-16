@@ -110,6 +110,15 @@ function redirectError(msg) {
 }
 
 onMounted(() => {
+  // 回 sessionStorage 的 token，避免 LINE Pay 回來變成未登入
+  const sessionToken = sessionStorage.getItem('token')
+  const localToken = localStorage.getItem('token')
+  if (!sessionToken && localToken) {
+    sessionStorage.setItem('token', localToken)
+    location.reload() // 重新整理頁面才能讓後續 API 成功取得 token
+    return
+  }
+
   const raw = localStorage.getItem('checkoutOrderData')
   if (!raw) return redirectError('找不到訂單資料')
 
@@ -168,6 +177,7 @@ async function submitPayment() {
     const rawType = (orderData.value.payment || '').toLowerCase()
     const paymentType = ['linepay', 'credit', 'atm'].includes(rawType) ? rawType : 'credit'
 
+    // 安全抓取 sponsorFormData 中的 selectedPlan
     const sponsorFormDataRaw = localStorage.getItem('sponsorFormData') || '{}'
     const selectedPlan = JSON.parse(sponsorFormDataRaw)?.selectedPlan || {}
     const planName =
@@ -178,7 +188,7 @@ async function submitPayment() {
 
     const productName = planName.slice(0, 100)
 
-    const baseURL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080').replace(/\/+$/, '')
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
 
     const payload = { amount, email, payment_type: paymentType, productName }
 

@@ -4,9 +4,9 @@
       v-for="(step, index) in steps"
       :key="index"
       class="step flex-fill text-center"
-      :class="{ active: currentStep === index }"
+      :class="{ active: currentStep === index, disabled: index < currentStep }"
       @click="goToStep(step)"
-      style="cursor: pointer"
+      :style="{ cursor: index < currentStep ? 'not-allowed' : 'pointer' }"
     >
       {{ step.label }}
     </div>
@@ -29,9 +29,16 @@ const steps = [
 ]
 
 function goToStep(step) {
-  if (step.path) {
-    router.push(step.path)
+  const targetIndex = steps.findIndex((s) => s.path === step.path)
+
+  // 如果要前往比目前 index 更小（往回），則不允許
+  if (targetIndex < props.currentStep) {
+    alert('您無法返回先前步驟，請依序完成流程。')
+    return
   }
+
+  // 否則允許切換（等於或往前）
+  router.push(step.path)
 }
 </script>
 
