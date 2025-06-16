@@ -13,12 +13,19 @@
       </div>
 
       <!-- 分類與工具列 -->
-      <div class="filter-section d-flex justify-content-between flex-wrap align-items-center bg-transparent" style="margin-top: 200px; padding-top: 40px;">
+      <div
+        class="filter-section d-flex justify-content-between flex-wrap align-items-center bg-transparent"
+        style="margin-top: 200px; padding-top: 40px"
+      >
         <!-- 分類按鈕 -->
         <div class="category-scroll">
           <ul class="nav nav-pills mb-2 category-button-group desktop-spacing">
             <li class="nav-item" v-for="tag in filters" :key="tag.key">
-              <button class="btn filter-tab" :class="{ active: currentFilter === tag.key }" @click="setFilter(tag.key)">
+              <button
+                class="btn filter-tab"
+                :class="{ active: currentFilter === tag.key }"
+                @click="setFilter(tag.key)"
+              >
                 {{ tag.label }}
               </button>
             </li>
@@ -27,7 +34,7 @@
 
         <!-- 搜尋與分類 -->
         <div class="tools-wrapper mb-2 ms-auto d-flex gap-3 align-items-center">
-          <div class="search-input">
+          <div class="search-input position-relative">
             <i class="bi bi-search"></i>
             <input
               type="text"
@@ -35,6 +42,14 @@
               v-model="searchKeyword"
               @input="fetchProjects"
             />
+            <button
+              v-if="searchKeyword"
+              @click="clearSearch"
+              class="btn btn-sm position-absolute end-0 top-50 translate-middle-y me-2"
+              style="background: none; border: none; font-size: 16px; color: #888"
+            >
+              ✕
+            </button>
           </div>
 
           <div class="category-wrapper">
@@ -53,7 +68,10 @@
       </div>
 
       <!-- 卡片列表 -->
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 gx-2 gy-4 card-list" style="margin-top: 20px;">
+      <div
+        class="row row-cols-1 row-cols-md-2 row-cols-lg-3 gx-2 gy-4 card-list"
+        style="margin-top: 20px"
+      >
         <div class="col" v-for="project in visibleProjects" :key="project.id">
           <ProjectCard :project="project" />
         </div>
@@ -65,7 +83,12 @@
           <li class="page-item" :class="{ disabled: currentPage === 1 }">
             <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">‹</a>
           </li>
-          <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: currentPage === page }">
+          <li
+            class="page-item"
+            v-for="page in totalPages"
+            :key="page"
+            :class="{ active: currentPage === page }"
+          >
             <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
           </li>
           <li class="page-item" :class="{ disabled: currentPage === totalPages }">
@@ -78,37 +101,51 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { getAllProjects, getAllCategories } from '@/api/project'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import axios from 'axios'
 import ProjectCard from '@/components/ProjectCard.vue'
+import { getAllCategories } from '@/api/project'
 
+const route = useRoute()
+const router = useRouter()
+
+const searchKeyword = ref(route.query.keyword || '')
+const selectedCategory = ref(route.query.category || '')
+const currentPage = ref(Number(route.query.page) || 1)
+const projects = ref([])
+const categories = ref([])
+const isLoading = ref(false)
+
+const perPage = 9
+const totalPages = ref(1)
 const filters = [
   { key: 'all', label: '全部專案' },
   { key: 'recent', label: '近期專案' },
   { key: 'popular', label: '熱門專案' },
   { key: 'long', label: '長期贊助' },
 ]
-
 const currentFilter = ref('all')
-const searchKeyword = ref('')
-const selectedCategory = ref('')
-const currentPage = ref(1)
-const perPage = 9
-const projects = ref([])
-const totalPages = ref(1)
-const categories = ref([])
 
+//  fetchProjects 支援 keyword + category + page
 const fetchProjects = async () => {
-  const res = await getAllProjects({
-    filter: currentFilter.value,
-    page: currentPage.value,
-    per_page: perPage,
-    search: searchKeyword.value,
-    category_id: selectedCategory.value,
-  })
-  if (res.data?.status) {
-    projects.value = res.data.data
-    totalPages.value = res.data.pagination.total_pages
+  isLoading.value = true
+  try {
+    const res = await axios.get('https://lovia-backend-xl4e.onrender.com/api/v1/projects', {
+      params: {
+        keyword: searchKeyword.value || undefined,
+        category_id: selectedCategory.value || undefined,
+        page: currentPage.value,
+        filter: currentFilter.value !== 'all' ? currentFilter.value : undefined,
+      },
+    })
+    projects.value = res.data.projects || res.data.data || []
+    totalPages.value = Math.ceil((res.data.total || projects.value.length) / perPage)
+  } catch (err) {
+    console.error('搜尋失敗', err)
+    projects.value = []
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -119,23 +156,61 @@ const fetchCategories = async () => {
   }
 }
 
-const setFilter = (key) => {
-  currentFilter.value = key
-  currentPage.value = 1
-  fetchProjects()
+//  同步 URL query + 觸發搜尋
+const updateRouteAndSearch = () => {
+  router.push({
+    path: '/projects/explore-projects',
+    query: {
+      keyword: searchKeyword.value || undefined,
+      category: selectedCategory.value || undefined,
+      page: currentPage.value,
+    },
+  })
 }
 
+//  清除搜尋欄位
+const clearSearch = () => {
+  searchKeyword.value = ''
+  updateRouteAndSearch()
+}
+
+//  分頁切換
 const changePage = (page) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page
-    fetchProjects()
+    updateRouteAndSearch()
   }
 }
 
-const visibleProjects = computed(() => projects.value)
+//  篩選切換
+const setFilter = (key) => {
+  currentFilter.value = key
+  currentPage.value = 1
+  updateRouteAndSearch()
+}
+
+//  監聽路由變化，重新 fetch
+watch(
+  () => route.query,
+  (newQuery) => {
+    searchKeyword.value = newQuery.keyword || ''
+    selectedCategory.value = newQuery.category || ''
+    currentPage.value = Number(newQuery.page) || 1
+    fetchProjects()
+  },
+  { immediate: true }
+)
+
+// debounce 輸入搜尋（使用 setTimeout）
+let debounceTimer = null
+watch(searchKeyword, () => {
+  clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    updateRouteAndSearch()
+  }, 500)
+})
 
 onMounted(() => {
-  fetchProjects()
   fetchCategories()
 })
 </script>
@@ -325,7 +400,7 @@ onMounted(() => {
 
   /* 分類區往上調整，避免背景留白 */
   .filter-section {
-    margin-top: 70px !important;  
+    margin-top: 70px !important;
     padding-top: 12px;
     flex-direction: column;
     gap: 0.75rem;

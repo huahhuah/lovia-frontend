@@ -23,15 +23,23 @@
 
       <!-- 桌機導覽列 -->
       <div class="d-none d-lg-flex align-items-center gap-4 middle-nav">
-        <form class="search-form mb-0">
+        <form class="search-form mb-0" @submit.prevent="handleSearch">
           <div class="input-group">
             <span class="input-group-text bg-transparent border-end-0">
-              <img src="/searchicon.png" alt="search" width="18" />
+              <img
+                src="/searchicon.png"
+                alt="search"
+                width="18"
+                @click="handleSearch"
+                style="cursor: pointer"
+              />
             </span>
             <input
+              v-model="searchKeyword"
               class="form-control rounded-pill border-start-0"
               type="search"
               placeholder="搜尋產品 / 專案"
+              @keydown.enter.prevent="handleSearch"
             />
           </div>
         </form>
@@ -82,7 +90,7 @@
                   </ul>
                 </li>
                 <li v-else>
-                  <router-link to="/orders" class="dropdown-item">訂單管理</router-link>
+                  <router-link to="/orders" class="dropdown-item"></router-link>
                 </li>
 
                 <!-- 專案提問 -->
@@ -128,34 +136,65 @@
   >
     <form class="search-form mt-2 px-4">
       <div class="input-group">
-        <input class="form-control rounded-pill" type="search" placeholder="搜尋產品 / 專案" />
+        <input
+          class="form-control rounded-pill"
+          type="search"
+          placeholder="搜尋產品 / 專案"
+          v-model="searchKeyword"
+          @keydown.enter.prevent="handleSearch"
+        />
       </div>
     </form>
   </div>
 
   <!-- 手機全頁選單 -->
-  <div
-    v-if="isMenuOpen && windowWidth < 992"
-    class="mobile-menu-overlay"
-    @click.self="isMenuOpen = false"
-  >
-    <div class="d-flex flex-column align-items-center py-4 gap-4">
-      <img src="/homepageS1-logo.png" alt="Logo" width="150" @click="isMenuOpen = false" />
-      <router-link to="/" class="menu-link" @click="isMenuOpen = false">首頁</router-link>
-      <router-link to="/explore" class="menu-link" @click="isMenuOpen = false">探索</router-link>
-      <!-- <router-link to="/propose" class="menu-link" @click="isMenuOpen = false">提案</router-link> -->
-      <span class="menu-link" @click="handlePropose">提案</span>
-      <router-link v-if="!user" to="/register" class="menu-link" @click="isMenuOpen = false"
-        >註冊</router-link
-      >
-      <router-link v-if="!user" to="/login" class="menu-link" @click="isMenuOpen = false"
-        >登入</router-link
-      >
-      <button @click="isMenuOpen = false" class="btn p-0 border-0">
-        <img src="/close.png" alt="Close" width="24" />
-      </button>
+  <transition name="slide-fade">
+    <div
+      v-if="isMenuOpen && windowWidth < 992"
+      class="mobile-menu-overlay"
+      @click.self="isMenuOpen = false"
+    >
+      <div class="d-flex flex-column align-items-center pt-5 pb-4 gap-4">
+        <img
+          src="/homepageS1-logo.png"
+          alt="Logo"
+          width="150"
+          style="margin-top: 2rem"
+          @click="isMenuOpen = false"
+        />
+
+        <!-- 公共連結 -->
+        <router-link to="/" class="menu-link" @click="isMenuOpen = false">首頁</router-link>
+        <router-link to="/projects/explore-projects" class="menu-link" @click="isMenuOpen = false"
+          >探索</router-link
+        >
+        <span class="menu-link" @click="handlePropose">提案</span>
+        <router-link v-if="!user" to="/register" class="menu-link" @click="isMenuOpen = false"
+          >註冊</router-link
+        >
+
+        <!--  未登入時 -->
+        <router-link v-if="!user" to="/register" class="menu-link" @click="isMenuOpen = false"
+          >註冊</router-link
+        >
+        <router-link v-if="!user" to="/login" class="menu-link" @click="isMenuOpen = false"
+          >登入</router-link
+        >
+        <!--  已登入時 -->
+        <template v-else>
+          <router-link to="/user" class="menu-link" @click="isMenuOpen = false"
+            >會員中心</router-link
+          >
+          <span class="menu-link text-danger" @click="handleLogout">登出</span>
+        </template>
+
+        <!-- 關閉按鈕 -->
+        <button @click="isMenuOpen = false" class="btn p-0 border-0">
+          <img src="/close.png" alt="Close" width="24" />
+        </button>
+      </div>
     </div>
-  </div>
+  </transition>
 </template>
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick, watch, onBeforeUnmount } from 'vue'
@@ -172,6 +211,7 @@ const isLoading = ref(true)
 const isMenuOpen = ref(false)
 const isSearchOpen = ref(false)
 const isDropdownOpen = ref(false)
+const searchKeyword = ref('')
 const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
 
 const avatarUrl = computed(() => {
@@ -216,6 +256,17 @@ const handlePropose = () => {
   } else {
     router.push('/users/postApplication')
   }
+}
+
+const handleSearch = () => {
+  const keyword = searchKeyword.value.trim()
+  if (keyword) {
+    router.push({ path: '/projects/explore-projects', query: { keyword } })
+  } else {
+    router.push('/projects/explore-projects')
+  }
+  isSearchOpen.value = false
+  isMenuOpen.value = false
 }
 
 onMounted(() => {
@@ -344,6 +395,7 @@ const handleLogout = () => {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .menu-link {
@@ -360,6 +412,27 @@ const handleLogout = () => {
 
 .menu-link:hover {
   color: #000;
+}
+
+/* 漢堡動畫 */
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.4s ease;
+}
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+/* 可選：讓 .menu-panel 有背景與邊界效果 */
+.menu-panel {
+  width: 85%;
+  max-width: 360px;
+  background-color: #fff7f6;
+  height: 100%;
+  overflow-y: auto;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 991.98px) {

@@ -50,7 +50,12 @@
             class="img-fluid hero-headline position-relative"
           />
         </div>
-        <button class="btn custom-cta rounded-pill px-4 py-2 mt-3">立刻行動 >></button>
+        <button
+          class="btn custom-cta rounded-pill px-4 py-2 mt-3"
+          onclick="window.location.href='#/projects/explore-projects'"
+        >
+          立刻行動 >>
+        </button>
       </div>
     </div>
 
@@ -92,6 +97,7 @@ onMounted(() => {
 .hero-img {
   height: 100vh;
   object-fit: cover;
+  pointer-events: none;
 }
 
 .hero-overlay {
@@ -127,6 +133,8 @@ onMounted(() => {
 }
 
 .custom-cta {
+  z-index: 10;
+  position: relative;
   background-color: #fc5b53;
   color: #fafafa;
   border: none;
@@ -148,6 +156,88 @@ onMounted(() => {
 .carousel-control-prev,
 .carousel-control-next {
   z-index: 3; /* 蓋過 overlay */
+}
+
+.custom-cta {
+  position: relative;
+  overflow: hidden;
+}
+
+.custom-cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  transform: skewX(-20deg);
+  animation: shine 2.5s infinite;
+}
+
+@keyframes shine {
+  100% {
+    left: 125%;
+  }
+}
+
+.hero-illustration img {
+  opacity: 0;
+  transform: translateY(20px) scale(1);
+  animation:
+    fadeInUp 1s ease-out 0.3s forwards,
+    pulse 3s ease-in-out infinite;
+}
+
+/* 淡入 + 上移動畫 */
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 呼吸放大動畫 */
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.hero-headline {
+  opacity: 0;
+  transform: translateY(30px);
+  animation:
+    fadeUp 1s ease-out forwards,
+    sway 2.5s ease-in-out infinite;
+  animation-delay: 0.3s, 1.3s; /* 第二個動畫延後啟動，等 fadeUp 結束 */
+  transform-origin: bottom center;
+}
+
+/* 進場動畫（向上浮現） */
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 左右搖擺動畫 */
+@keyframes sway {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  75% {
+    transform: translateY(0) rotate(2deg);
+  }
 }
 
 @media (max-width: 768px) {
