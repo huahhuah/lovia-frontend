@@ -209,8 +209,12 @@
               <span>總計</span>
               <span>NT$ {{ totalAmount }}</span>
             </div>
-            <button class="btn btn-primary w-100 mt-3" @click="submitOrder" :disabled="loading">
-              {{ loading ? '送出中...' : '送出訂單' }}
+            <button
+              class="btn btn-primary w-100 mt-3"
+              @click="submitOrder"
+              :disabled="isSubmitting"
+            >
+              {{ isSubmitting ? '送出中...' : '送出訂單' }}
             </button>
           </div>
         </div>
@@ -399,26 +403,35 @@ watchEffect(() => {
   }
 })
 
+const isSubmitting = ref(false)
+
 async function submitOrder() {
+  if (isSubmitting.value) return
+  isSubmitting.value = true
+
   const token = authStore.token
   if (!token) {
     alert('請先登入')
     router.push('/login')
+    isSubmitting.value = false
     return
   }
 
   if (!projectId.value || !planId.value) {
     alert('找不到專案資訊，請重新操作')
+    isSubmitting.value = false
     return
   }
 
-  if (!validateInvoiceForm(form.value)) return
-  if (!validateOrderForm(form.value)) return
+  if (!validateInvoiceForm(form.value) || !validateOrderForm(form.value)) {
+    isSubmitting.value = false
+    return
+  }
 
   const amount = totalAmount.value
-
   if (!Number.isInteger(amount) || amount <= 0) {
     alert('贊助金額必須為正整數')
+    isSubmitting.value = false
     return
   }
 
@@ -451,17 +464,11 @@ async function submitOrder() {
   try {
     const res = await createSponsorship(projectId.value, planId.value, payload, token)
 
-    const baseAmountToSave = Number.isFinite(sponsorData.value.base_amount)
-      ? sponsorData.value.base_amount
-      : amount
-
-    //  組出 selectedPlan，提供給付款頁顯示用
-    const selectedPlan = {
-      plan_name: sponsorData.value.plan_name || '',
-      feedback: sponsorData.value.feedback || '',
+    if (!res.data?.order_uuid) {
+      alert('建立訂單失敗，請稍後再試')
+      return
     }
 
-    //  儲存付款頁需要的訂單資料（含 plan 資訊）
     localStorage.setItem(
       'checkoutOrderData',
       JSON.stringify({
@@ -477,23 +484,21 @@ async function submitOrder() {
         display_name: sponsorData.value.display_name,
         project_title: sponsorData.value.project_title,
         feedback: sponsorData.value.feedback,
-        base_amount: baseAmountToSave,
+        base_amount: sponsorData.value.base_amount || amount,
         payment: form.value.payment || 'card',
-        selectedPlan,
+        selectedPlan: {
+          plan_name: sponsorData.value.plan_name || '',
+          feedback: sponsorData.value.feedback || '',
+        },
       })
     )
 
-    console.log('使用付款方式:', form.value.payment)
-    console.log('建立訂單成功：', res.data)
-    if (!res.data?.order_uuid) {
-      alert('建立訂單失敗，請稍後再試')
-      return
-    }
     router.push('/checkout/confirm')
   } catch (err) {
     console.error('建立訂單失敗:', err)
-    console.error('錯誤回應內容:', err.response?.data)
     alert(err.response?.data?.message || '建立訂單失敗，請稍後再試')
+  } finally {
+    isSubmitting.value = false
   }
 }
 </script>
