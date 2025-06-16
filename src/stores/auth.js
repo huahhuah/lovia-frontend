@@ -39,5 +39,15 @@ export const useUserStore = defineStore('user', {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
     },
+    restore() {
+      const token = localStorage.getItem('token')
+      const user = localStorage.getItem('user')
+      if (token) this.token = token
+      if (user) {
+        try {
+          this.user = JSON.parse(user)
+        } catch {}
+      }
+    },
   },
 })
