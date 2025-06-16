@@ -11,50 +11,7 @@
       <div class="container" style="padding-left: 10rem; padding-right: 10rem">
         <div class="row justify-content-center g-4">
           <div class="col-md-4" v-for="(card, index) in visibleCards" :key="index">
-            <div class="card shadow-sm rounded-5 h-100 d-flex flex-column overflow-hidden">
-              <!-- 卡片圖片與 icon -->
-              <div class="position-relative">
-                <img :src="card.cover" class="card-img-top rounded-top-4" :alt="card.title" />
-                <img
-                  :src="card.category_img || '/default.png'"
-                  alt="分類標籤"
-                  class="category-badge"
-                />
-                <div class="favorite-wrapper">
-                  <img src="/favorite.png" alt="收藏" class="favorite-icon" />
-                </div>
-              </div>
-
-              <!-- 卡片內文 -->
-              <div class="card-body text-start px-3 pb-4 d-flex flex-column flex-grow-1">
-                <!-- 標題區 -->
-                <h5 class="card-title fw-bold text-ellipsis-2">{{ card.title }}</h5>
-                <!-- 說明區 -->
-                <p class="card-text small mb-1 text-ellipsis-3">{{ card.summary }}</p>
-                <!-- 提案單位 -->
-                <p class="text-proposer mb-2">提案單位：{{ card.proposer }}</p>
-
-                <!-- 進度與按鈕（固定底部） -->
-                <div class="mt-auto">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-muted">倒數 {{ card.days_left }} 天</small>
-                    <small>{{ card.percentage }}%</small>
-                  </div>
-                  <div class="progress my-2 progress-custom">
-                    <div class="progress-bar" :style="{ width: card.percentage + '%' }"></div>
-                  </div>
-                  <div class="d-flex justify-content-between align-items-center">
-                    <strong>NT$ {{ card.amount.toLocaleString() }}</strong>
-                    <router-link
-                      :to="`/projects/funding/${card.id}`"
-                      class="btn btn-sm btn-danger rounded-pill px-3"
-                    >
-                      立即贊助 >
-                    </router-link>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ProjectCard :project="card" />
           </div>
         </div>
 
@@ -73,6 +30,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { getAllProjects } from '@/api/project'
+import ProjectCard from '@/components/ProjectCard.vue'
 import axios from 'axios'
 
 const isLoading = ref(true)
