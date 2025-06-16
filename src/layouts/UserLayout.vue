@@ -30,22 +30,17 @@
         </li>
 
         <!-- ✅ dropdown：訂單管理（若為贊助者時出現） -->
-        <li class="nav-item dropdown-nav" v-if="isSponsor">
-          <div
-            class="nav-link dropdown-toggle"
-            @click="toggleOrders"
-            @mouseover="!isMobile && (showOrders = true)"
-            @mouseleave="!isMobile && (showOrders = false)"
-          >
+        <li
+          class="nav-item dropdown-nav"
+          v-if="isSponsor"
+          @mouseenter="!isMobile && (showOrders = true)"
+          @mouseleave="!isMobile && (showOrders = false)"
+        >
+          <div class="nav-link dropdown-toggle" @click="toggleOrders">
             <span>訂單管理</span>
             <span class="arrow">▾</span>
           </div>
-          <ul
-            class="dropdown-list"
-            v-show="showOrders"
-            @mouseenter="showOrders = true"
-            @mouseleave="showOrders = false"
-          >
+          <ul class="dropdown-list" v-show="showOrders">
             <li>
               <router-link to="/user/sponsorships" class="dropdown-item">我的贊助</router-link>
             </li>
@@ -56,12 +51,15 @@
         </li>
 
         <!-- ✅ dropdown：專案提問（提問列表／提問管理） -->
-        <li class="nav-item dropdown-nav" v-if="isSponsor || isProposer">
+        <li
+          class="nav-item dropdown-nav"
+          v-if="isSponsor || isProposer"
+          @mouseenter="!isMobile && (showQuestions = true)"
+          @mouseleave="!isMobile && (showQuestions = false)"
+        >
           <div
             class="nav-link dropdown-toggle"
             @click="toggleQuestions"
-            @mouseover="!isMobile && (showQuestions = true)"
-            @mouseleave="!isMobile && (showQuestions = false)"
           >
             <span>專案提問</span>
             <span class="arrow">▾</span>
@@ -69,8 +67,6 @@
           <ul
             class="dropdown-list"
             v-show="showQuestions"
-            @mouseenter="showQuestions = true"
-            @mouseleave="showQuestions = false"
           >
             <li>
               <router-link to="/user/questions" class="dropdown-item">我的提問</router-link>
@@ -111,7 +107,11 @@ const showQuestions = ref(false)
 const isMobile = ref(false)
 
 onMounted(() => {
-  isMobile.value = window.innerWidth <= 768
+  const checkMobile = () => {
+    isMobile.value = window.innerWidth <= 768
+  }
+  checkMobile()
+  window.addEventListener('resize', checkMobile)
 })
 
 const toggleOrders = () => {
@@ -136,6 +136,7 @@ const toggleQuestions = () => {
   background-size: cover;
   background-position: center top;
   overflow-x: hidden;
+  overflow-y: visible;
 }
 
 .background-layer {
@@ -160,7 +161,7 @@ const toggleQuestions = () => {
 
 .user-header {
   position: relative;
-  z-index: 1;
+  z-index: 20;
   padding-top: 240px;
 
   display: flex;
@@ -226,7 +227,6 @@ const toggleQuestions = () => {
 
 .user-main {
   position: relative;
-  z-index: 0;
 }
 
 .dropdown-nav {
@@ -325,20 +325,21 @@ const toggleQuestions = () => {
   }
 
   .user-nav {
-    width: 100%;
-    max-width: 343px;
-    height: 48px;
     display: flex;
     flex-direction: row;
     align-items: center;
     overflow-x: auto;
     white-space: nowrap;
     padding: 0 8px;
-    gap: 8px;
     margin: 0 auto;
+    gap: 8px;
+    width: 100%;
+    max-width: 343px;
+    height: auto;
     scrollbar-width: none;
     flex-wrap: nowrap;
-    box-sizing: border-box;
+    position: relative;
+    z-index: 1000; /* ⭐ 讓 dropdown 不被擋住 */
   }
 
   .user-nav::-webkit-scrollbar {
@@ -349,8 +350,6 @@ const toggleQuestions = () => {
     flex: none;
     padding: 6px 10px;
     font-size: 14px;
-    height: auto;
-    width: auto;
     text-align: center;
   }
 
@@ -363,18 +362,34 @@ const toggleQuestions = () => {
     border-bottom: 2px solid #fc5b53;
   }
 
-  .dropdown-list {
-    left: 50%;
-    transform: translateX(-50%);
-    min-width: auto;
-    width: max-content;
-    max-width: 90vw;
-    overflow-x: auto;
-    box-sizing: border-box;
+  .dropdown-nav {
+    position: relative;
+    z-index: 1001; /* ⭐ 每一個 dropdown 都提高層級 */
   }
 
-  .user-nav .nav-item:not(:last-child) {
-    margin-right: 12px;
+  .dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    z-index: 1002;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    min-width: 160px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .dropdown-item {
+    padding: 0.375rem 1rem;
+    white-space: nowrap;
+    color: #444;
+  }
+
+  .dropdown-item:hover {
+    background-color: #f8f9fa;
   }
 }
 </style>
