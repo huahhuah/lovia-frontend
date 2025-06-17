@@ -11,7 +11,7 @@
 
       <!-- 右側登入表單 -->
       <div class="col-md-6">
-        <div class="border-0 rounded-4 p-5 shadow bg-white" style="background-color: #fff9f5">
+        <div class="form-box">
           <div class="text-center mb-3">
             <i class="bi bi-person-circle fs-1"></i>
             <h3 class="fw-bold mt-2">登入</h3>
@@ -49,7 +49,7 @@
               </div>
             </div>
 
-            <button type="submit" class="btn btn-outline-dark w-100 mb-3">登入</button>
+            <button type="submit" class="btn login-btn w-100 mb-3">登入</button>
           </form>
 
           <!-- 提示區塊 -->
@@ -69,10 +69,7 @@
 
             <p class="text-secondary small mb-3">或使用以下方式登入</p>
 
-            <button
-              class="btn w-100 d-flex align-items-center justify-content-center gap-2"
-              style="background-color: #5f6368; color: white; border-radius: 10px"
-            >
+            <button class="btn google-btn w-100 d-flex align-items-center justify-content-center gap-2">
               <img src="@/assets/icons/google-g.svg" alt="Google" width="20" height="20" />
               使用 Google 帳戶登入
             </button>
@@ -200,6 +197,14 @@ async function handleLogin() {
   background-repeat: no-repeat;
 }
 
+.login-wrapper .form-box {
+  background-color: #fff9f5;
+  border: none;
+  border-radius: 1rem;
+  padding: 2.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); /* 陰影加深 */
+}
+
 .toggle-eye {
   position: absolute;
   top: 50%;
@@ -210,7 +215,16 @@ async function handleLogin() {
   font-size: 1.2rem;
 }
 
-.slogan-text {
-  margin-top: -10px;
+.login-wrapper .login-btn {
+  background-color: #FC5B53;
+  color: white;
+  border-radius: 50px;
+  font-weight: bold;
+}
+
+.login-wrapper .google-btn {
+  background-color: #D5DAE0;
+  color: black;
+  border-radius: 20px;
 }
 </style>

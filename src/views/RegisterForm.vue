@@ -4,7 +4,7 @@
   >
     <div class="row w-100" style="max-width: 960px">
       <!-- 左側內容 -->
-      <div class="col-md-6 d-flex flex-column justify-content-center">
+      <div class="col-12 col-md-6 d-flex flex-column justify-content-center">
         <h2 class="fw-bold">註冊新帳號</h2>
         <p class="small">
           已經有帳號了嗎？
@@ -12,15 +12,14 @@
         </p>
         <img
           src="@/assets/images/bg pic 4.png"
-          class="mb-3"
+          class="mb-3 d-none d-md-block"
           style="max-width: 100%; height: auto"
         />
-        <img src="@/assets/images/headline.png" class="mb-3" style="max-width: 50%; height: auto" />
       </div>
 
       <!-- 右側註冊表單 -->
-      <div class="col-md-6">
-        <div class="border rounded-4 p-4 shadow-sm bg-light">
+      <div class="col-12 col-md-6 mt-4 mt-md-5">
+        <div class="form-card">
           <form @submit.prevent="handleRegister">
             <!-- Email -->
             <div class="mb-3">
@@ -117,7 +116,13 @@
             </div>
 
             <!-- 註冊按鈕 -->
-            <button type="submit" class="btn btn-dark rounded-pill w-100">註冊</button>
+            <button 
+              type="submit" 
+              class="btn rounded-pill w-100 text-white"
+              style="background-color: #FC5B53"
+            >
+              註冊
+            </button>
 
             <!-- Google 登入 -->
             <div class="text-center small mt-4">
@@ -128,8 +133,7 @@
               </div>
               <button
                 type="button"
-                class="btn w-100 d-flex align-items-center justify-content-center gap-2"
-                style="background-color: #5f6368; color: white; border-radius: 20px"
+                class="btn w-100 d-flex align-items-center justify-content-center gap-2 google-btn"
               >
                 <img src="@/assets/icons/google-g.svg" alt="Google" width="20" height="20" />
                 使用 Google 帳戶登入
@@ -246,18 +250,64 @@ async function handleRegister() {
 
 <style scoped>
 .register-wrapper {
-  background-image: url('@/assets/images/bg.png');
+  min-height: 100vh;
+  background-image: linear-gradient(to right, #ffedf2, #fff6e3);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
-.eye-button {
+
+.register-wrapper img {
+  max-width: 75%;
+  height: auto;
+}
+
+.register-wrapper .form-title {
+  font-weight: bold;
+}
+
+.register-wrapper .form-card {
+  background-color: #fff9f5;
+  border: none;
+  border-radius: 1rem;
+  padding: 2.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.register-wrapper .form-control {
+  border-radius: 0.5rem;
+}
+
+.register-wrapper .eye-button {
   cursor: pointer;
   background-color: #fff;
   border-left: none;
 }
-.eye-button i {
+
+.register-wrapper .eye-button i {
   font-size: 1.1rem;
   color: #666;
+}
+
+.register-wrapper .input-group-text.eye-button {
+  border-top-right-radius: 0.5rem !important;
+  border-bottom-right-radius: 0.5rem !important;
+}
+
+.register-wrapper .btn {
+  border-radius: 50px;
+}
+
+.register-wrapper .google-btn {
+  background-color: #D5DAE0;
+  color: black;
+  border-radius: 20px;
+}
+
+@media (max-width: 768px) {
+  .register-wrapper {
+    padding-top: 80px; /* 避開固定導覽列 */
+    padding-bottom: 60px; /* 拉開 footer 間距 */
+  }
 }
 </style>

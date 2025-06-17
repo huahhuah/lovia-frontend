@@ -1,5 +1,6 @@
 <template>
   <div class="forgot-password-container">
+    <div class="form-card">
     <h2>忘記密碼</h2>
     <p>請輸入您的電子郵件地址，我們將發送重設密碼連結給您。</p>
 
@@ -33,6 +34,7 @@
     <div class="back-to-login">
       <router-link to="/login">← 返回登入頁面</router-link>
     </div>
+  </div>
   </div>
 </template>
 
@@ -116,26 +118,28 @@ export default {
 
 <style scoped>
 .forgot-password-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to right, #ffedf2, #fff6e3);
+  padding: 80px 16px 60px; /* 上避開 navbar，下避開 footer */
+}
+
+.form-card {
+  background-color: #fff9f5;
+  padding: 2.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 100%;
   max-width: 500px;
-  margin: 0 auto;
-  padding: 2rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-
-   position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-
-  max-height: 90vh;
-  overflow-y: auto;
 }
 
 h2 {
   text-align: center;
   margin-bottom: 1rem;
   color: #333;
+  font-weight: bold;
 }
 
 p {
@@ -159,36 +163,30 @@ p {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 0.5rem;
   font-size: 1rem;
-  transition: border-color 0.3s;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.form-group input:disabled {
-  background-color: #f5f5f5;
-  cursor: not-allowed;
+  border-color: #FC5B53;
+  box-shadow: 0 0 0 2px rgba(252, 91, 83, 0.25);
 }
 
 button {
   width: 100%;
   padding: 0.75rem;
-  background-color: #007bff;
+  background-color: #FC5B53;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 2rem;
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 button:hover:not(:disabled) {
-  background-color: #0056b3;
+  background-color: #e4504b;
 }
 
 button:disabled {
@@ -201,7 +199,7 @@ button:disabled {
   padding: 1rem;
   background-color: #d4edda;
   border: 1px solid #c3e6cb;
-  border-radius: 4px;
+  border-radius: 0.5rem;
   margin-bottom: 1rem;
 }
 
@@ -220,31 +218,34 @@ button:disabled {
   color: #6c757d !important;
 }
 
+.success,
+.error {
+  text-align: center;
+  font-weight: bold;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+}
+
 .success {
   color: #28a745;
-  font-weight: bold;
-  text-align: center;
-  margin-top: 1rem;
+  background-color: #e6f4ea;
+  border: 1px solid #28a745;
 }
 
 .error {
   color: #dc3545;
-  font-weight: bold;
-  text-align: center;
-  margin-top: 1rem;
-  padding: 0.5rem;
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
-  border-radius: 4px;
 }
 
 .link-button {
   display: inline-block;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.25rem;
   background-color: #28a745;
   color: white;
   text-decoration: none;
-  border-radius: 4px;
+  border-radius: 0.5rem;
   margin-top: 1rem;
   transition: background-color 0.3s;
 }
@@ -255,7 +256,7 @@ button:disabled {
 
 .back-to-login {
   text-align: center;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
   padding-top: 1rem;
   border-top: 1px solid #eee;
 }
@@ -268,5 +269,4 @@ button:disabled {
 .back-to-login a:hover {
   text-decoration: underline;
 }
-
 </style>
