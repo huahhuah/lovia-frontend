@@ -163,6 +163,51 @@ const visibleCards = computed(() => (showAll.value ? projects.value : projects.v
   z-index: 0;
 }
 
+.section2-bg2 {
+  opacity: 0;
+  transform: scale(1.05);
+  animation: fadeZoomIn 2s ease-out forwards;
+}
+
+@keyframes fadeZoomIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.section2-illustration {
+  opacity: 0;
+  transform: translateY(20px);
+  animation:
+    fadeFloatIn 1s ease-out 0.5s forwards,
+    floatUpDown 3s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+.section2-illustration:hover {
+  transform: scale(1.05);
+}
+
+/* 初次進場浮現動畫 */
+@keyframes fadeFloatIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 上下浮動動畫 */
+@keyframes floatUpDown {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 .custom-section2-spacing {
   padding-top: 5rem;
   padding-bottom: 25rem;

@@ -17,7 +17,12 @@
             <div class="content text-start">
               <h4 class="fw-bold">我要提案</h4>
               <p>讓你的願景發聲，讓好點子成真！</p>
-              <button class="btn btn-dark rounded-pill px-4 py-2">GO &gt;</button>
+              <button
+                class="btn btn-dark rounded-pill px-4 py-2"
+                onclick="window.location.href='#/projects/create'"
+              >
+                GO &gt;
+              </button>
             </div>
           </div>
         </div>
@@ -32,7 +37,12 @@
             <div class="content text-start">
               <h4 class="fw-bold">我要贊助</h4>
               <p>每一份支持，都是實現夢想的起點！</p>
-              <button class="btn btn-dark rounded-pill px-4 py-2">GO &gt;</button>
+              <button
+                class="btn btn-dark rounded-pill px-4 py-2"
+                onclick="window.location.href='#/projects/explore-projects'"
+              >
+                GO &gt;
+              </button>
             </div>
           </div>
         </div>
@@ -43,7 +53,7 @@
 
 <style scoped>
 .section5 {
-  background: linear-gradient(to right, #FFEDF2, #FFF6E3);
+  background: linear-gradient(to right, #ffedf2, #fff6e3);
   padding: 8rem 0;
   position: relative;
   overflow: hidden;
@@ -61,7 +71,7 @@
   overflow: hidden;
   position: relative;
   z-index: 2;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1)
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 .bg-layer.base {
   position: absolute;
@@ -109,7 +119,7 @@
 .content p {
   font-size: 0.9rem;
   margin: 8px 0 16px;
-  color: #5F6368
+  color: #5f6368;
 }
 
 .light-deco {
@@ -126,6 +136,42 @@
   right: 60px;
   bottom: -50px;
   width: 600px;
+}
+.card-wrapper {
+  position: relative;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  background-color: white;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.card-wrapper:hover {
+  transform: translateY(-8px) scale(1.03); /* 向上浮 + 微放大 */
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15); /* 增加陰影 */
+  animation: bounce 0.4s;
+}
+
+/* 彈跳動畫 */
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-5px);
+  }
+  60% {
+    transform: translateY(2px);
+  }
+  100% {
+    transform: translateY(-2px);
+  }
+}
+.card-wrapper:hover .bg-deco {
+  transform: scale(1.05) rotate(-2deg);
+  transition: transform 0.3s ease;
 }
 
 @media (max-width: 768px) {

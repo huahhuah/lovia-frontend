@@ -209,8 +209,12 @@
               <span>總計</span>
               <span>NT$ {{ totalAmount }}</span>
             </div>
-            <button class="btn btn-primary w-100 mt-3" @click="submitOrder" :disabled="loading">
-              {{ loading ? '送出中...' : '送出訂單' }}
+            <button
+              class="btn btn-primary w-100 mt-3"
+              @click="submitOrder"
+              :disabled="isSubmitting"
+            >
+              {{ isSubmitting ? '送出中...' : '送出訂單' }}
             </button>
           </div>
         </div>
@@ -225,6 +229,7 @@ import { ref, onMounted, computed, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { createSponsorship } from '@/api/project'
 import { useUserStore } from '@/stores/auth'
+import { zipcodeMap, getDistrictByZipcode } from '@/utils/zipcodeMap'
 
 const authStore = useUserStore()
 const router = useRouter()
@@ -279,6 +284,28 @@ const totalAmount = computed(() => {
 })
 
 onMounted(() => {
+  //  強制還原 token（若沒有）以防刷新後失效
+  if (!authStore.token) {
+    const storedToken = localStorage.getItem('token')
+    if (storedToken) {
+      authStore.setToken(storedToken)
+      console.log(' token 還原成功：', storedToken)
+    }
+  }
+
+  //  還原 user（optional，加強保險）
+  if (!authStore.user) {
+    const rawUser = localStorage.getItem('user')
+    if (rawUser) {
+      try {
+        authStore.setUser(JSON.parse(rawUser))
+        console.log(' user 還原成功')
+      } catch (e) {
+        console.warn(' user 還原失敗:', e)
+      }
+    }
+  }
+
   // 取得 localStorage 贊助資料
   const raw = localStorage.getItem('sponsorFormData')
   if (!raw) {
@@ -370,42 +397,11 @@ function validateOrderForm(form) {
     isValid = false
   }
 
-  const zipcodeMap = {
-    100: '中正區',
-    103: '大同區',
-    104: '中山區',
-    105: '松山區',
-    106: '大安區',
-    108: '萬華區',
-    110: '信義區',
-    111: '士林區',
-    112: '北投區',
-    114: '內湖區',
-    115: '南港區',
-    116: '文山區',
-    200: '基隆市',
-    220: '板橋區',
-    221: '汐止區',
-    231: '新店區',
-    241: '三重區',
-    242: '新莊區',
-    243: '泰山區',
-    244: '林口區',
-    247: '蘆洲區',
-    251: '淡水區',
-    300: '新竹市',
-    400: '台中市',
-    500: '彰化縣',
-    600: '嘉義市',
-    700: '台南市',
-    800: '高雄市',
-    900: '屏東縣',
-  }
   if (!form.zipcode.trim()) {
     errors.value.zipcode = '請填寫郵遞區號'
     isValid = false
   } else if (!/^\d{3}$/.test(form.zipcode) || !(form.zipcode in zipcodeMap)) {
-    errors.zipcode = '請輸入有效的郵遞區號'
+    errors.value.zipcode = '請輸入有效的郵遞區號'
     isValid = false
   }
 
@@ -429,26 +425,35 @@ watchEffect(() => {
   }
 })
 
+const isSubmitting = ref(false)
+
 async function submitOrder() {
+  if (isSubmitting.value) return
+  isSubmitting.value = true
+
   const token = authStore.token
   if (!token) {
     alert('請先登入')
     router.push('/login')
+    isSubmitting.value = false
     return
   }
 
   if (!projectId.value || !planId.value) {
     alert('找不到專案資訊，請重新操作')
+    isSubmitting.value = false
     return
   }
 
-  if (!validateInvoiceForm(form.value)) return
-  if (!validateOrderForm(form.value)) return
+  if (!validateInvoiceForm(form.value) || !validateOrderForm(form.value)) {
+    isSubmitting.value = false
+    return
+  }
 
   const amount = totalAmount.value
-
   if (!Number.isInteger(amount) || amount <= 0) {
     alert('贊助金額必須為正整數')
+    isSubmitting.value = false
     return
   }
 
@@ -481,21 +486,16 @@ async function submitOrder() {
   try {
     const res = await createSponsorship(projectId.value, planId.value, payload, token)
 
-    const baseAmountToSave = Number.isFinite(sponsorData.value.base_amount)
-      ? sponsorData.value.base_amount
-      : amount
-
-    //  組出 selectedPlan，提供給付款頁顯示用
-    const selectedPlan = {
-      plan_name: sponsorData.value.plan_name || '',
-      feedback: sponsorData.value.feedback || '',
+    const orderId = res.data?.orderId || res.data?.order_uuid
+    if (!orderId) {
+      alert('建立訂單失敗，請稍後再試')
+      return
     }
 
-    //  儲存付款頁需要的訂單資料（含 plan 資訊）
     localStorage.setItem(
       'checkoutOrderData',
       JSON.stringify({
-        order_uuid: res.data.order_uuid,
+        order_uuid: orderId,
         amount,
         name: form.value.name,
         email: form.value.account,
@@ -507,23 +507,21 @@ async function submitOrder() {
         display_name: sponsorData.value.display_name,
         project_title: sponsorData.value.project_title,
         feedback: sponsorData.value.feedback,
-        base_amount: baseAmountToSave,
+        base_amount: sponsorData.value.base_amount || amount,
         payment: form.value.payment || 'card',
-        selectedPlan,
+        selectedPlan: {
+          plan_name: sponsorData.value.plan_name || '',
+          feedback: sponsorData.value.feedback || '',
+        },
       })
     )
 
-    console.log('使用付款方式:', form.value.payment)
-    console.log('建立訂單成功：', res.data)
-    if (!res.data?.order_uuid) {
-      alert('建立訂單失敗，請稍後再試')
-      return
-    }
     router.push('/checkout/confirm')
   } catch (err) {
     console.error('建立訂單失敗:', err)
-    console.error('錯誤回應內容:', err.response?.data)
     alert(err.response?.data?.message || '建立訂單失敗，請稍後再試')
+  } finally {
+    isSubmitting.value = false
   }
 }
 </script>
