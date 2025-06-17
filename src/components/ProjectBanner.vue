@@ -217,6 +217,7 @@ const isMobile = window.innerWidth < 992
 
 .project-banner-img {
   object-fit: cover;
+  height: auto;
   aspect-ratio: 16 / 9;
 }
 

@@ -1,55 +1,63 @@
 <template>
- <div class="my-projects">
-    <h1>我的專案</h1>
+  <div class="my-projects">
+    <h1 class="section-title">我的專案</h1>
 
     <div v-if="loading" class="loading">載入中...</div>
     <div v-else-if="projects.length === 0" class="no-projects">尚無提案</div>
 
-    <table v-else class="project-table">
-      <thead>
-        <tr>
-          <th>專案名稱</th>
-          <th>目標金額</th>
-          <th>支持金額</th>
-          <th>訂單狀態</th>
-          <th>回饋品</th>
-          <th>配送地址</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="project in projects" :key="project.id">
-          <td>{{ project.title }}</td>
-          <td>{{ formatCurrency(project.targetAmount) }}</td>
-          <td>{{ formatCurrency(project.supportAmount) }}</td>
-          <td>
-            <span class="status-badge" :class="getStatusClass(project.status)">
-              {{ project.status }}
-            </span>
-          </td>
-          <td>{{ project.rewardItem || '無' }}</td>
-          <td>
-            <span v-if="project.shippingInfo" class="status-success">✔️ 已填寫</span>
-            <span v-else class="status-warning">❌ 無</span>
-          </td>
-          <td class="actions">
-            <router-link
-              :to="{ name: 'ProjectFormEdit', params: { project_id: project.id } }"
-              class="btn-edit"
-            >
-              編輯專案
-            </router-link>
-            <button
-              @click="handleDelete(project.id)"
-              class="btn-delete"
-              :disabled="deleting === project.id"
-            >
-              {{ deleting === project.id ? '刪除中...' : '刪除' }}
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-else class="card-wrapper">
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="project-table">
+            <thead>
+              <tr>
+                <th>專案名稱</th>
+                <th>目標金額</th>
+                <th>支持金額</th>
+                <th>訂單狀態</th>
+                <th>回饋品</th>
+                <th>配送地址</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="project in projects" :key="project.id">
+                <td>{{ project.title }}</td>
+                <td>{{ formatCurrency(project.targetAmount) }}</td>
+                <td>{{ formatCurrency(project.supportAmount) }}</td>
+                <td>
+                  <span class="status-badge" :class="getStatusClass(project.status)">
+                    {{ project.status }}
+                  </span>
+                </td>
+                <td>{{ project.rewardItem || '無' }}</td>
+                <td>
+                  <span v-if="project.shippingInfo" class="status-success">✔️ 已填寫</span>
+                  <span v-else class="status-warning"> 無</span>
+                </td>
+                <td class="actions">
+                  <!-- 編輯按鈕（用 edit.png） -->
+                  <router-link
+                    :to="{ name: 'ProjectFormEdit', params: { project_id: project.id } }"
+                    class="icon-button"
+                  >
+                    <img src="/edit.png" alt="edit" width="20" height="20" />
+                  </router-link>
+                  <!-- 刪除按鈕（用 delete.png） -->
+                  <button
+                    @click="handleDelete(project.id)"
+                    class="icon-button"
+                    :disabled="deleting === project.id"
+                  >
+                    <img src="/delete.png" alt="delete" width="20" height="20" />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -179,6 +187,14 @@ export default {
   margin: 0 auto;
 }
 
+.section-title {
+  font-size: 16px;
+  font-weight: 400;
+  color: #1a1a1a;
+  margin-left: 18px;
+  text-align: left;
+}
+
 .loading,
 .no-projects {
   text-align: center;
@@ -187,17 +203,29 @@ export default {
   font-size: 16px;
 }
 
+.card-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.table-card {
+  background: transparent;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  overflow-x: auto;
+}
+
 .project-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  overflow: hidden;
+  margin-top: 10px;
 }
 
 .project-table th {
-  background-color: #f8f9fa;
+  background-color: #FFD2CF;
+  white-space: nowrap;
   font-weight: 600;
   color: #333;
 }
@@ -205,20 +233,14 @@ export default {
 .project-table th,
 .project-table td {
   padding: 12px;
-  border: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
   text-align: left;
-}
-
-.project-table th:last-child,
-.project-table td:last-child {
-  text-align: center;
 }
 
 .project-table tbody tr:hover {
   background-color: #f8f9fa;
 }
 
-/* 狀態徽章樣式 */
 .status-badge {
   padding: 4px 8px;
   border-radius: 12px;
@@ -251,7 +273,6 @@ export default {
   color: #6c757d;
 }
 
-/* 狀態指示器 */
 .status-success {
   color: #28a745;
 }
@@ -260,53 +281,41 @@ export default {
   color: #ffc107;
 }
 
-/* 操作按鈕區域 */
 .actions {
   white-space: nowrap;
 }
 
-.btn-edit {
-  display: inline-block;
-  padding: 6px 12px;
-  margin-right: 8px;
-  background-color: #007bff;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: background-color 0.2s;
-}
-
-.btn-edit:hover {
-  background-color: #0056b3;
-}
-
-.btn-delete {
-  padding: 6px 12px;
-  color: white;
-  background-color: #dc3545;
+/* ✅ 改為 icon-only 樣式 */
+.icon-button {
+  background: transparent;
   border: none;
-  border-radius: 4px;
+  padding: 4px;
   cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
 }
 
-.btn-delete:hover:not(:disabled) {
-  background-color: #c82333;
+.icon-button img {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  transition: transform 0.2s;
 }
 
-.btn-delete:disabled {
-  background-color: #6c757d;
+.icon-button:hover img {
+  transform: scale(1.1);
+}
+
+.icon-button:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* 響應式設計 */
-@media (max-width: 768px) {
-  .my-projects {
-    padding: 10px;
-  }
+/* ✅ 移除舊的 btn-edit 與 btn-delete 樣式 */
+.btn-edit,
+.btn-delete {
+  display: none;
+}
 
+@media (max-width: 768px) {
   .project-table {
     font-size: 14px;
   }
@@ -314,12 +323,6 @@ export default {
   .project-table th,
   .project-table td {
     padding: 8px 4px;
-  }
-
-  .btn-edit,
-  .btn-delete {
-    padding: 4px 8px;
-    font-size: 12px;
   }
 }
 </style>
