@@ -1,7 +1,6 @@
 <template>
   <div class="container py-5">
-    <h1 class="mb-4">管理員後台</h1>
-    <p>這是只有管理員才能看到的內容。</p>
+    <h2 class="text-xl font-bold mb-4">使用者資料</h2>
     <table border="1" style="width: 100%" class="user-table">
       <thead>
         <tr>
