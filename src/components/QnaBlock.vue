@@ -165,19 +165,4 @@ onMounted(() => {
   position: relative;
 }
 
-.qa-question::after {
-  content: '';
-  position: absolute;
-  left: 18px; /* 頭貼一半寬度 + 邊距微調 */
-  top: 48px;  /* 頭貼底部 + 一點距離 */
-   height: calc(100% - -50px);
-  width: 1px;
-  border-left: 1px dashed #ccc;
-}
-
-.qa-question {
-  position: relative;
-  padding-bottom: 1rem; /* 預留空間讓虛線不會太短 */
-}
-
 </style>

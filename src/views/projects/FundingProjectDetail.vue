@@ -53,9 +53,13 @@
           <!-- ❌ 常見問題 -->
           <div v-else-if="activeTab === '常見問題'">
             <div v-if="faqs.length > 0">
-              <div v-for="(faq, index) in faqs" :key="index" class="mb-3">
-                <strong> Q: {{ faq.question }}</strong>
-                <p>A: {{ faq.answer }}</p>
+              <div class="faq-box" v-for="(faq, index) in faqs" :key="index">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <img src="/layers.png" width="16" />
+                  <h6 class="mb-0">{{ faq.question }}</h6>
+                </div>
+                <hr class="my-2" />
+                <p class="text-secondary small mb-0">{{ faq.answer }}</p>
               </div>
             </div>
             <p v-else class="text-muted">尚未提供 常見問題 資料。</p>
@@ -63,12 +67,14 @@
 
           <!-- ❌ 進度分享 -->
           <div v-else-if="activeTab === '進度分享'">
-            <div v-if="progresses.length > 0">
-              <div v-for="(progress, index) in progresses" :key="index" class="mb-3">
-                <strong> 標題： {{ progress.title }}</strong>
-                <p>發布日期：{{ progress.date }}<br />{{ progress.content }}</p>
-                <div v-if="progress.fund_usages?.length" class="table-responsive">
-                  <table class="table table-bordered text-center align-middle">
+            <div v-if="progresses.length > 0" class="progress-card-list">
+              <div v-for="(progress, index) in progresses" :key="index" class="progress-card">
+                <h5 class="fw-bold">{{ progress.title }}</h5>
+                <p class="progress-date">發佈日期：{{ progress.date }}</p>
+                <p class="progress-content" style="white-space: pre-line">{{ progress.content }}</p>
+
+                <div v-if="progress.fund_usages?.length">
+                  <table class="progress-table table text-center align-middle small">
                     <thead>
                       <tr>
                         <th>匯款對象</th>
@@ -89,6 +95,7 @@
                 </div>
               </div>
             </div>
+
             <p v-else class="text-muted">尚未發布任何更新內容。</p>
           </div>
         </div>
@@ -263,5 +270,90 @@ onMounted(() => {
   font-weight: 400; /* 或改為 300 更細 */
   background-color: #000;
   color: #fff;
+}
+/* 常見問題 */
+.faq-box {
+  background-color: #FFF9F6;
+  border-radius: 1rem;
+  padding: 20px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.faq-box h6 {
+  font-size: 16px;
+  font-weight: normal;
+  color: #1a1a1a;
+  margin-bottom: 0;
+}
+
+.faq-box p {
+  font-size: 14px;
+  color: #666;
+  white-space: pre-line;
+  margin-left: 24px;
+}
+
+.faq-box hr {
+  border: none;
+  border-top: 1px dashed #888;
+  margin: 8px 0;
+}
+
+/* 進度分享 */
+.progress-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.progress-card {
+  background-color: #fff8f7;
+  border-radius: 1rem;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  font-size: 15px;
+  line-height: 1.6;
+  border: 1px solid #ddd;
+}
+
+.progress-card h5 {
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.progress-date {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.progress-content {
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.progress-table {
+  background-color: #FFF8F9; /* 淺灰色底 */
+  border-radius: 0.75rem;    /* 四個角圓角 */
+  overflow: hidden;          /* 裁掉超出圓角的線 */
+  border-collapse: separate; /* 為了讓 border-radius 生效 */
+  border-spacing: 0;
+  border: 1px solid #ddd;
+}
+
+.progress-table th,
+.progress-table td {
+  background-color: transparent; /* 避免內部重疊背景 */
+}
+
+.progress-table th {
+  font-weight: 600;
+  color: #444;
+  background-color: #eaeaea;
+}
+
+.progress-table td {
+  color: #333;
 }
 </style>

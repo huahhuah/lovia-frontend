@@ -72,9 +72,11 @@
 
         <div class="progress rounded-pill mb-2" style="height: 8px">
           <div
-            class="progress-bar bg-danger"
-            :style="{ width: (project?.progress_percent ?? 0) + '%' }"
-          ></div>
+            class="progress-bar"
+            :style="{ width: (project?.progress_percent ?? 0) + '%',
+            backgroundImage: 'linear-gradient(to right, #fc7c9d, #ffc443)'
+          }"
+         ></div>
         </div>
 
         <p class="fw-bold fs-5 text-dark mb-1">
