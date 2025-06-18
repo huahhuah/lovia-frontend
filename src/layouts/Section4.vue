@@ -74,6 +74,13 @@ onMounted(async () => {
     isLoading.value = false
   }
 })
+
+function onToggleFollow({ projectId, follow }) {
+  const target = projects.value.find((p) => p.id === projectId)
+  if (target) {
+    target.isFollowed = follow
+  }
+}
 </script>
 
 <style scoped>

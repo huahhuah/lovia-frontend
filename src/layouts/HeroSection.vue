@@ -42,7 +42,7 @@
           <img
             src="/homepageS1-Frame 489.png"
             alt="背景底圖"
-            class="img-fluid hero-subheadline position-absolute"
+            class="img-fluid hero-subheadline position-absolute hero-glow"
           />
           <img
             src="/homepageS1-headline.png"
@@ -152,6 +152,10 @@ onMounted(() => {
 .hero-illustration img {
   max-width: 400px;
 }
+.carousel-control-prev {
+  left: 12px;
+  width: 40px; /* 預設是 15%，你只要保留實際箭頭範圍即可 */
+}
 
 .carousel-control-prev,
 .carousel-control-next {
@@ -159,8 +163,11 @@ onMounted(() => {
 }
 
 .custom-cta {
+  pointer-events: auto;
+  z-index: 10;
   position: relative;
-  overflow: hidden;
+  overflow: hidden; /*  關鍵：裁切 ::before 動畫區域 */
+  position: relative; /*  讓 ::before 根據它定位 */
 }
 
 .custom-cta::before {
@@ -238,6 +245,22 @@ onMounted(() => {
   75% {
     transform: translateY(0) rotate(2deg);
   }
+}
+
+@keyframes glow {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.hero-glow {
+  animation: glow 3s ease-in-out infinite;
 }
 
 @media (max-width: 768px) {

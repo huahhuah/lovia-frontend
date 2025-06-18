@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import { useUserStore } from '@/stores/auth'
 import axios from 'axios'
@@ -6,7 +6,7 @@ import axios from 'axios'
 const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
 
 const router = createRouter({
-  history: createWebHashHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
@@ -18,6 +18,13 @@ const router = createRouter({
       name: 'login',
       component: () => import('../views/LoginForm.vue'),
     },
+    {
+      //第三方登入成功通知
+      path: '/login-success',
+      name: 'LoginSuccess',
+      component: () => import('@/views/LoginSuccess.vue'),
+    },
+
     {
       path: '/register',
       name: 'register',
@@ -127,12 +134,13 @@ const router = createRouter({
       component: () => import('@/views/projects/OrderConfirm.vue'),
     },
     {
-      //訂單交易結果
+      //訂單交易成功結果
       path: '/checkout/result',
       name: 'PaymentResult',
       component: () => import('@/views/payment/PaymentResult.vue'),
     },
     {
+      //訂單交易失敗
       path: '/checkout/cancel',
       name: 'PaymentCancel',
       component: () => import('@/views/payment/PaymentCancel.vue'),
