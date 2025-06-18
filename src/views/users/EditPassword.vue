@@ -1,9 +1,9 @@
 <template>
-  <div class="edit-wrapper">
+  <div class="edit-wrapper py-5">
     <div class="container d-flex justify-content-center">
       <div
         class="card p-4 rounded-4 shadow"
-        style="width: 100%; max-width: 480px; margin-top: 40px"
+        style="width: 100%; max-width: 480px"
       >
         <h5 class="fw-bold mb-4 text-center">修改密碼</h5>
 
@@ -85,7 +85,12 @@
           </div>
 
           <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary px-5" :disabled="isSubmitting">
+            <button
+              type="submit"
+              class="btn w-100 text-white fw-bold rounded-pill"
+              :disabled="isSubmitting"
+              style="background-color: #FC5B53"
+            >
               <span
                 v-if="isSubmitting"
                 class="spinner-border spinner-border-sm me-2"
@@ -223,21 +228,28 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.card {
+  background-color: #FFF9F5;
+  border: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); /* 可留可不留，陰影柔化效果 */
+}
 
 .form-control {
-  padding-right: 2.5rem !important; /* 強制確保有預留空間 */
-  height: 2.5rem; /* 確保input高度一致 */
-  line-height: 2.5rem; /* 垂直置中 */
-  }
+  padding-right: 2.5rem !important;
+  height: 2.5rem;
+  line-height: 2.5rem;
+}
+
 .edit-wrapper {
   background-color: transparent;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .toggle-eye {
   position: absolute;
-  top: 70%;
+  top: 50%;
   right: 12px;
-  transform: translateY(-50%);
   cursor: pointer;
   color: #888;
   font-size: 1.2rem;

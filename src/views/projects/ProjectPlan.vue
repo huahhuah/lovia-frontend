@@ -1,101 +1,68 @@
 <template>
-  <div class="container py-5">
-    <h2 class="mb-4">
-      {{ isEdit ? '編輯回饋方案' : '新增回饋方案'}} - {{ projectData.title }}
-    </h2>
+  <div class="project-plan-wrapper py-5">
+    <div class="container" style="max-width: 720px">
+      <h3 class="text-center fw-bold mb-5">
+        {{ isEdit ? '編輯回饋方案' : '新增回饋方案'}}
+      </h3>
 
-    <form @submit.prevent="submitPlans">
-      <!-- 方案區塊 -->
-      <div
-        v-for="(plan, index) in form.plans"
-        :key="plan.id || index"
-        class="border rounded p-4 mb-4 bg-light"
-      >
-        <h5>回饋方案 {{ index + 1 }}</h5>
+      <form @submit.prevent="submitPlans">
+        <div
+          v-for="(plan, index) in form.plans"
+          :key="plan.id || index"
+          class="rounded-4 p-4 shadow-sm mb-4 border border-light-subtle"
+          style="background-color: #FFF9F5;"
+        >
+          <h6 class="fw-bold mb-3">方案 {{ index + 1 }}</h6>
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label">方案名稱</label>
+              <input v-model="plan.plan_name" type="text" class="form-control" required />
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label">金額</label>
+              <input v-model.number="plan.amount" type="number" class="form-control" required />
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label">數量</label>
+              <input v-model.number="plan.quantity" type="number" class="form-control" required />
+            </div>
 
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="form-label">方案名稱</label>
-            <input
-              v-model="plan.plan_name"
-              type="text"
-              class="form-control"
-              placeholder="例如：感謝小卡"
-              required
-            />
-          </div>
+            <div class="col-12">
+              <label class="form-label">回饋說明</label>
+              <textarea v-model="plan.feedback" class="form-control" rows="2" required></textarea>
+            </div>
 
-          <div class="col-md-3">
-            <label class="form-label">金額</label>
-            <input
-              v-model.number="plan.amount"
-              type="number"
-              class="form-control"
-              min="1"
-              required
-            />
-          </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">回饋圖片網址</label>
+              <input v-model="plan.feedback_img" type="text" class="form-control" required />
+            </div>
 
-          <div class="col-md-3">
-            <label class="form-label">數量</label>
-            <input
-              v-model.number="plan.quantity"
-              type="number"
-              class="form-control"
-              min="1"
-              required
-            />
-          </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">預計出貨日期</label>
+              <input v-model="plan.delivery_date" type="date" class="form-control" required />
+            </div>
 
-          <div class="col-12">
-            <label class="form-label">回饋說明</label>
-            <textarea
-              v-model="plan.feedback"
-              class="form-control"
-              rows="2"
-              placeholder="我們將寄送手寫感謝卡"
-              required
-            ></textarea>
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">回饋圖片網址</label>
-            <input
-              v-model="plan.feedback_img"
-              type="text"
-              class="form-control"
-              placeholder="https://example.com/thankyou.jpg"
-              required
-            />
-          </div>
-
-          <div class="col-md-6">
-            <label class="form-label">預計出貨日期</label>
-            <input v-model="plan.delivery_date" type="date" class="form-control" required />
-          </div>
-
-          <div class="col-12 text-end">
-            <button type="button" class="btn btn-outline-danger" @click="removePlan(index)">
-              刪除此方案
-            </button>
+            <div class="col-12 text-end">
+              <button type="button" class="btn btn-outline-danger btn-sm" @click="removePlan(index)">
+                刪除方案
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- 新增方案按鈕 -->
-      <div class="mb-4">
-        <button type="button" class="btn btn-outline-secondary" @click="addPlan">
-          ＋ 新增回饋方案
-        </button>
-      </div>
+        <div class="text-center mb-4">
+          <button type="button" class="btn btn-outline-secondary" @click="addPlan">
+            ＋ 新增方案
+          </button>
+        </div>
 
-      <!-- 送出按鈕 -->
-      <div class="text-center">
-        <button type="submit" class="btn btn-danger px-5 py-2">
-          {{ isEdit ? '更新回饋方案' : '送出回饋方案'}}
-        </button>
-      </div>
-    </form>
+        <div class="text-center">
+          <button type="submit" class="btn btn-danger px-5 py-2" :disabled="isSubmitting">
+            {{ isEdit ? '更新回饋方案' : '送出回饋方案'}}
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -231,4 +198,12 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.project-plan-wrapper {
+  padding-top: 100px !important; /* 根據 navbar 實際高度調整 */
+  min-height: 100vh;
+  background-image: linear-gradient(to right, #FFEDF2, #FFF6E3);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+</style>

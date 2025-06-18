@@ -72,7 +72,7 @@ onMounted(() => {
         isEditMode.value = true
         progressId.value = props.progressId
         progressData()
-    }
+    } 
 })
 
 async function progressData(){

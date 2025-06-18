@@ -1,135 +1,89 @@
 <template>
-  <div class="edit-wrapper">
-    <div class="container d-flex justify-content-center">
-      <div
-        class="card p-4 rounded-4 shadow"
-        style="width: 100%; max-width: 720px; margin-top: 40px"
-      >
-        <h5 class="fw-bold mb-4 text-center">編輯個人資料</h5>
+  <div class="edit-wrapper d-flex justify-content-center align-items-center py-5">
+    <div class="edit-card card border-0 rounded-4 shadow p-4 w-100" style="max-width: 720px">
+      <div class="text-center mb-4">
+        <h3 class="fw-bold mt-2">編輯個人資料</h3>
+      </div>
 
-        <div v-if="isLoading" class="text-center py-5">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </div>
-
-        <div v-else class="row g-4 align-items-start">
-          <!-- 左側：頭像 + 上傳 -->
-          <div class="col-md-4 text-center">
-            <img
-              :src="form.avatar_url || defaultAvatar"
-              class="rounded-circle shadow mb-2"
-              style="width: 120px; height: 120px; object-fit: cover"
-              alt="頭像"
-            />
-            <label for="avatarInput" class="btn btn-outline-secondary btn-sm">點擊更換圖片</label>
-            <input
-              id="avatarInput"
-              type="file"
-              accept="image/*"
-              class="d-none"
-              @change="onImageChange"
-            />
-          </div>
-
-          <!-- 右側：表單欄位 -->
-          <div class="col-md-8">
-            <form @submit.prevent="submitForm">
-              <div class="mb-3">
-                <label class="form-label">使用者名稱</label>
-                <input
-                  v-model="form.username"
-                  class="form-control"
-                  :class="{ 'is-invalid': !usernameValid && form.username }"
-                />
-                <div class="invalid-feedback">請輸入 2~50 字的使用者名稱</div>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">手機</label>
-                <input
-                  v-model="form.phone"
-                  class="form-control"
-                  :class="{ 'is-invalid': !phoneValid && form.phone }"
-                />
-                <div class="invalid-feedback">請輸入正確的手機號碼</div>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">生日</label>
-                <input
-                  id="birthday"
-                  v-model="form.birthday"
-                  type="date"
-                  class="form-control"
-                  :max="maxBirthday"
-                />
-              </div>
-
-              <div class="mb-3">
-                <label for="gender" class="form-label">性別</label>
-                <select id="gender" v-model.number="form.gender" class="form-select">
-                  <option disabled value="">請選擇</option>
-                  <option value="1">男性</option>
-                  <option value="2">女性</option>
-                  <option value="3">其他</option>
-                  <option value="4">不願透露</option>
-                </select>
-              </div>
-
-              <div class="text-center mt-4">
-                <button type="submit" class="btn btn-primary px-5" :disabled="isSubmitting">
-                  <span
-                    v-if="isSubmitting"
-                    class="spinner-border spinner-border-sm me-2"
-                    role="status"
-                    aria-hidden="true"
-                  ></span>
-                  修改
-                </button>
-              </div>
-            </form>
-          </div>
+      <div v-if="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
         </div>
       </div>
-    </div>
 
-    <!-- Bootstrap Modal -->
-    <div
-      class="modal fade"
-      ref="modalRef"
-      tabindex="-1"
-      aria-labelledby="modalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div :class="`modal-header bg-${modalType}`">
-            <h5 class="modal-title text-white" id="modalLabel">提示</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
-          </div>
-          <div class="modal-body">{{ modalMessage }}</div>
+      <div v-else class="row g-4">
+        <div class="col-md-4 text-center avatar-section">
+          <img
+            :src="form.avatar_url || defaultAvatar"
+            class="rounded-circle shadow mb-2"
+            style="width: 120px; height: 120px; object-fit: cover"
+            alt="頭像"
+          />
+          <label for="avatarInput" class="btn btn-outline-secondary btn-sm">點擊更換圖片</label>
+          <input
+            id="avatarInput"
+            type="file"
+            accept="image/*"
+            class="d-none"
+            @change="onImageChange"
+          />
         </div>
-      </div>
-    </div>
 
-    <!-- Bootstrap Toast -->
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
-      <div
-        class="toast align-items-center text-white bg-success border-0"
-        ref="toastRef"
-        role="alert"
-        aria-live="assertive"
-        aria-atomic="true"
-      >
-        <div class="d-flex">
-          <div class="toast-body">{{ toastMessage }}</div>
-          <button
-            type="button"
-            class="btn-close btn-close-white me-2 m-auto"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          ></button>
+        <div class="col-md-8">
+          <form @submit.prevent="submitForm">
+            <div class="mb-3">
+              <label class="form-label">使用者名稱</label>
+              <input
+                v-model="form.username"
+                class="form-control"
+                :class="{ 'is-invalid': !usernameValid && form.username }"
+              />
+              <div class="invalid-feedback">請輸入 2~50 字的使用者名稱</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">手機</label>
+              <input
+                v-model="form.phone"
+                class="form-control"
+                :class="{ 'is-invalid': !phoneValid && form.phone }"
+              />
+              <div class="invalid-feedback">請輸入正確的手機號碼</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">生日</label>
+              <input
+                type="date"
+                v-model="form.birthday"
+                class="form-control"
+                :max="maxBirthday"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">性別</label>
+              <select v-model.number="form.gender" class="form-select">
+                <option disabled value="">請選擇</option>
+                <option value="1">男性</option>
+                <option value="2">女性</option>
+                <option value="3">其他</option>
+                <option value="4">不願透露</option>
+              </select>
+            </div>
+
+            <div class="text-center mt-4">
+              <button type="submit" class="btn btn-primary px-5" :disabled="isSubmitting">
+                <span
+                  v-if="isSubmitting"
+                  class="spinner-border spinner-border-sm me-2"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                修改
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -336,7 +290,38 @@ async function submitForm() {
 </script>
 
 <style scoped>
+.card {
+  margin-top: -50px;
+  padding: 32px 24px; /* 比原本 padding 少一些 */
+}
+
 .edit-wrapper {
-  background-color: transparent;
+  min-height: 100vh;
+  background-image: linear-gradient(to right, #FFEDF2, #FFF6E3);
+}
+
+.edit-card {
+  background-color: #fff9f5;
+}
+
+.btn-primary {
+  background-color: #FC5B53;
+  border: none;
+  border-radius: 999px; /* 變圓角 */
+}
+
+.btn-primary:hover {
+  background-color: #e44c47; /* 深一點的 hover 色（可選） */
+}
+
+.avatar-section {
+  margin-top: 20px; /* 或改 20px 看起來自然即可 */
+}
+
+@media (max-width: 767.98px) {
+  .avatar-section label {
+    display: block;
+    margin-top: 8px;
+  }
 }
 </style>
