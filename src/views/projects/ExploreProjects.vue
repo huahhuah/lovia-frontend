@@ -105,9 +105,11 @@ import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import ProjectCard from '@/components/ProjectCard.vue'
 import { getAllCategories } from '@/api/project'
+import { useUserStore } from '@/stores/auth'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 
 const searchKeyword = ref(route.query.keyword || '')
 const selectedCategory = ref(route.query.category || '')
