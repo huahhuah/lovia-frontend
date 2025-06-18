@@ -36,12 +36,7 @@
         <div class="tools-wrapper mb-2 ms-auto d-flex gap-3 align-items-center">
           <div class="search-input position-relative">
             <i class="bi bi-search"></i>
-            <input
-              type="text"
-              placeholder="輸入關鍵字搜尋專案"
-              v-model="searchKeyword"
-              @input="fetchProjects"
-            />
+            <input type="text" placeholder="輸入關鍵字搜尋專案" v-model="searchKeyword" />
             <button
               v-if="searchKeyword"
               @click="clearSearch"
@@ -68,12 +63,16 @@
       </div>
 
       <!-- 卡片列表 -->
-      <div
-        class="row row-cols-1 row-cols-md-2 row-cols-lg-3 gx-2 gy-4 card-list"
-        style="margin-top: 20px"
-      >
-        <div class="col" v-for="project in visibleProjects" :key="project.id">
-          <ProjectCard :project="project" />
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 gx-2 gy-4 card-list">
+        <div class="col" v-for="project in projects" :key="project.id">
+          <ProjectCard
+            :project="project"
+            :is-archived="project.status === '已結束'"
+            @toggle-follow="onToggleFollow"
+          />
+        </div>
+        <div v-if="!isLoading && projects.length === 0" class="text-center text-muted mt-4">
+          沒有符合條件的專案
         </div>
       </div>
 
@@ -113,27 +112,32 @@ const router = useRouter()
 const searchKeyword = ref(route.query.keyword || '')
 const selectedCategory = ref(route.query.category || '')
 const currentPage = ref(Number(route.query.page) || 1)
+const currentFilter = ref(route.query.filter || 'all')
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
+
 const projects = ref([])
 const categories = ref([])
 const isLoading = ref(false)
-
 const perPage = 9
 const totalPages = ref(1)
+
 const filters = [
   { key: 'all', label: '全部專案' },
   { key: 'recent', label: '近期專案' },
   { key: 'popular', label: '熱門專案' },
   { key: 'long', label: '長期贊助' },
 ]
-const currentFilter = ref('all')
 
 //  fetchProjects 支援 keyword + category + page
 const fetchProjects = async () => {
   isLoading.value = true
   try {
-    const res = await axios.get('https://lovia-backend-xl4e.onrender.com/api/v1/projects', {
+    const res = await axios.get(`${baseURL}/projects`, {
+      headers: {
+        Authorization: `Bearer ${userStore.token}`,
+      },
       params: {
-        keyword: searchKeyword.value || undefined,
+        search: searchKeyword.value || undefined,
         category_id: selectedCategory.value || undefined,
         page: currentPage.value,
         filter: currentFilter.value !== 'all' ? currentFilter.value : undefined,
@@ -161,9 +165,10 @@ const updateRouteAndSearch = () => {
   router.push({
     path: '/projects/explore-projects',
     query: {
-      keyword: searchKeyword.value || undefined,
+      search: searchKeyword.value || undefined,
       category: selectedCategory.value || undefined,
       page: currentPage.value,
+      filter: currentFilter.value !== 'all' ? currentFilter.value : undefined,
     },
   })
 }
@@ -193,12 +198,13 @@ const setFilter = (key) => {
 watch(
   () => route.query,
   (newQuery) => {
-    searchKeyword.value = newQuery.keyword || ''
+    searchKeyword.value = newQuery.search || ''
     selectedCategory.value = newQuery.category || ''
     currentPage.value = Number(newQuery.page) || 1
+    currentFilter.value = newQuery.filter || 'all'
     fetchProjects()
   },
-  { immediate: true }
+  { immediate: false }
 )
 
 // debounce 輸入搜尋（使用 setTimeout）
@@ -212,7 +218,15 @@ watch(searchKeyword, () => {
 
 onMounted(() => {
   fetchCategories()
+  fetchProjects()
 })
+
+function onToggleFollow({ projectId, follow }) {
+  const target = projects.value.find((p) => p.id === projectId)
+  if (target) {
+    target.is_followed = follow
+  }
+}
 </script>
 
 <style scoped>

@@ -69,7 +69,11 @@
 
             <p class="text-secondary small mb-3">或使用以下方式登入</p>
 
-            <button class="btn google-btn w-100 d-flex align-items-center justify-content-center gap-2">
+            <button
+              @click="loginWithGoogle"
+              class="btn w-100 d-flex align-items-center justify-content-center gap-2"
+              style="background-color: #5f6368; color: white; border-radius: 10px"
+            >
               <img src="@/assets/icons/google-g.svg" alt="Google" width="20" height="20" />
               使用 Google 帳戶登入
             </button>
@@ -131,8 +135,30 @@ const toastInstance = ref(null)
 const toastMessage = ref('')
 const toastType = ref('success')
 
-onMounted(() => {
+onMounted(async () => {
   toastInstance.value = new Toast(toastRef.value, { delay: 2500, autohide: true })
+
+  const query = new URLSearchParams(window.location.search)
+  const code = query.get('code')
+
+  if (code) {
+    try {
+      const res = await axios.post(`${baseUrl}/api/v1/auth/google`, { code })
+      const { token, users: user } = res.data.data
+
+      userStore.setToken(token)
+      userStore.setUser(user)
+      localStorage.setItem('token', token)
+
+      showToast('Google 登入成功', 'success')
+      setTimeout(() => {
+        router.push('/')
+      }, 1600)
+    } catch (err) {
+      showToast('Google 登入失敗，請重新嘗試', 'danger')
+      console.error('[Google 登入錯誤]', err)
+    }
+  }
 })
 
 function showToast(msg, type = 'success') {
@@ -170,12 +196,26 @@ async function handleLogin() {
     showToast('登入成功', 'success')
 
     setTimeout(() => {
-      router.push('/')
-    }, 1600)
+      location.href = '/'
+    }, 1500)
   } catch (err) {
     const msg = err.response?.data?.message || err.message || '登入失敗，請確認帳密是否正確'
     showToast(msg, 'danger')
   }
+}
+
+function loginWithGoogle() {
+  const params = new URLSearchParams({
+    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+    redirect_uri: import.meta.env.VITE_GOOGLE_REDIRECT_URI,
+    response_type: 'code',
+    scope:
+      'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
+    access_type: 'online',
+    prompt: 'consent',
+  })
+
+  window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`
 }
 </script>
 
@@ -207,16 +247,15 @@ async function handleLogin() {
 }
 
 .login-wrapper .login-btn {
-  background-color: #FC5B53;
+  background-color: #fc5b53;
   color: white;
   border-radius: 50px;
   font-weight: bold;
 }
 
 .login-wrapper .google-btn {
-  background-color: #D5DAE0;
+  background-color: #d5dae0;
   color: black;
   border-radius: 20px;
 }
-
 </style>

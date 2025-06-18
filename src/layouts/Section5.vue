@@ -97,18 +97,26 @@
   width: 60%;
 }
 .support-bg1 {
-  top: 40%;
+  top: 35%;
   left: 0%;
   width: 100%;
+  z-index: 0;
+  pointer-events: none;
+  position: absolute;
 }
 .support-bg2 {
-  top: 30%;
-  left: 40%;
-  width: 60%;
+  top: 42%;
+  left: 45%;
+  width: 55%;
+}
+.support-bg1,
+.support-bg2 {
+  pointer-events: none;
+  z-index: 0;
 }
 
 .content {
-  position: absolute;
+  position: relative;
   top: 24px;
   left: 24px;
   z-index: 3;
@@ -193,6 +201,18 @@
   }
   .bg-layer.base {
     display: none;
+  }
+  /* 手機版背景圖調整：避免壓到按鈕 */
+  .support-bg1 {
+    top: 46% !important;
+    width: 100% !important;
+    left: 0% !important;
+  }
+
+  .support-bg2 {
+    top: 45% !important;
+    width: 50% !important;
+    left: 50% !important;
   }
 }
 </style>

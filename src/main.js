@@ -2,6 +2,7 @@
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { useUserStore } from './stores/auth'
 
 import axios from 'axios'
 import VueAxios from 'vue-axios'
