@@ -14,3 +14,15 @@ export const allUsers = ( token, page = 1 ) => {
     }
   })
 }
+
+// 取得全部專案資料
+export const allProjects = ( token, page = 1 ) => {
+  return axios.get(`${BASE_URL}/api/v1/admins/projects`,{
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params:{
+      page,
+    }
+  })
+}

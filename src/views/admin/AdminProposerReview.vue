@@ -1,59 +1,61 @@
 <template>
-  <div class="w-full mx-auto p-4 bg-gray-100 min-h-screen">
-    <h2 class="text-xl font-bold mb-4">申請資料審核</h2>
+  <div class="container py-5">
+    <div class="w-full mx-auto p-4 bg-gray-100 min-h-screen">
+      <h2 class="text-xl font-bold mb-4">申請資料審核</h2>
 
-    <div
-      v-for="(item, index) in paginatedData"
-      :key="item.user_id"
-      class="bg-white p-4 mb-2 rounded border w-full"
-    >
-      <p><strong>申請人：</strong>{{ item.user.username }}</p>
-      <p>
-        <strong>勸募許可網址：</strong>
-        <a :href="item.url" class="text-blue-600 underline" target="_blank">{{ item.url }}</a>
-      </p>
-      <p>
-        <strong>活動專戶：</strong>
-        <span v-html="formatFundingAccount(item.funding_account)"></span>
-      </p>
+      <div
+        v-for="(item, index) in paginatedData"
+        :key="item.user_id"
+        class="bg-white p-4 mb-2 rounded border w-full"
+      >
+        <p><strong>申請人：</strong>{{ item.user.username }}</p>
+        <p>
+          <strong>勸募許可網址：</strong>
+          <a :href="item.url" class="text-blue-600 underline" target="_blank">{{ item.url }}</a>
+        </p>
+        <p>
+          <strong>活動專戶：</strong>
+          <span v-html="formatFundingAccount(item.funding_account)"></span>
+        </p>
 
-      <div class="mt-4">
-        <label class="block font-semibold mb-1">審核狀態：</label>
-        <select v-model="item.selectedStatus" class="w-full border rounded p-1">
-          <option value="1">審核中</option>
-          <option value="2">准許</option>
-          <option value="3">駁回</option>
-        </select>
+        <div class="mt-4">
+          <label class="block font-semibold mb-1">審核狀態：</label>
+          <select v-model="item.selectedStatus" class="w-full border rounded p-1">
+            <option value="1">審核中</option>
+            <option value="2">准許</option>
+            <option value="3">駁回</option>
+          </select>
+        </div>
+
+        <div class="mt-4">
+          <label class="block font-semibold mb-1">駁回理由：</label>
+          <input
+            type="text"
+            v-model="item.reason"
+            class="w-full border rounded p-1"
+            placeholder="請輸入駁回理由"
+            style="width: 80%;"
+          />
+        </div>
       </div>
 
-      <div class="mt-4">
-        <label class="block font-semibold mb-1">駁回理由：</label>
-        <input
-          type="text"
-          v-model="item.reason"
-          class="w-full border rounded p-1"
-          placeholder="請輸入駁回理由"
-          style="width: 80%;"
-        />
-      </div>
-    </div>
+      <!-- 頁碼與送出按鈕同一排 -->
+      <div class="pagination-container">
+        <div class="pagination">
+          <button
+            v-for="n in totalPages"
+            :key="n"
+            :class="{ active: n === currentPage }"
+            @click="changePage(n)"
+          >
+            {{ n }}
+          </button>
+        </div>
 
-    <!-- 頁碼與送出按鈕同一排 -->
-    <div class="pagination-container">
-      <div class="pagination">
-        <button
-          v-for="n in totalPages"
-          :key="n"
-          :class="{ active: n === currentPage }"
-          @click="changePage(n)"
-        >
-          {{ n }}
+        <button @click="submitReview" class="submit-btn">
+          確認送出
         </button>
       </div>
-
-      <button @click="submitReview" class="submit-btn">
-        確認送出
-      </button>
     </div>
   </div>
 </template>
@@ -89,7 +91,6 @@ const submitReview = () => {
     new_status: item.selectedStatus,
     reason: item.reason || null,
   }))
-  console.log("送出 PATCH payload:", payload)
   axios.patch('https://lovia-backend-xl4e.onrender.com/api/v1/admins/proposerStatus',
   payload,
   {
@@ -98,8 +99,10 @@ const submitReview = () => {
     }
   }).then(response => {
     console.log('更新成功', response.data)
+    alert ('審核完成，資料已更新')
   }).catch(error =>{
     console.log('更新失敗', error)
+    alert ('更新失敗，請稍後再試')
   })
 }
 

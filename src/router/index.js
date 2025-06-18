@@ -201,7 +201,7 @@ const router = createRouter({
         {
           path: 'projects',
           name: 'AdminProjects',
-          component: () => import('../views/admin/AdminProjects.vue'),
+          component: () => import('@/views/admin/AdminProjects.vue'),
         },
         {
           path: 'proposerReview',
