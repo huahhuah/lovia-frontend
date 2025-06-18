@@ -194,8 +194,8 @@ async function submitPayment() {
 
     const url =
       paymentType === 'linepay'
-        ? `${baseURL}/api/v1/users/orders/${orderId}/payment`
-        : `${baseURL}/api/v1/users/orders/${orderId}/ecpay`
+        ? `${baseURL}/users/orders/${orderId}/payment`
+        : `${baseURL}/users/orders/${orderId}/ecpay`
 
     if (paymentType === 'linepay') {
       await handleLinePayPayment(payload, token, url)
