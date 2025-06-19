@@ -53,12 +53,7 @@
 
             <div class="mb-3">
               <label class="form-label">生日</label>
-              <input
-                type="date"
-                v-model="form.birthday"
-                class="form-control"
-                :max="maxBirthday"
-              />
+              <input type="date" v-model="form.birthday" class="form-control" :max="maxBirthday" />
             </div>
 
             <div class="mb-3">
@@ -149,31 +144,31 @@ function showModal(msg, type = 'danger') {
 
 async function onImageChange(event) {
   const file = event.target.files[0]
-  if (!file) return 
-  if (file.size > 10*1024*1024 ) {
-      return showModalAndAutoClose('檔案太大，請選擇10MB以下的圖片')
-    }
-  try{
+  if (!file) return
+  if (file.size > 10 * 1024 * 1024) {
+    return showModalAndAutoClose('檔案太大，請選擇10MB以下的圖片')
+  }
+  try {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('type', 'avatar')
 
     const res = await axios.post(`${baseUrl}/api/v1/uploads/image`, formData, {
       headers: {
-        Authorization:`Bearer ${userStore.token}`,
-        'Content-Type' : 'multipart/form-data',
+        Authorization: `Bearer ${userStore.token}`,
+        'Content-Type': 'multipart/form-data',
       },
     })
-  const { url } = res.data
-  form.avatar_url = url
-  } catch (error){
+    const { url } = res.data
+    form.avatar_url = url
+  } catch (error) {
     console.error('圖片上傳失敗', error)
     showModalAndAutoClose('圖片上傳失敗', error)
   }
 }
 
-function convertGender(gender){
-   switch (gender) {
+function convertGender(gender) {
+  switch (gender) {
     case 1:
     case '1':
     case 'male':
@@ -209,7 +204,7 @@ async function fetchUserProfile() {
     form.phone = user.phone || ''
     form.avatar_url = user.avatar_url ? `${user.avatar_url}?t=${Date.now()}` : ''
     form.birthday = user.birthday || ''
-    form.gender = convertGender(user.gender?.gender ?? user.gender) 
+    form.gender = convertGender(user.gender?.gender ?? user.gender)
     userStore.setUser(user)
   } catch (err) {
     console.error('取得個人資料失敗:', err)
@@ -234,9 +229,9 @@ async function fetchUserProfile() {
 
 onMounted(async () => {
   await nextTick()
-  if(modalRef.value){
+  if (modalRef.value) {
     modalInstance = new Modal(modalRef.value)
-    }
+  }
   await fetchUserProfile()
 })
 
@@ -297,7 +292,7 @@ async function submitForm() {
 
 .edit-wrapper {
   min-height: 100vh;
-  background-image: linear-gradient(to right, #FFEDF2, #FFF6E3);
+  background-image: linear-gradient(to right, #ffedf2, #fff6e3);
 }
 
 .edit-card {
@@ -305,7 +300,7 @@ async function submitForm() {
 }
 
 .btn-primary {
-  background-color: #FC5B53;
+  background-color: #fc5b53;
   border: none;
   border-radius: 999px; /* 變圓角 */
 }

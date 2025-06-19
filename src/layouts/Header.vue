@@ -291,7 +291,7 @@ const checkLoginStatus = async () => {
     return
   }
   try {
-    const res = await axios.post(`${baseUrl}/api/v1/users/status`, null, {
+    const res = await axios.post(`${baseUrl}/users/status`, null, {
       headers: { Authorization: `Bearer ${userStore.token}` },
     })
     userStore.setUser(res.data.user)

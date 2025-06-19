@@ -34,7 +34,7 @@
             v-model="item.reason"
             class="w-full border rounded p-1"
             placeholder="請輸入駁回理由"
-            style="width: 80%;"
+            style="width: 80%"
           />
         </div>
       </div>
@@ -52,9 +52,7 @@
           </button>
         </div>
 
-        <button @click="submitReview" class="submit-btn">
-          確認送出
-        </button>
+        <button @click="submitReview" class="submit-btn">確認送出</button>
       </div>
     </div>
   </div>
@@ -75,9 +73,7 @@ const formatFundingAccount = (text) => {
   return text.replace(/\n/g, '<br>')
 }
 
-const totalPages = computed(() =>
-  Math.ceil(allData.value.length / perPage)
-)
+const totalPages = computed(() => Math.ceil(allData.value.length / perPage))
 
 const updatePaginatedData = () => {
   const start = (currentPage.value - 1) * perPage
@@ -86,39 +82,43 @@ const updatePaginatedData = () => {
 
 const submitReview = () => {
   const token = localStorage.getItem('token')
-  const payload = allData.value.map(item => ({
+  const payload = allData.value.map((item) => ({
     user_id: item.user_id,
     new_status: item.selectedStatus,
     reason: item.reason || null,
   }))
-  axios.patch('https://lovia-backend-xl4e.onrender.com/api/v1/admins/proposerStatus',
-  payload,
-  {
-    headers:{
-      Authorization: `Bearer ${token}`,
-    }
-  }).then(response => {
-    console.log('更新成功', response.data)
-    alert ('審核完成，資料已更新')
-  }).catch(error =>{
-    console.log('更新失敗', error)
-    alert ('更新失敗，請稍後再試')
-  })
+  axios
+    .patch('https://lovia-backend-xl4e.onrender.com/api/v1/admins/proposerStatus', payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((response) => {
+      console.log('更新成功', response.data)
+      alert('審核完成，資料已更新')
+    })
+    .catch((error) => {
+      console.log('更新失敗', error)
+      alert('更新失敗，請稍後再試')
+    })
 }
 
 onMounted(async () => {
   try {
-    const token = localStorage.getItem('token') 
-    const res = await axios.get('https://lovia-backend-xl4e.onrender.com/api/v1/admins/proposerApplication', {
-      headers: {
-        Authorization: `Bearer ${token}`
+    const token = localStorage.getItem('token')
+    const res = await axios.get(
+      'https://lovia-backend-xl4e.onrender.com/api/v1/admins/proposerApplication',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-    })
+    )
     const fetched = res.data.data || []
     allData.value = fetched
-      .map(item => ({
+      .map((item) => ({
         ...item,
-        selectedStatus: String(item.proposerStatuses?.id || "1"),
+        selectedStatus: String(item.proposerStatuses?.id || '1'),
       }))
       .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
     updatePaginatedData()

@@ -74,8 +74,12 @@
               <span>NT$ {{ orderData.amount }}</span>
             </div>
             <p class="text-muted small mt-3">備註：{{ orderData.note || '無' }}</p>
-            <button class="btn btn-primary w-100 mt-3">
-              @click="submitPayment" :disabled="isSubmitting" >
+
+            <button
+              class="btn btn-primary w-100 mt-3"
+              @click="submitPayment"
+              :disabled="isSubmitting"
+            >
               {{ isSubmitting ? '正在跳轉中...' : '立即付款' }}
             </button>
           </div>

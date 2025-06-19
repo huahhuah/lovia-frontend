@@ -27,17 +27,15 @@ app.use(VueAxios, axios)
 const userStore = useUserStore()
 userStore.restore()
 
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
+
 if (userStore.token) {
   axios
-    .post(
-      `${'import.meta.env.VITE_API_BASE_URL ||http://localhost:8080/api/v1'}/users/status`,
-      null,
-      {
-        headers: {
-          Authorization: `Bearer ${userStore.token}`,
-        },
-      }
-    )
+    .post(`${baseURL}/users/status`, null, {
+      headers: {
+        Authorization: `Bearer ${userStore.token}`,
+      },
+    })
     .then((res) => {
       userStore.setUser(res.data.user)
     })
