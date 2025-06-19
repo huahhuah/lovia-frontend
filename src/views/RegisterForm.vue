@@ -231,7 +231,7 @@ async function handleRegister() {
       username: form.username,
       password: form.password,
     }
-    await axios.post(`${baseUrl}/api/v1/users/signup`, payload)
+    await axios.post(`${baseUrl}/users/signup`, payload)
     showToast('註冊成功！即將跳轉登入頁', 'success')
     setTimeout(() => router.push('/login'), 1500)
   } catch (err) {
