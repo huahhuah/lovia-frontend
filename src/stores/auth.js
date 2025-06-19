@@ -52,4 +52,17 @@ export const useUserStore = defineStore('user', {
       }
     },
   },
+  restoreFromLocalStorage() {
+    const token = localStorage.getItem('token')
+    const user = localStorage.getItem('user')
+    if (token) this.token = token
+    if (user) {
+      try {
+        this.user = JSON.parse(user)
+      } catch (e) {
+        console.warn('user JSON parse failed:', e)
+        this.user = null
+      }
+    }
+  },
 })

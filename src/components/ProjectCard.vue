@@ -90,11 +90,28 @@ watchEffect(() => {
 })
 
 // 初始是否已收藏
-onMounted(() => {
-  isFavorite.value = props.project?.is_followed || false
+onMounted(async () => {
+  if (isReady.value) {
+    await fetchFollowStatus()
+  }
 })
 
 const emit = defineEmits(['toggle-follow'])
+
+const fetchFollowStatus = async () => {
+  try {
+    const url = `${baseUrl}/users/projects/${props.project.id}/follow-status`
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${userStore.token}`,
+      },
+    })
+    isFavorite.value = res.data?.follow === true
+  } catch (err) {
+    console.error('取得收藏狀態失敗：', err)
+    isFavorite.value = false // 預設為未收藏
+  }
+}
 
 const toggleFavorite = async () => {
   if (!isReady.value) {
@@ -124,8 +141,12 @@ const toggleFavorite = async () => {
       follow: isFavorite.value,
     })
   } catch (err) {
-    console.error(' 收藏操作失敗：', err)
-    alert('操作失敗，請稍後再試')
+    console.error(' 收藏操作失敗：', {
+      message: err.message,
+      status: err.response?.status,
+      data: err.response?.data,
+      stack: err.stack,
+    })
   }
 }
 </script>

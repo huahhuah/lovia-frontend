@@ -2,6 +2,7 @@
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { useUserStore } from './stores/auth'
 
 import axios from 'axios'
 import VueAxios from 'vue-axios'
@@ -22,5 +23,27 @@ const pinia = createPinia()
 app.use(router)
 app.use(pinia)
 app.use(VueAxios, axios)
+
+const userStore = useUserStore()
+userStore.restore()
+
+if (userStore.token) {
+  axios
+    .post(
+      `${'import.meta.env.VITE_API_BASE_URL ||http://localhost:8080/api/v1'}/users/status`,
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${userStore.token}`,
+        },
+      }
+    )
+    .then((res) => {
+      userStore.setUser(res.data.user)
+    })
+    .catch(() => {
+      userStore.clear()
+    })
+}
 
 app.mount('#app')

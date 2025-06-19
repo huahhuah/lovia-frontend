@@ -37,7 +37,7 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label">郵遞區號</label>
-                <input type="text" class="form-control" :value="orderData.zipcode" disabled />
+                <input type="text" class="form-control" :value="orderData.zipcode || '未提供'" />
               </div>
               <div class="col-md-6">
                 <label class="form-label">地址</label>
@@ -74,11 +74,8 @@
               <span>NT$ {{ orderData.amount }}</span>
             </div>
             <p class="text-muted small mt-3">備註：{{ orderData.note || '無' }}</p>
-            <button
-              class="btn btn-primary w-100 mt-3"
-              @click="submitPayment"
-              :disabled="isSubmitting"
-            >
+            <button class="btn btn-primary w-100 mt-3">
+              @click="submitPayment" :disabled="isSubmitting" >
               {{ isSubmitting ? '正在跳轉中...' : '立即付款' }}
             </button>
           </div>
@@ -188,7 +185,7 @@ async function submitPayment() {
 
     const productName = planName.slice(0, 100)
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+    const baseURL = import.meta.env.VITE_API_BASE_URL
 
     const payload = { amount, email, payment_type: paymentType, productName }
 
