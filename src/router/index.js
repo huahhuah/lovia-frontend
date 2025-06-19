@@ -3,7 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import { useUserStore } from '@/stores/auth'
 import axios from 'axios'
 
-const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
+const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -242,7 +242,7 @@ router.beforeEach(async (to, from, next) => {
 
   if (isLoggedIn && !userStore.user?.role) {
     try {
-      const res = await axios.post(`${baseUrl}/api/v1/users/status`, null, {
+      const res = await axios.post(`${baseUrl}/users/status`, null, {
         headers: { Authorization: `Bearer ${userStore.token}` },
       })
       userStore.setUser(res.data.user || res.data.users) // 支援兩種格式
