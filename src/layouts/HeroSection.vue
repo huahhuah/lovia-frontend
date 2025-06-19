@@ -52,7 +52,7 @@
         </div>
         <button
           class="btn custom-cta rounded-pill px-4 py-2 mt-3"
-          onclick="window.location.href='#/projects/explore-projects'"
+          onclick="window.location.href='/projects/explore-projects'"
         >
           立刻行動 >>
         </button>
