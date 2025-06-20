@@ -31,6 +31,10 @@
               placeholder="https://..."
               required
             />
+            <!-- ✅ 新增說明文字 -->
+            <small class="text-muted d-block mt-2">
+              *提醒您：為了保障捐款人之權益與提案的合法性，依據法規規定，公益募資必須先取得主管機關（如衛福部）許可，方能向大眾募集資源。
+            </small>
           </div>
 
           <!-- 專戶資訊 -->
@@ -61,6 +65,44 @@
             {{ message }}
           </div>
         </form>
+      </div>
+    </div>
+    <!-- 常見問答區 -->
+    <div class="container" style="max-width: 1000px">
+    <div class="faq-section mt-5">
+      <h5 class="fw-bold mb-3 text-center">常見問答 Q&A</h5>
+      <div v-for="(faq, index) in faqs" :key="index" class="faq-item mb-3">
+        <!-- 問題區 -->
+        <button
+          class="faq-question btn w-100 text-start fw-semibold d-flex align-items-start"
+          @click="toggleFAQ(index)"
+        >
+          <span class="me-2">Q:</span>{{ faq.question }}
+          <span class="float-icon me-2 ms-auto">{{ faq.open ? '▲' : '▼' }}</span>
+        </button>
+        <!-- 答案區 -->
+        <div v-show="faq.open" class="faq-answer text-muted mt-2 ps-4">
+          <span class="text-secondary fw-bold">A:</span> {{ faq.answer }}
+        </div>
+      </div>
+    </div>
+    </div>
+    <!-- Q&A 結束後的提醒區塊 -->
+    <div class="container mt-5" style="max-width: 1000px">
+      <div class="reminder-box px-4 py-4 rounded-4">
+        <p class="mb-3">
+          🔔 <strong>提醒您</strong>，若經判定為違法之公益勸募計畫，主管機關有權要求計畫將勸募所得財物返還捐贈人。
+        </p>
+        <p>
+          請先填寫以下基本資料，經由管理員審核身份與提案目的後，您就可以開始發起屬於您的公益專案，一起為社會帶來改變！
+        </p>
+        <p class="mt-4 fw-semibold">一起守護善意，也守住信任 💛</p>
+        <p>
+          在 Lovia，每一個提案都承載著改善世界的希望。我們希望讓這份善意更有力量，也更安心地傳遞出去。
+        </p>
+        <p class="text-muted mt-3 small">
+          * 審核需時 1–3 個工作天，如尚有任何問題，可查看提案說明內詳細 Q&A。
+        </p>
       </div>
     </div>
   </section>
@@ -112,6 +154,37 @@
   const handleCancel = () => {
     router.push('/')
   }
+
+  const faqs = ref([
+  {
+    question: '公益勸募是什麼？',
+    answer:
+      '如果您想為弱勢族群、災害救助、社會福利等公益目標發起提案，這類行為就屬於「公益勸募」，需要依《公益勸募條例》申請許可。',
+    open: false,
+  },
+  {
+    question: '什麼是勸募字號？',
+    answer:
+      '通過審核後，主管機關會核發一組合法字號（例如：衛部救字第XXXXXXXXXX號），這是公開募資的重要憑證。',
+    open: false,
+  },
+  {
+    question: '為什麼要這麼做？',
+    answer:
+      '若未經許可即對外勸募，將可能觸法、遭主管機關裁罰，並公開違規資訊。這對於提案人與平台的信任都是一大風險。',
+    open: false,
+  },
+  {
+    question: '我有提供回饋品給贊助者，就不受《公益勸募條例》規範嗎？',
+    answer:
+      '不是的，根據《公益勸募條例》規範，只要文案中宣稱集資金額將使「不特定多數人」受惠，即屬「公益」範疇，不論是否有提供回饋品，均需符合規範。',
+    open: false,
+  },
+])
+
+const toggleFAQ = (index) => {
+  faqs.value[index].open = !faqs.value[index].open
+}
   </script>
   
 <style scoped>
@@ -159,6 +232,37 @@ button {
   border-radius: 8px;
 }
 
+.faq-section {
+  border-top: 1px solid #ccc;
+  margin-top: 3rem;
+  padding-top: 2rem;
+}
+
+.faq-question {
+  background-color: #fff6f9;
+  border: 1px solid #ffdbe5;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.faq-question:hover {
+  background-color: #ffeef3;
+}
+
+.faq-answer {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.faq-toggle-icon {
+  font-size: 0.8rem;
+  line-height: 1;
+  padding-top: 6px;
+}
+
+
 /* ✅ 手機 RWD */
 @media (max-width: 576px) {
   .form-wrapper {
@@ -180,5 +284,6 @@ button {
     gap: 1rem !important;
   }
 }
+
 </style>
   

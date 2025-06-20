@@ -71,8 +71,7 @@
 
             <button
               @click="loginWithGoogle"
-              class="btn w-100 d-flex align-items-center justify-content-center gap-2"
-              style="background-color: #5f6368; color: white; border-radius: 10px"
+              class="btn w-100 d-flex align-items-center justify-content-center gap-2 google-btn"
             >
               <img src="@/assets/icons/google-g.svg" alt="Google" width="20" height="20" />
               使用 Google 帳戶登入
@@ -253,9 +252,9 @@ function loginWithGoogle() {
   font-weight: bold;
 }
 
-.login-wrapper .google-btn {
-  background-color: #d5dae0;
-  color: black;
-  border-radius: 20px;
+.google-btn {
+  background-color: rgba(26, 26, 26, 0.4);
+  color: white;
+  border-radius: 50px;
 }
 </style>

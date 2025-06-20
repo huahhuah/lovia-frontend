@@ -32,11 +32,16 @@
         <!-- ✅ dropdown：訂單管理（若為贊助者時出現） -->
         <li
           class="nav-item dropdown-nav"
+          :class="{ 'show-orders': showOrders }"
           v-if="isSponsor"
           @mouseenter="!isMobile && (showOrders = true)"
           @mouseleave="!isMobile && (showOrders = false)"
         >
-          <div class="nav-link dropdown-toggle" @click="toggleOrders">
+          <div 
+            class="nav-link dropdown-toggle" 
+            @click="toggleOrders"
+            data-bs-popper-config='{"strategy":"fixed"}'
+          >
             <span>訂單管理</span>
             <span class="arrow">▾</span>
           </div>
@@ -53,6 +58,7 @@
         <!-- ✅ dropdown：專案提問（提問列表／提問管理） -->
         <li
           class="nav-item dropdown-nav"
+          :class="{ 'show-questions': showQuestions }"
           v-if="isSponsor || isProposer"
           @mouseenter="!isMobile && (showQuestions = true)"
           @mouseleave="!isMobile && (showQuestions = false)"
@@ -117,12 +123,15 @@ onMounted(() => {
 const toggleOrders = () => {
   if (isMobile.value) {
     showOrders.value = !showOrders.value
+    showQuestions.value = false
+    console.log('showOrders:', showOrders.value)
   }
 }
 
 const toggleQuestions = () => {
   if (isMobile.value) {
     showQuestions.value = !showQuestions.value
+    showOrders.value = false
   }
 }
 </script>
@@ -131,7 +140,6 @@ const toggleQuestions = () => {
 .user-layout-wrapper {
   position: relative;
   min-height: 100vh;
-  overflow: hidden;
   background-image: linear-gradient(to right, #ffedf2, #fff6e3);
   background-size: cover;
   background-position: center top;
@@ -289,6 +297,7 @@ const toggleQuestions = () => {
     height: 243px;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 1;
   }
 
   .user-header,
@@ -363,16 +372,15 @@ const toggleQuestions = () => {
   }
 
   .dropdown-nav {
-    position: relative;
-    z-index: 1001; /* ⭐ 每一個 dropdown 都提高層級 */
+    position: relative; /* ✅ 關鍵：讓 dropdown 對齊它 */
   }
 
   .dropdown-list {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 8px); /* 顯示在按鈕正下方並留點間距 */
     left: 0;
-    margin-top: 4px;
-    z-index: 1002;
+
+    z-index: 9999;
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 0.25rem;
@@ -380,6 +388,16 @@ const toggleQuestions = () => {
     min-width: 160px;
     max-height: 200px;
     overflow-y: auto;
+
+    pointer-events: auto !important;
+    position: absolute;
+    /* ⭐ 重點加這兩行讓它不撐開外層 */
+    display: none;
+  }
+
+  .dropdown-nav.show-orders .dropdown-list,
+  .dropdown-nav.show-questions .dropdown-list {
+    display: block;
   }
 
   .dropdown-item {
