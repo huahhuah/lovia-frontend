@@ -105,14 +105,16 @@ const maskedEmail = computed(() => {
   return email.replace(/^(.{3})(.*)(@.*)$/, (_, a, _b, c) => `${a}***${c}`)
 })
 
+let retryCount = 0
+const maxRetries = 6 // 最多輪詢 6 次（每 5 秒）
+
 onMounted(async () => {
-  // 清除網址上的 method 與 transactionId 避免錯誤
   if (route.query.method || route.query.transactionId) {
     const cleanQuery = { orderId: route.query.orderId }
     router.replace({ path: '/checkout/result', query: cleanQuery })
-    return // 不繼續執行下面的 fetch，等跳轉後重新執行
+    return
   }
-  // 還原 token（避免 LINE Pay 回來變成未登入）
+
   const storedToken = sessionStorage.getItem('token') || localStorage.getItem('token')
   if (storedToken && !userStore.token) {
     userStore.setToken(storedToken)
@@ -143,17 +145,11 @@ async function fetchResult() {
     const res = await fetch(
       `https://lovia-backend-xl4e.onrender.com/api/v1/users/sponsorships/${orderId}/result`,
       {
-        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${token.value}`,
         },
       }
     )
-
-    if (!res.ok) {
-      throw new Error(`錯誤 ${res.status}：${res.statusText}`)
-    }
 
     const json = await res.json()
     const data = json.data
@@ -182,8 +178,16 @@ async function fetchResult() {
       v_account: data.v_account || '',
       expire_date: data.expire_date || '',
     }
+
+    console.log(` [第 ${retryCount + 1} 次] 訂單狀態: ${data.status}`)
+
+    // 若還未付款，自動再嘗試
+    if (data.status !== 'paid' && retryCount < maxRetries) {
+      retryCount++
+      setTimeout(fetchResult, 5000) // 每 5 秒輪詢
+    }
   } catch (err) {
-    console.error('付款資料取得失敗:', err)
+    console.error(' 查詢付款結果失敗:', err)
     error.value = err.message || '查詢付款結果失敗'
   } finally {
     loading.value = false
