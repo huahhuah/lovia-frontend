@@ -210,7 +210,7 @@ const isMenuOpen = ref(false)
 const isSearchOpen = ref(false)
 const isDropdownOpen = ref(false)
 const searchKeyword = ref('')
-const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
+const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
 const avatarUrl = computed(() => {
   const avatar = user.value?.avatar_url
