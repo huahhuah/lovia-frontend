@@ -141,7 +141,7 @@ async function fetchResult() {
 
   try {
     const res = await fetch(
-      `https://lovia-backend-xl4e.onrender.com/api/v1/users/orders/${orderId}/payment/success`,
+      `https://lovia-backend-xl4e.onrender.com/api/v1/users/sponsorships/${orderId}/result`,
       {
         method: 'GET',
         headers: {
