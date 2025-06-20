@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 //base_url
-const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
+const BASE_URL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
 // �ק�l�ܪ��A
 export const toggleFavorite = (projectId, token) => {
