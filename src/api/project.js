@@ -2,7 +2,7 @@
 import axios from 'axios'
 
 //base_url
-const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
+const BASE_URL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
 // 新增專案
 export const createProject = (data, token) => {

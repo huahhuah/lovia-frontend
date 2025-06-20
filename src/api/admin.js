@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 //base_url
-const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
+const BASE_URL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
 // 取得全部使用者資料
 export const allUsers = (token, page = 1) => {
