@@ -9,6 +9,7 @@
           <th>募資期間</th>
           <th>提案單位</th>
           <th>查看詳情</th>
+          <th>提案狀態</th>
         </tr>
       </thead>
       <tbody>
@@ -18,9 +19,31 @@
           <td>{{ project.start_time }} ~ {{ project.end_time }}</td>
           <td>{{ project.project_team }}</td>
           <td><button @click="viewDetails(project)">🔍</button></td>
+          <td>
+            <select 
+              v-model="project.status_id" 
+              :class="statusClass(project.status_id)" 
+              @change="onStatusChange(project)"
+            >
+              <option :value=1>審查中</option>
+              <option :value=2>提案通過</option>
+              <option :value=3>提案退回</option>
+            </select>
+            <div v-if="project.status_id === 3" style="margin-top: 4px;">
+              <input 
+                type="text" 
+                v-model="project.reason" 
+                placeholder="請輸入退回原因" 
+                style="width: 100%;"
+              />
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
+    <div style="margin-top: 20px; text-align: center;">
+      <button @click="submitAllUpdates()">送出更新</button>
+    </div>
   </div>
   <div class="pagination mt-3">
     <button 
@@ -60,7 +83,7 @@
         </ul>   
     </div>
   </div>
-  </div>
+</div>
 </template>
 
 <script setup>
@@ -98,7 +121,11 @@ async function getAllProjects( page = 1){
     const res = await getProjects(token, page)
     const result = res.data.result
 
-    projects.value = result.data
+    projects.value = result.data.map(project => ({
+      ...project,
+      status_id: typeof project.projectStatus?.id === 'number' ? project.projectStatus.id : 1,
+      reason: ''
+    }))
     totalPages.value = result.pagination.totalPages
     currentPage.value = result.pagination.currentPage
   } catch (err) {
@@ -125,6 +152,60 @@ const changePage = (page) =>{
     getAllProjects(page)
   }
 }
+function onStatusChange(project) {
+  if (project.status_id === 3 && !project.reason){
+    project.reason = ''
+  }
+}
+
+function statusClass(status) {
+  switch(status) {
+    case 2:
+      return "status-approved"
+    case 3:
+      return "status-rejected"
+    case 1:
+    default:
+      return "status-pending"
+  }
+}
+
+async function submitAllUpdates() {
+  const token = userStore.token
+
+  try {
+    for (const project of projects.value) {
+      const status = project.status_id
+      if (![2,3].includes(status)) {
+        continue // 只送出通過或退回
+      }
+      const payload = { status }
+      if (status === 3) {
+        if (!project.reason.trim()) {
+          alert(`請填寫提案 ${project.id} 的退回原因`)
+          return
+        }
+        payload.reason = project.reason.trim()
+      }
+
+      await axios.patch(`https://lovia-backend-xl4e.onrender.com/api/v1/admins/projects/${project.id}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+    }
+    alert('所有狀態已更新')
+    await getAllProjects(currentPage.value)  // 更新完重新載入列表
+  } catch (error) {
+    console.error('更新失敗', error)
+    alert('更新失敗，請稍後再試')
+  }
+}
+
 </script>
 
 <style scoped>
