@@ -82,7 +82,7 @@
                 <li v-if="isProposer" class="dropdown-submenu">
                   <a class="dropdown-item dropdown-toggle" href="#">訂單管理</a>
                   <ul class="dropdown-menu">
-                    <li><router-link to="/orders" class="dropdown-item">我的贊助</router-link></li>
+                    <li><router-link to="/user/sponsorships" class="dropdown-item">我的贊助</router-link></li>
                     <li>
                       <router-link to="/user/projects/mine" class="dropdown-item"
                         >我的專案</router-link
@@ -99,10 +99,10 @@
                   <a class="dropdown-item dropdown-toggle" href="#">專案提問</a>
                   <ul class="dropdown-menu">
                     <li>
-                      <router-link to="/questions" class="dropdown-item">我的提問</router-link>
+                      <router-link to="/user/questions" class="dropdown-item">我的提問</router-link>
                     </li>
                     <li>
-                      <router-link to="/questions/manage" class="dropdown-item"
+                      <router-link to="/user/questions/manage" class="dropdown-item"
                         >提問管理</router-link
                       >
                     </li>

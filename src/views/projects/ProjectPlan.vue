@@ -2,7 +2,7 @@
   <div class="project-plan-wrapper py-5">
     <div class="container" style="max-width: 720px">
       <h3 class="text-center fw-bold mb-5">
-        {{ isEdit ? '編輯回饋方案' : '新增回饋方案'}}
+        {{ isEdit ? '編輯回饋方案' : '新增回饋方案' }}
       </h3>
 
       <form @submit.prevent="submitPlans">
@@ -10,7 +10,7 @@
           v-for="(plan, index) in form.plans"
           :key="plan.id || index"
           class="rounded-4 p-4 shadow-sm mb-4 border border-light-subtle"
-          style="background-color: #FFF9F5;"
+          style="background-color: #fff9f5"
         >
           <h6 class="fw-bold mb-3">方案 {{ index + 1 }}</h6>
           <div class="row g-3">
@@ -33,8 +33,20 @@
             </div>
 
             <div class="col-12 col-md-6">
-              <label class="form-label">回饋圖片網址</label>
-              <input v-model="plan.feedback_img" type="text" class="form-control" required />
+              <label class="form-label">回饋圖片</label>
+              <input
+                type="file"
+                accept="image/jpeg,image/png"
+                class="form-control"
+                @change="handlePlanImageUpload($event, index)"
+              />
+              <img
+                v-if="plan.feedback_img"
+                :src="plan.feedback_img"
+                alt="圖片預覽"
+                class="img-thumbnail mt-2"
+                style="max-height: 150px"
+              />
             </div>
 
             <div class="col-12 col-md-6">
@@ -43,7 +55,11 @@
             </div>
 
             <div class="col-12 text-end">
-              <button type="button" class="btn btn-outline-danger btn-sm" @click="removePlan(index)">
+              <button
+                type="button"
+                class="btn btn-outline-danger btn-sm"
+                @click="removePlan(index)"
+              >
                 刪除方案
               </button>
             </div>
@@ -58,7 +74,7 @@
 
         <div class="text-center">
           <button type="submit" class="btn btn-danger px-5 py-2" :disabled="isSubmitting">
-            {{ isEdit ? '更新回饋方案' : '送出回饋方案'}}
+            {{ isEdit ? '更新回饋方案' : '送出回饋方案' }}
           </button>
         </div>
       </form>
@@ -69,7 +85,13 @@
 <script>
 import { reactive, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getProjectById, createProjectPlan, getProjectPlans, updateProjectPlan } from '@/api/project'
+import {
+  getProjectById,
+  createProjectPlan,
+  getProjectPlans,
+  updateProjectPlan,
+} from '@/api/project'
+import { uploadImage } from '@/api/upload'
 
 export default {
   name: 'ProjectPlan',
@@ -82,7 +104,8 @@ export default {
     const token = localStorage.getItem('token')
 
     const form = reactive({
-      project_id, plans: [],
+      project_id,
+      plans: [],
     })
 
     const projectData = reactive({
@@ -96,25 +119,25 @@ export default {
       try {
         const res = await getProjectById(form.project_id, token)
         projectData.title = res.data.data.title
-      if (isEdit) {
-        const planRes = await getProjectPlans(form.project_id, token)
-        form.plans = planRes.data.data.map(plan => ({
-          id: plan.plan_id,
-          plan_name: plan.plan_name,
-          amount: plan.amount,
-          quantity: plan.quantity,
-          feedback: plan.feedback,
-          feedback_img: plan.feedback_img,
-          delivery_date: plan.delivery_date
-        }))
-      } else {
-        form.plans = []
-      }
-    } catch (err) {
+        if (isEdit) {
+          const planRes = await getProjectPlans(form.project_id, token)
+          form.plans = planRes.data.data.map((plan) => ({
+            id: plan.plan_id,
+            plan_name: plan.plan_name,
+            amount: plan.amount,
+            quantity: plan.quantity,
+            feedback: plan.feedback,
+            feedback_img: plan.feedback_img,
+            delivery_date: plan.delivery_date,
+          }))
+        } else {
+          form.plans = []
+        }
+      } catch (err) {
         console.error('獲取專案資料失敗', err)
         alert('無法獲取專案資料')
-    }
-  })
+      }
+    })
 
     // 新增一筆方案
     const addPlan = () => {
@@ -133,14 +156,39 @@ export default {
       form.plans.splice(index, 1)
     }
 
-    // 提交所有方案
+    const handlePlanImageUpload = async (event, index) => {
+      const file = event.target.files[0]
+      if (!file) return
+
+      // 限制檔案格式與大小
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        alert('僅支援 JPG 或 PNG 格式')
+        return
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        alert('圖片大小不能超過 10MB')
+        return
+      }
+
+      const formData = new FormData()
+      formData.append('file', file)
+
+      try {
+        const res = await uploadImage(formData)
+        form.plans[index].feedback_img = res.data.url
+      } catch (err) {
+        console.error('圖片上傳失敗', err)
+        alert('圖片上傳失敗，請稍後再試')
+      }
+    }
+
     const submitPlans = async () => {
       if (!token) {
         alert('未登入或 token 遺失')
         return
       }
       isSubmitting.value = true
-      try{
+      try {
         for (const [i, plan] of form.plans.entries()) {
           if (
             !plan.plan_name ||
@@ -151,7 +199,7 @@ export default {
             !plan.delivery_date ||
             plan.amount <= 0
           ) {
-            alert(`第 ${i + 1} 筆回饋方案未填寫完整`)
+            alert(`第 ${i + 1} 筆回饋方案未填寫完整或金額錯誤`)
             isSubmitting.value = false
             return
           }
@@ -167,7 +215,7 @@ export default {
               feedback_img: plan.feedback_img,
               delivery_date: plan.delivery_date,
             }
-            if (plan.id){
+            if (plan.id) {
               return updateProjectPlan(form.project_id, plan.id, planPayload, token)
             } else {
               return createProjectPlan(form.project_id, planPayload, token)
@@ -193,6 +241,7 @@ export default {
       projectData,
       isSubmitting,
       isEdit,
+      handlePlanImageUpload,
     }
   },
 }
@@ -202,7 +251,7 @@ export default {
 .project-plan-wrapper {
   padding-top: 100px !important; /* 根據 navbar 實際高度調整 */
   min-height: 100vh;
-  background-image: linear-gradient(to right, #FFEDF2, #FFF6E3);
+  background-image: linear-gradient(to right, #ffedf2, #fff6e3);
   background-repeat: no-repeat;
   background-size: cover;
 }
