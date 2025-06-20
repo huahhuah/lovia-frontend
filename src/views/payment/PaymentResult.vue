@@ -118,10 +118,14 @@ onMounted(async () => {
   const storedToken = sessionStorage.getItem('token') || localStorage.getItem('token')
   if (storedToken && !userStore.token) {
     userStore.setToken(storedToken)
-    console.log('token 已還原至 userStore')
+    console.log(' token 已還原至 userStore')
   }
 
-  token.value = userStore.token || ''
+  // 強制補 token.value，避免 userStore.token 還沒設好
+  token.value = userStore.token || storedToken || ''
+  console.log(' token:', token.value)
+  console.log(' orderId:', orderId)
+
   if (!token.value) {
     error.value = '登入憑證不存在，請重新登入'
     loading.value = false
