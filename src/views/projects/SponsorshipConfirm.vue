@@ -1,72 +1,72 @@
 <template>
   <SponsorshipLayout>
-    <div class="container py-5">
-      <div v-if="project && selectedPlan" class="container py-5">
-        <!-- 標題與金額 -->
-        <div class="text-center mb-4">
-          <h3 class="fw-bold">贊助專案名稱：{{ project.title }}</h3>
-          <p class="fs-5 mt-2">方案金額 NT$ {{ selectedPlan.amount }}</p>
-          <hr />
+  <div class="container py-5 sponsorship-bg">
+    <div v-if="project && selectedPlan" class="narrow-wrapper mx-auto">
+      <!-- 標題與金額 -->
+      <div class="mb-4 text-center text-md-start">
+        <h3 class="fw-bold">贊助專案名稱：{{ project.title }}</h3>
+        <p class="fs-5 mt-2">方案金額 NT$ {{ selectedPlan.amount }}</p>
+        <hr class="custom-hr" />
+      </div>
+
+      <div class="row">
+        <!-- 左側內容 -->
+        <div class="col-lg-8 mb-4 mb-lg-0">
+          <section class="mb-4">
+            <h6 class="fw-bold">🎁 理念支持回饋品</h6>
+            <p class="text-muted">{{ selectedPlan.feedback }}</p>
+            <img
+              :src="imgSrc"
+              @error="onImageError"
+              class="img-fluid mb-3"
+              style="max-width: 300px"
+            />
+          </section>
+
+          <section class="mb-3">
+            <label class="form-label fw-bold">列名感謝顯示名稱</label>
+            <input v-model="donorName" class="form-control" placeholder="請輸入希望公開的名稱" />
+          </section>
+
+          <section>
+            <label class="form-label fw-bold">備註</label>
+            <textarea
+              v-model="note"
+              class="form-control"
+              rows="4"
+              placeholder="如有特殊需求請填寫"
+            ></textarea>
+          </section>
         </div>
 
-        <div class="row">
-          <!-- 左側 -->
-          <div class="col-lg-8">
-            <section class="mb-4">
-              <h6 class="fw-bold">🎁 理念支持回饋品</h6>
-              <p class="text-muted">{{ selectedPlan.feedback }}</p>
-              <img
-                :src="imgSrc"
-                @error="onImageError"
-                class="img-fluid mb-3"
-                style="max-width: 300px"
-              />
-            </section>
+        <!-- 右側卡片 -->
+        <div class="col-lg-4">
+          <div class="sponsor-card p-4 shadow-sm">
+            <p class="mb-1 fw-bold">方案金額：NT$ {{ selectedPlan.amount }}</p>
 
-            <section class="mb-3">
-              <label class="form-label fw-bold">列名感謝顯示名稱</label>
-              <input v-model="donorName" class="form-control" placeholder="請輸入希望公開的名稱" />
-            </section>
+            <label class="form-label fw-bold mt-2">額外贊助金額（可輸入加碼）</label>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              v-model.number="extraAmount"
+              class="form-control"
+              :readonly="isLongTerm"
+              placeholder="例如：NT$100"
+            />
 
-            <section>
-              <label class="form-label fw-bold">備註</label>
-              <textarea
-                v-model="note"
-                class="form-control"
-                rows="4"
-                placeholder="如有特殊需求請填寫"
-              ></textarea>
-            </section>
-          </div>
+            <div class="text-end mt-3 fs-5 fw-bold">總金額 NT$ {{ totalAmount }}</div>
 
-          <!-- 右側 -->
-          <div class="col-lg-4">
-            <div class="border rounded-4 p-4 shadow-sm">
-              <p class="mb-1 fw-bold">方案金額：NT$ {{ selectedPlan.amount }}</p>
+            <button class="btn btn-primary w-100 mt-3" @click="confirmSponsorship">
+              確認贊助
+            </button>
 
-              <label class="form-label fw-bold mt-2">額外贊助金額（可輸入加碼）</label>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                v-model.number="extraAmount"
-                class="form-control"
-                :readonly="isLongTerm"
-                placeholder="例如：100"
-              />
-
-              <div class="text-end mt-3 fs-5 fw-bold">總金額 NT$ {{ totalAmount }}</div>
-
-              <button class="btn btn-primary w-100 mt-3" @click="confirmSponsorship">
-                確認贊助
-              </button>
-
-              <p class="text-muted mt-3 small">備註：「確認贊助」即代表您同意平台付款條款。</p>
-            </div>
+            <p class="text-muted mt-3 small">備註：「確認贊助」即代表您同意平台付款條款。</p>
           </div>
         </div>
       </div>
     </div>
+  </div>
   </SponsorshipLayout>
 </template>
 
@@ -215,11 +215,14 @@ async function confirmSponsorship() {
   }
 }
 </script>
+
 <style>
+
 .btn.btn-primary {
   background-color: #fc5b53 !important;
   border-color: #fc5b53 !important;
   color: white !important;
+  border-radius: 50px !important;
 }
 
 .btn.btn-primary:hover {
@@ -236,5 +239,46 @@ async function confirmSponsorship() {
 
 .p-4 {
   background-color: #fff;
+}
+
+.custom-hr {
+  width: 100%;
+  max-width: 580px;
+  height: 1px;
+  background-color: #888;
+  border: none;
+}
+
+.narrow-wrapper {
+  max-width: 900px;
+  width: 100%;
+}
+
+.sponsor-card {
+  background-color: #fff;
+  border-radius: 1rem;
+  border: 1px solid #eee;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .custom-hr {
+    max-width: 100%;
+  }
+
+  h3.fw-bold {
+    font-size: 1.25rem;
+    text-align: center;
+  }
+
+  .fs-5 {
+    font-size: 1rem !important;
+    text-align: center;
+  }
+
+  .sponsor-card {
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
 }
 </style>

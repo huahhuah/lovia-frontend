@@ -2,6 +2,7 @@
 <template>
   <SponsorshipLayout>
     <div class="container py-5">
+      <div class="narrow-wrapper mx-auto">
       <div class="row">
         <div class="col-lg-8">
           <section class="mb-5">
@@ -134,55 +135,27 @@
 
           <section class="mb-5">
             <h5 class="fw-bold">付款方式</h5>
-            <div class="d-flex gap-3 flex-wrap">
-              <button
-                class="btn btn-outline-secondary"
-                :class="{ active: form.payment === 'card' }"
-                @click="
-                  () => {
-                    form.payment = 'card'
-                    errors.payment = ''
-                  }
-                "
-              >
-                <img
-                  src="/src/assets/images/credit.png"
-                  alt="信用卡"
-                  style="width: 40px; height: 40px"
-                />
-                信用卡
-              </button>
-
-              <button
-                class="btn btn-outline-secondary"
-                :class="{ active: form.payment === 'atm' }"
-                @click="
-                  () => {
-                    form.payment = 'atm'
-                    errors.payment = ''
-                  }
-                "
-              >
-                <img src="/src/assets/icons/atm.svg" alt="ATM" style="width: 40px; height: 40px" />
-                ATM
-              </button>
-
-              <button
-                class="btn btn-outline-secondary"
-                :class="{ active: form.payment === 'linepay' }"
-                @click="
-                  () => {
-                    form.payment = 'linepay'
-                    errors.payment = ''
-                  }
-                "
-              >
-                <img
-                  src="/src/assets/icons/LINE_Pay.svg"
-                  alt="LinePay"
-                  style="width: 80px; height: auto"
-                />
-              </button>
+            <div class="row g-3">
+              <div class="col-4" v-for="option in paymentList" :key="option.value">
+                <label
+                  class="payment-radio w-100 d-flex flex-column align-items-center justify-content-center"
+                  :class="{ active: form.payment === option.value }"
+                >
+                  <input
+                    type="radio"
+                    class="d-none"
+                    :value="option.value"
+                    v-model="form.payment"
+                    @change="errors.payment = ''"
+                  />
+                  <img
+                    :src="option.icon"
+                    :alt="option.label"
+                    :class="['payment-icon', { 'large-linepay': option.value === 'linepay' }]"
+                  />
+                  <div>{{ option.label }}</div>
+                </label>
+              </div>
             </div>
             <p class="text-danger small mt-2" v-if="errors.payment">{{ errors.payment }}</p>
           </section>
@@ -220,6 +193,7 @@
         </div>
       </div>
     </div>
+    </div>
   </SponsorshipLayout>
 </template>
 
@@ -237,6 +211,11 @@ const router = useRouter()
 const sponsorData = ref({})
 const projectId = ref(null)
 const planId = ref(null)
+const paymentList = [
+  { value: 'card', label: '信用卡', icon: '/src/assets/images/credit.png' },
+  { value: 'atm', label: 'ATM', icon: '/src/assets/icons/atm.png' },
+  { value: 'linepay', icon: '/src/assets/icons/LINE_Pay.png' },
+]
 
 const form = ref({
   name: '',
@@ -527,8 +506,15 @@ async function submitOrder() {
 </script>
 
 <style scoped>
+.narrow-wrapper {
+  max-width: 900px;
+  width: 100%;
+}
+
 .card {
   border-radius: 1rem;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
 .btn.active {
@@ -537,21 +523,18 @@ async function submitOrder() {
   border-color: #0d0d0c;
 }
 
-/* 覆蓋 hover 時的灰色背景 */
 .btn-outline-secondary:hover {
-  background-color: #ffe1d9 !important; /* 自訂 hover 背景色 */
+  background-color: #ffe1d9 !important;
   border-color: #ffb6a7 !important;
   color: #0d0d0c !important;
 }
 
-/* 若已被選取（active）+ hover 狀態下的樣式 */
 .btn-outline-secondary.active:hover {
   background-color: #ffa18f !important;
   border-color: #ffa18f !important;
   color: #0d0d0c !important;
 }
 
-/* 若按鈕是 active 狀態（選取後） */
 .btn-outline-secondary.active {
   background-color: #ffb6a7 !important;
   border-color: #ffb6a7 !important;
@@ -562,10 +545,12 @@ async function submitOrder() {
   background-color: #fc5b53 !important;
   border-color: #fc5b53 !important;
   color: white !important;
+  border-radius: 50px !important;
+  font-weight: bold;
 }
 
 .btn.btn-primary:hover {
-  background-color: #e0433b !important; /* 可選：hover 深一點 */
+  background-color: #e0433b !important;
   border-color: #e0433b !important;
   color: white !important;
 }
@@ -574,5 +559,46 @@ async function submitOrder() {
   background-color: #fc5b53 !important;
   border-color: #fc5b53 !important;
   opacity: 0.65;
+  border-radius: 50px !important;
+}
+
+.payment-radio {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 1rem;
+  height: 100px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.payment-radio.active {
+  border-color: #fc5b53;
+  background-color: #ffe1d9;
+}
+
+.payment-radio img {
+  width: 40px;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+.payment-radio div {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.payment-icon {
+  width: 40px;
+  height: auto;
+  margin-bottom: 0.5rem;
+}
+
+.large-linepay {
+  width: 50px !important;
+  padding-top: 10px;
 }
 </style>

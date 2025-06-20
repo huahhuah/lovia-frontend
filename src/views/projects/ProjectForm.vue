@@ -140,7 +140,7 @@
       maxlength="100"
       @input="summaryCount = form.summary.length"
       class="form-control bg-light rounded"
-      placeholder="請簡要介紹您的提案，讓支持者了解計畫初衷，並將希望與支持帶給需要的人。"
+      placeholder="請簡要介紹您的提案，另勸募案需填寫勸募字號與期間，請在『提案介紹』中標明：範例如下&#10;勸募字號：衛部救字第1121360084號&#10;勸募期間：2025/05/01~2025/10/31"
       rows="3"
       required
     ></textarea>
