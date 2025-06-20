@@ -59,74 +59,76 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
-const questions = ref([]);
-const loading = ref(false);
-const error = ref(null);
+const BASE_URL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
-const showModal = ref(false);
-const currentQuestion = ref(null);
-const replyContent = ref('');
+const questions = ref([])
+const loading = ref(false)
+const error = ref(null)
+
+const showModal = ref(false)
+const currentQuestion = ref(null)
+const replyContent = ref('')
 
 async function loadQuestions() {
-  loading.value = true;
-  error.value = null;
+  loading.value = true
+  error.value = null
 
   try {
-    const token = localStorage.getItem('token');
-    const res = await axios.get('/api/v1/projects/my-projects/questions', {
+    const token = localStorage.getItem('token')
+    const res = await axios.get(`${BASE_URL}/projects/my-projects/questions`, {
       headers: { Authorization: `Bearer ${token}` },
-    });
+    })
 
     if (res.data.status) {
-      questions.value = res.data.data;
+      questions.value = res.data.data
     } else {
-      error.value = res.data.message || '讀取資料失敗';
+      error.value = res.data.message || '讀取資料失敗'
     }
   } catch (err) {
-    error.value = err.response?.data?.message || err.message || '發生錯誤';
+    error.value = err.response?.data?.message || err.message || '發生錯誤'
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
 function openReplyModal(question) {
-  currentQuestion.value = question;
-  replyContent.value = '';
-  showModal.value = true;
+  currentQuestion.value = question
+  replyContent.value = ''
+  showModal.value = true
 }
 
 function closeReplyModal() {
-  showModal.value = false;
-  currentQuestion.value = null;
-  replyContent.value = '';
+  showModal.value = false
+  currentQuestion.value = null
+  replyContent.value = ''
 }
 
 async function submitReply() {
   if (!replyContent.value.trim()) {
-    alert('請輸入回覆內容');
-    return;
+    alert('請輸入回覆內容')
+    return
   }
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token')
     await axios.post(
-      `/api/v1/projects/comments/${currentQuestion.value.id}/reply`,
+      `${BASE_URL}/projects/comments/${currentQuestion.value.id}/reply`,
       { content: replyContent.value },
       { headers: { Authorization: `Bearer ${token}` } }
-    );
-    alert('回覆成功');
-    closeReplyModal();
-    loadQuestions();
+    )
+    alert('回覆成功')
+    closeReplyModal()
+    loadQuestions()
   } catch (err) {
-    alert(err.response?.data?.message || '回覆失敗');
+    alert(err.response?.data?.message || '回覆失敗')
   }
 }
 
 onMounted(() => {
-  loadQuestions();
-});
+  loadQuestions()
+})
 </script>
 
 <style scoped>
