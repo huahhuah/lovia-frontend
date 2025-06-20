@@ -2,6 +2,32 @@
 // { RouterLink, RouterView } from "vue-router";
 import Header from './layouts/Header.vue'
 import Footer from './layouts/Footer.vue'
+import { useUserStore } from './stores/auth'
+import { onMounted } from 'vue'
+import axios from 'axios'
+
+const userStore = useUserStore()
+const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
+
+onMounted(async () => {
+  // 儲存過的 token/user 還原
+  userStore.restore()
+
+  // 如果有 token 但沒有 user，就從 /users/me 補資料
+  if (userStore.token && !userStore.user) {
+    try {
+      const res = await axios.get(`${baseUrl}/users/me`, {
+        headers: {
+          Authorization: `Bearer ${userStore.token}`,
+        },
+      })
+      userStore.setUser(res.data.data)
+    } catch (err) {
+      console.warn('自動還原使用者失敗，清除登入狀態', err)
+      userStore.clear()
+    }
+  }
+})
 </script>
 
 <template>
@@ -21,7 +47,8 @@ import Footer from './layouts/Footer.vue'
   max-width: 100vw;
 }
 
-html, body {
+html,
+body {
   max-width: 100vw;
   overflow-x: hidden;
 }

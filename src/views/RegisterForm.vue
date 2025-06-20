@@ -116,10 +116,10 @@
             </div>
 
             <!-- 註冊按鈕 -->
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               class="btn rounded-pill w-100 text-white"
-              style="background-color: #FC5B53"
+              style="background-color: #fc5b53"
             >
               註冊
             </button>
@@ -132,8 +132,9 @@
                 <hr class="flex-grow-1" />
               </div>
               <button
-                type="button"
-                class="btn w-100 d-flex align-items-center justify-content-center gap-2 google-btn"
+                @click="loginWithGoogle"
+                class="btn w-100 d-flex align-items-center justify-content-center gap-2"
+                style="background-color: #5f6368; color: white; border-radius: 10px"
               >
                 <img src="@/assets/icons/google-g.svg" alt="Google" width="20" height="20" />
                 使用 Google 帳戶登入
@@ -143,29 +144,24 @@
         </div>
       </div>
     </div>
-
-    <!-- Modal -->
-    <div
-      class="modal fade"
-      ref="modalRef"
-      tabindex="-1"
-      aria-labelledby="feedbackModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="feedbackModalLabel">提示</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            {{ modalMessage }}
-          </div>
+    <!-- toast -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+      <div
+        ref="toastRef"
+        class="toast align-items-center text-white"
+        :class="toastType === 'success' ? 'bg-success' : 'bg-danger'"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+      >
+        <div class="d-flex">
+          <div class="toast-body">{{ toastMessage }}</div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            data-bs-dismiss="toast"
+            aria-label="Close"
+          ></button>
         </div>
       </div>
     </div>
@@ -174,12 +170,14 @@
 
 <script setup>
 import { reactive, ref, computed, onMounted } from 'vue'
+import { Toast } from 'bootstrap'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { Modal } from 'bootstrap'
 
 const router = useRouter()
-const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
+const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
+
 const form = reactive({
   email: '',
   username: '',
@@ -203,27 +201,28 @@ const passwordMismatch = computed(
 
 const isUsernameTooLong = computed(() => form.username.length > 50)
 
-//Modal 控制
-const modalRef = ref(null)
-const modalMessage = ref('')
-const modalType = ref('success') // 'success' or 'danger'
-let modalInstance = null
+//toast 控制
+const toastRef = ref(null)
+const toastInstance = ref(null)
+const toastMessage = ref('')
+const toastType = ref('success') // 'success' or 'danger'
 
 onMounted(() => {
-  modalInstance = new Modal(modalRef.value)
+  toastInstance.value = new Toast(toastRef.value, { autohide: true, delay: 3000 })
 })
 
-function showModal(msg, type = 'danger') {
-  modalMessage.value = msg
-  modalType.value = type
-  modalInstance?.show()
+function showToast(message, type = 'success') {
+  toastMessage.value = message
+  toastType.value = type
+  toastInstance.value?.show()
 }
 
 async function handleRegister() {
   if (!isEmailValid.value || !isPasswordValid.value || passwordMismatch.value || !form.agree) return
 
   if (form.username.length > 50) {
-    showModal('使用者名稱長度不能超過 50 字元')
+    showToast('使用者名稱長度不能超過 50 字元', 'danger')
+
     return
   }
   try {
@@ -232,19 +231,26 @@ async function handleRegister() {
       username: form.username,
       password: form.password,
     }
-    await axios.post(`${baseUrl}/api/v1/users/signup`, payload)
-    //modalMessage.value = '註冊成功！即將跳轉登入頁'
-    showModal('註冊成功！即將跳轉登入頁', 'success')
-    setTimeout(() => {
-      modalInstance.hide() //關閉 Modal
-      const backdrop = document.querySelector('.modal-backdrop')
-      if (backdrop) backdrop.remove() //清除殘留遮罩
-      router.push('/login')
-    }, 1500)
+    await axios.post(`${baseUrl}/users/signup`, payload)
+    showToast('註冊成功！即將跳轉登入頁', 'success')
+    setTimeout(() => router.push('/login'), 1500)
   } catch (err) {
-    modalMessage.value = err.response?.data?.message || '註冊失敗，請稍後再試'
-    modalInstance.show()
+    showToast(err.response?.data?.message || '註冊失敗，請稍後再試', 'danger')
   }
+}
+
+function loginWithGoogle() {
+  const params = new URLSearchParams({
+    client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+    redirect_uri: import.meta.env.VITE_GOOGLE_REDIRECT_URI,
+    response_type: 'code',
+    scope:
+      'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
+    access_type: 'online',
+    prompt: 'consent',
+  })
+
+  window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`
 }
 </script>
 
@@ -299,7 +305,7 @@ async function handleRegister() {
 }
 
 .register-wrapper .google-btn {
-  background-color: #D5DAE0;
+  background-color: #d5dae0;
   color: black;
   border-radius: 20px;
 }

@@ -27,7 +27,7 @@ export const useUserStore = defineStore('user', {
     },
     setUser(user) {
       this.user = {
-        ...this.user, // 保留原本的屬性（特別是 role）
+        ...(this.user || {}), // 保留原本的屬性（特別是 role）
         ...user, // 用新資料更新
       }
       localStorage.setItem('user', JSON.stringify(this.user))
@@ -46,8 +46,23 @@ export const useUserStore = defineStore('user', {
       if (user) {
         try {
           this.user = JSON.parse(user)
-        } catch {}
+        } catch {
+          this.user = null
+        }
       }
     },
+  },
+  restoreFromLocalStorage() {
+    const token = localStorage.getItem('token')
+    const user = localStorage.getItem('user')
+    if (token) this.token = token
+    if (user) {
+      try {
+        this.user = JSON.parse(user)
+      } catch (e) {
+        console.warn('user JSON parse failed:', e)
+        this.user = null
+      }
+    }
   },
 })

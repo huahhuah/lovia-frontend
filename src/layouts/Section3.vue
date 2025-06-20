@@ -14,7 +14,12 @@
       <div class="container" style="padding-left: 10rem; padding-right: 10rem">
         <div class="row justify-content-center g-4">
           <div class="col-md-4" v-for="(card, index) in visibleCards" :key="index">
-            <ProjectCard :project="card" />
+            <ProjectCard
+              :project="card"
+              :is-archived="card.status === '已結束'"
+              :isFollowed="card.is_followed"
+              @toggle-follow="onToggleFollow"
+            />
           </div>
         </div>
       </div>
@@ -80,6 +85,13 @@ onMounted(async () => {
 const visibleCards = computed(() =>
   showAll.value ? longTermProjects.value : longTermProjects.value.slice(0, 3)
 )
+
+function onToggleFollow({ projectId, follow }) {
+  const target = longTermProjects.value.find((p) => p.id === projectId)
+  if (target) {
+    target.is_followed = follow
+  }
+}
 </script>
 
 <style scoped>

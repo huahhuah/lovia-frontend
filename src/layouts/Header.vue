@@ -71,6 +71,7 @@
 
               <!-- ✅ 一般會員（贊助者 + 提案者）功能 -->
               <template v-else>
+                <!-- 通用項目 -->
                 <li><router-link to="/user" class="dropdown-item">會員中心</router-link></li>
                 <li><router-link to="/user/edit" class="dropdown-item">個人資料</router-link></li>
                 <li>
@@ -90,7 +91,7 @@
                   </ul>
                 </li>
                 <li v-else>
-                  <router-link to="/orders" class="dropdown-item"></router-link>
+                  <router-link to="/orders" class="dropdown-item">我的贊助</router-link>
                 </li>
 
                 <!-- 專案提問 -->
@@ -108,7 +109,7 @@
                   </ul>
                 </li>
                 <li v-else>
-                  <router-link to="/questions" class="dropdown-item">專案提問</router-link>
+                  <router-link to="/questions" class="dropdown-item">我的提問</router-link>
                 </li>
               </template>
 
@@ -169,9 +170,6 @@
           >探索</router-link
         >
         <span class="menu-link" @click="handlePropose">提案</span>
-        <router-link v-if="!user" to="/register" class="menu-link" @click="isMenuOpen = false"
-          >註冊</router-link
-        >
 
         <!--  未登入時 -->
         <router-link v-if="!user" to="/register" class="menu-link" @click="isMenuOpen = false"
@@ -270,6 +268,7 @@ const handleSearch = () => {
 }
 
 onMounted(() => {
+  userStore.restore()
   window.addEventListener('resize', updateWindowWidth)
   window.addEventListener('click', handleClickOutside)
   updateWindowWidth()
@@ -292,7 +291,7 @@ const checkLoginStatus = async () => {
     return
   }
   try {
-    const res = await axios.post(`${baseUrl}/api/v1/users/status`, null, {
+    const res = await axios.post(`${baseUrl}/users/status`, null, {
       headers: { Authorization: `Bearer ${userStore.token}` },
     })
     userStore.setUser(res.data.user)

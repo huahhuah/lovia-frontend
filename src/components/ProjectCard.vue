@@ -2,7 +2,12 @@
   <div class="card shadow-sm rounded-5 d-flex flex-column overflow-hidden">
     <!-- 封面 + 標籤 + 收藏 -->
     <div class="position-relative">
-      <img :src="project.cover" class="card-img-top" :alt="project.title" :class="{ grayscale: isArchived }" />
+      <img
+        :src="project.cover"
+        class="card-img-top"
+        :alt="project.title"
+        :class="{ grayscale: isArchived }"
+      />
 
       <!-- 灰階遮罩 -->
       <div v-if="isArchived" class="overlay-dark"></div>
@@ -10,8 +15,21 @@
       <img v-if="isArchived" :src="project.status_img" class="status-stamp" alt="狀態印章" />
 
       <img :src="project.category_img || '/default.png'" alt="分類標籤" class="category-badge" />
-      <div class="favorite-wrapper">
-        <img src="/favorite.png" alt="收藏" class="favorite-icon" />
+      <!-- 收藏按鈕（歷年專案不顯示） -->
+      <div
+        v-if="!isArchived"
+        class="favorite-wrapper"
+        :class="{ 'is-favorite': isFavorite }"
+        @click="toggleFavorite"
+        :title="isFavorite ? '取消收藏' : '加入收藏'"
+      >
+        <!-- 收藏按鈕 -->
+        <img
+          :src="isFavorite ? '/heart.png' : '/favorite.png'"
+          :key="isFavorite"
+          alt="收藏"
+          class="favorite-icon"
+        />
       </div>
     </div>
 
@@ -48,10 +66,89 @@
 </template>
 
 <script setup>
-defineProps({
+import { ref, onMounted, watchEffect } from 'vue'
+import { useUserStore } from '@/stores/auth'
+import axios from 'axios'
+
+const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
+
+const props = defineProps({
   project: { type: Object, required: true },
-  isArchived: { type: Boolean, default: false }
+  isArchived: { type: Boolean, default: false },
+  isFollowed: { type: Boolean, default: false },
 })
+
+const userStore = useUserStore()
+userStore.restore()
+
+const isFavorite = ref(false)
+const isReady = ref(false)
+
+// 登入資料還原完成後才允許操作
+watchEffect(() => {
+  isReady.value = !!userStore.token && !!userStore.user
+})
+
+// 初始是否已收藏
+onMounted(async () => {
+  if (isReady.value) {
+    await fetchFollowStatus()
+  }
+})
+
+const emit = defineEmits(['toggle-follow'])
+
+const fetchFollowStatus = async () => {
+  try {
+    const url = `${baseUrl}/users/projects/${props.project.id}/follow-status`
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${userStore.token}`,
+      },
+    })
+    isFavorite.value = res.data?.follow === true
+  } catch (err) {
+    console.error('取得收藏狀態失敗：', err)
+    isFavorite.value = false // 預設為未收藏
+  }
+}
+
+const toggleFavorite = async () => {
+  if (!isReady.value) {
+    alert('請先登入才能收藏')
+    return
+  }
+  try {
+    const url = `${baseUrl}/users/projects/${props.project.id}/follow`
+
+    console.log(` 發送收藏切換請求 → PATCH: ${url}`)
+
+    const res = await axios.patch(
+      url,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${userStore.token}`,
+        },
+      }
+    )
+
+    isFavorite.value = res.data.follow
+    console.log(' 收藏狀態已更新:', isFavorite.value)
+
+    emit('toggle-follow', {
+      projectId: props.project.id,
+      follow: isFavorite.value,
+    })
+  } catch (err) {
+    console.error(' 收藏操作失敗：', {
+      message: err.message,
+      status: err.response?.status,
+      data: err.response?.data,
+      stack: err.stack,
+    })
+  }
+}
 </script>
 
 <style>
@@ -84,7 +181,7 @@ defineProps({
   position: absolute;
   top: 12px;
   right: 12px;
-  width: 44px;  /* 放大 */
+  width: 44px; /* 放大 */
   height: 44px;
   background-color: rgba(26, 26, 26, 0.2);
   border-radius: 50%;
@@ -94,15 +191,9 @@ defineProps({
   z-index: 2;
   cursor: pointer;
 }
-.favorite-icon {
-  width: 20x;
-  height: 20px;
-  filter: brightness(0) invert(1);
-}
 
 .text-ellipsis-2 {
   display: -webkit-box;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -111,7 +202,6 @@ defineProps({
 }
 .text-ellipsis-3 {
   display: -webkit-box;
-  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -157,5 +247,16 @@ defineProps({
   width: 120px;
   transform: translate(-50%, -50%);
   z-index: 2;
+}
+
+.favorite-icon {
+  width: 20px;
+  height: 20px;
+  filter: grayscale(100%) brightness(1.2); /* 預設灰色 */
+  transition: filter 0.2s ease;
+}
+
+.favorite-wrapper.is-favorite .favorite-icon {
+  filter: none !important;
 }
 </style>

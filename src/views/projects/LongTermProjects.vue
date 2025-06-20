@@ -8,3 +8,8 @@
     </div>
   </div>
 </template>
+<script setup>
+defineProps({
+  visibleProjects: Array,
+})
+</script>

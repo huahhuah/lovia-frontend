@@ -37,15 +37,16 @@
                 <br/>
                 <button @click="removeCard(index)">刪除此筆資料</button>
             </div>
-            <button @click="addCard">新增一筆資料</button>
+            <button @click="addCard">新增一筆匯款資料</button>
             <button @click="submit">儲存進度</button>
         </div>
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 
 const title = ref('')
 const content = ref('')
@@ -54,6 +55,7 @@ const cards = ref([])
 const props = defineProps(['projectId', 'progressId'])
 const isEditMode = ref(false)
 const progressId = ref(null)
+const router = useRouter()
 
 function addCard(){
     cards.value.push({
@@ -72,7 +74,7 @@ onMounted(() => {
         isEditMode.value = true
         progressId.value = props.progressId
         progressData()
-    }
+    } 
 })
 
 async function progressData(){
@@ -121,8 +123,8 @@ async function submit(){
                 fund_usages: cards.value
             }
         })
-        console.log('送出成功', response.data)
         alert(isEditMode.value? '進度更新成功!':'進度儲存成功!')
+        router.push({ name: 'FundingProjectDetail', params: { id: props.projectId } })
     } catch (error){
         console.error('送出失敗',error)
         alert('儲存失敗，請檢查後再送出')
