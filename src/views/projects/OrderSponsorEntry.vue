@@ -204,6 +204,15 @@ import { useRouter } from 'vue-router'
 import { createSponsorship } from '@/api/project'
 import { useUserStore } from '@/stores/auth'
 import { zipcodeMap, getDistrictByZipcode } from '@/utils/zipcodeMap'
+import creditIcon from '@/assets/images/credit.png'
+import atmIcon from '@/assets/icons/atm.png'
+import linePayIcon from '@/assets/icons/LINE_Pay.png'
+
+const paymentList = [
+  { value: 'card', label: '信用卡', icon: creditIcon },
+  { value: 'atm', label: 'ATM', icon: atmIcon },
+  { value: 'linepay', icon: linePayIcon }
+]
 
 const authStore = useUserStore()
 const router = useRouter()
@@ -211,11 +220,6 @@ const router = useRouter()
 const sponsorData = ref({})
 const projectId = ref(null)
 const planId = ref(null)
-const paymentList = [
-  { value: 'card', label: '信用卡', icon: '/src/assets/images/credit.png' },
-  { value: 'atm', label: 'ATM', icon: '/src/assets/icons/atm.png' },
-  { value: 'linepay', icon: '/src/assets/icons/LINE_Pay.png' },
-]
 
 const form = ref({
   name: '',

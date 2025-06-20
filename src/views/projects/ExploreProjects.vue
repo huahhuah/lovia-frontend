@@ -64,11 +64,12 @@
 
       <!-- 卡片列表 -->
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 gx-2 gy-4 card-list">
-        <div class="col" v-for="project in projects" :key="project.id">
+        <div class="col d-flex" v-for="project in projects" :key="project.id">
           <ProjectCard
             :project="project"
             :is-archived="project.status === '已結束'"
             @toggle-follow="onToggleFollow"
+            class="w-100"
           />
         </div>
         <div v-if="!isLoading && projects.length === 0" class="text-center text-muted mt-4">
