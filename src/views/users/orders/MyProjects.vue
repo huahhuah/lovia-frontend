@@ -16,13 +16,15 @@
                 <th>支持金額</th>
                 <th>訂單狀態</th>
                 <th>回饋品</th>
-                <th>配送地址</th>
+                <th>新增進度</th>
                 <th>操作</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="project in projects" :key="project.id">
-                <td>{{ project.title }}</td>
+                <td>
+                  <a href="#" @click.prevent="openProjectDetail(project)">{{ project.title }}</a>
+                </td>
                 <td>{{ formatCurrency(project.targetAmount) }}</td>
                 <td>{{ formatCurrency(project.supportAmount) }}</td>
                 <td>
@@ -31,10 +33,21 @@
                   </span>
                 </td>
                 <td>{{ project.rewardItem || '無' }}</td>
-                <td>
-                  <span v-if="project.shippingInfo" class="status-success">✔️ 已填寫</span>
-                  <span v-else class="status-warning"> 無</span>
-                </td>
+                <router-link
+                  :to="{ name: 'ProgressFormCreate', params: { projectId: project.id } }"
+                  class="icon-button icon-button--modern"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    class="icon--enhanced"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                  新增進度
+                </router-link>
                 <td class="actions">
                   <!-- 編輯按鈕（用 edit.png） -->
                   <router-link
@@ -58,19 +71,30 @@
         </div>
       </div>
     </div>
+
+    <ProjectDetailModal
+      v-if="selectedProject"
+      :project="selectedProject"
+      @close="selectedProject = null"
+    />
   </div>
 </template>
 
 <script>
 import { getMyProjects, deleteProject } from '@/api/project'
+import ProjectDetailModal from '@/views/users/orders/ProjectDetailModal.vue' // ← 加這一行
 
 export default {
   name: 'MyProjects',
+  components: {
+    ProjectDetailModal,
+  },
   data() {
     return {
       projects: [],
       loading: false,
       deleting: null, // 紀錄正在刪除的專案ID
+      selectedProject: null, // ← 加入這一行
     }
   },
   methods: {
@@ -172,6 +196,11 @@ export default {
         this.deleting = null
       }
     },
+
+    openProjectDetail(project) {
+      console.log('你點擊了：', project.title)
+      this.selectedProject = project
+    },
   },
 
   mounted() {
@@ -195,8 +224,7 @@ export default {
   text-align: left;
 }
 
-.loading,
-.no-projects {
+.loading, .no-projects {
   text-align: center;
   padding: 40px;
   color: #666;
@@ -224,17 +252,17 @@ export default {
 }
 
 .project-table th {
-  background-color: #FFD2CF;
+  background-color: #ffd2cf;
   white-space: nowrap;
   font-weight: 600;
   color: #333;
 }
 
-.project-table th,
-.project-table td {
+.project-table th, .project-table td {
   padding: 12px;
   border-bottom: 1px solid #e9ecef;
   text-align: left;
+  vertical-align: middle; /* 確保所有內容垂直居中 */
 }
 
 .project-table tbody tr:hover {
@@ -246,6 +274,8 @@ export default {
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .status-active {
@@ -285,23 +315,126 @@ export default {
   white-space: nowrap;
 }
 
-/* ✅ 改為 icon-only 樣式 */
+/* 統一的按鈕樣式 - 基礎版本 */
 .icon-button {
-  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
   border: none;
-  padding: 4px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
   cursor: pointer;
+  position: relative;
+  background: transparent;
+  color: #cc4444; /* 更紅的預設顏色 */
+  min-height: 32px; /* 確保按鈕有固定高度 */
+  box-sizing: border-box; /* 確保 padding 計算在高度內 */
 }
 
+.icon-button:hover {
+  background: #f1f3f4;
+  color: #aa2222; /* hover 時更深的紅色 */
+}
+
+/* 現代化漸變效果按鈕 - 粉色系暖漸層 */
+.icon-button--modern {
+  background: transparent;         /* 背景透明 */
+  color: black;                    /* 文字改成黑色 */
+  border: 1px solid black;         /* 加上黑色邊框 */
+  box-shadow: none;               /* 拿掉原本的陰影 */
+  overflow: hidden;
+  padding: 6px 10px;
+  min-height: 32px;
+  vertical-align: middle;
+  margin-top: 12px;
+  transition: all 0.3s ease;      /* 增加滑過動畫效果 */
+}
+
+.icon-button--modern:hover {
+  background: black;              /* 滑過變黑底 */
+  color: white;                   /* 文字變白色 */
+}
+
+.icon-button--modern::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.icon-button--modern:hover::before {
+  left: 100%;
+}
+
+.icon-button--modern:hover {
+  box-shadow: 0 2px 6px rgba(255, 154, 158, 0.3);
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+}
+
+/* 只有圖標的按鈕樣式 */
+.icon-button--icon-only {
+  padding: 8px;
+  border-radius: 50%;
+  min-width: 32px;
+  min-height: 32px;
+  gap: 0;
+}
+
+.icon-button--icon-only:hover {
+  background: #f1f3f4;
+  transform: scale(1.05);
+}
+
+/* 編輯按鈕 */
+.icon-button--edit {
+  color: #cc4444; /* 更偏紅的編輯按鈕顏色 */
+}
+
+.icon-button--edit:hover {
+  background: #ffebeb; /* 淡紅色背景 */
+  color: #aa2222; /* 深紅色 */
+}
+
+/* 刪除按鈕 */
+.icon-button--delete {
+  color: #dc2626; /* 保持較深的紅色 */
+}
+
+.icon-button--delete:hover {
+  background: #fef2f2;
+  color: #b91c1c; /* 更深的紅色 */
+}
+
+/* 增強的圖標樣式 */
+.icon--enhanced {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 1px 2px rgba(204, 68, 68, 0.2)); /* 紅色陰影 */
+  flex-shrink: 0; /* 防止圖標變形 */
+}
+
+/* 表格中的圖標 */
 .icon-button img {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   vertical-align: middle;
   transition: transform 0.2s;
+  filter: hue-rotate(10deg) saturate(1.2); /* 增加紅色調和飽和度 */
 }
 
 .icon-button:hover img {
   transform: scale(1.1);
+  filter: hue-rotate(15deg) saturate(1.4); /* hover 時更紅 */
 }
 
 .icon-button:disabled {
@@ -309,10 +442,9 @@ export default {
   cursor: not-allowed;
 }
 
-/* ✅ 移除舊的 btn-edit 與 btn-delete 樣式 */
-.btn-edit,
-.btn-delete {
-  display: none;
+.icon-button:disabled:hover {
+  transform: none;
+  background: transparent;
 }
 
 @media (max-width: 768px) {
@@ -323,6 +455,23 @@ export default {
   .project-table th,
   .project-table td {
     padding: 8px 4px;
+  }
+
+  .icon-button {
+    padding: 4px 8px;
+    font-size: 12px;
+    min-height: 28px;
+  }
+
+  .icon-button--icon-only {
+    min-width: 28px;
+    min-height: 28px;
+    padding: 6px;
+  }
+
+  .icon--enhanced {
+    width: 14px;
+    height: 14px;
   }
 }
 </style>
