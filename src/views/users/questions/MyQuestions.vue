@@ -42,6 +42,8 @@
 <script>
 import axios from 'axios'
 
+const BASE_URL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
+
 export default {
   name: 'MyQuestions',
   data() {
@@ -57,7 +59,7 @@ export default {
       this.error = null
       try {
         const token = localStorage.getItem('token')
-        const res = await axios.get('/api/v1/projects/my-questions', {
+        const res = await axios.get(`${BASE_URL}/projects/my-questions`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (res.data.status) {

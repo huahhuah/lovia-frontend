@@ -125,6 +125,8 @@
 <script>
 import axios from 'axios'
 
+const BASE_URL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
+
 export default {
   name: 'MySponsorships',
   data() {
@@ -160,7 +162,7 @@ export default {
         this.abortController = new AbortController()
 
         const token = localStorage.getItem('token')
-        const res = await axios.get(`/api/v1/users/orders/mine?timestamp=${Date.now()}`, {
+        const res = await axios.get(`${BASE_URL}/users/orders/mine?timestamp=${Date.now()}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
