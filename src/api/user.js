@@ -1,9 +1,9 @@
 import axios from 'axios'
 
 //base_url
-const BASE_URL = 'https://lovia-backend-xl4e.onrender.com'
+const BASE_URL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
-// ­×§ï°lÂÜª¬ºA
+// ï¿½×§ï¿½lï¿½Üªï¿½ï¿½A
 export const toggleFavorite = (projectId, token) => {
   return axios.patch(`${BASE_URL}/api/v1/users/projects/${projectId}/follow`, null, {
     headers: {
