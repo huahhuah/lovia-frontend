@@ -70,11 +70,12 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/auth'
 import SponsorshipLayout from '@/layouts/SponsorshipLayout.vue'
 
 const route = useRoute()
+const router = useRouter()
 const userStore = useUserStore()
 
 const orderId = route.query.orderId
