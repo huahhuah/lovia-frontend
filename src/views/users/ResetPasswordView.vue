@@ -34,14 +34,14 @@
           </button>
         </form>
       </div>
-    
-    <div v-else class="token-error">
-      <p class="error">連結已過期或無效，請重新申請重設密碼。</p>
-      <router-link to="/forgot-password" class="link-button">重新申請</router-link>
-    </div>
 
-    <p v-if="message" :class="{'success': success, 'error': !success}">{{ message }}</p>
-  </div>
+      <div v-else class="token-error">
+        <p class="error">連結已過期或無效，請重新申請重設密碼。</p>
+        <router-link to="/forgot-password" class="link-button">重新申請</router-link>
+      </div>
+
+      <p v-if="message" :class="{ success: success, error: !success }">{{ message }}</p>
+    </div>
   </div>
 </template>
 
@@ -59,20 +59,22 @@ export default {
       message: '',
       success: false,
       tokenValid: true,
-      baseUrl: 'https://lovia-backend-xl4e.onrender.com/api/v1/users'
+      baseUrl: 'https://lovia-backend-xl4e.onrender.com/api/v1/users',
     }
   },
   computed: {
     isFormValid() {
-      return this.password.length >= 8 &&
-             this.confirmPassword.length >= 8 &&
-             this.password === this.confirmPassword &&
-             this.isPasswordValid
+      return (
+        this.password.length >= 8 &&
+        this.confirmPassword.length >= 8 &&
+        this.password === this.confirmPassword &&
+        this.isPasswordValid
+      )
     },
     isPasswordValid() {
       const passwordPattern = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,16}/
       return passwordPattern.test(this.password)
-    }
+    },
   },
   mounted() {
     // 檢查 token 是否存在
@@ -102,7 +104,7 @@ export default {
 
       try {
         const res = await axios.post(`${this.baseUrl}/reset-password/${this.token}`, {
-          password: this.password
+          password: this.password,
         })
 
         this.message = res.data.message || '密碼已更新，請重新登入'
@@ -112,7 +114,6 @@ export default {
         setTimeout(() => {
           this.$router.push('/login')
         }, 3000)
-
       } catch (err) {
         console.error('重設密碼錯誤:', err)
 
@@ -125,8 +126,8 @@ export default {
       } finally {
         this.loading = false
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -183,7 +184,7 @@ p {
 
 .form-group input:focus {
   outline: none;
-  border-color: #FC5B53;
+  border-color: #fc5b53;
   box-shadow: 0 0 0 2px rgba(252, 91, 83, 0.25);
 }
 
@@ -197,7 +198,7 @@ p {
 button {
   width: 100%;
   padding: 0.75rem;
-  background-color: #FC5B53;
+  background-color: #fc5b53;
   color: white;
   border: none;
   border-radius: 2rem;

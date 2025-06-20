@@ -94,7 +94,7 @@ import router from '@/router'
 import defaultAvatar from '@/assets/images/default-avatar.png'
 import { useUserStore } from '@/stores/auth'
 
-const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
+const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 const userStore = useUserStore()
 const form = reactive({ username: '', phone: '', avatar_url: '', birthday: '', gender: '' })
 const isLoading = ref(true)
@@ -153,7 +153,7 @@ async function onImageChange(event) {
     formData.append('file', file)
     formData.append('type', 'avatar')
 
-    const res = await axios.post(`${baseUrl}/api/v1/uploads/image`, formData, {
+    const res = await axios.post(`${baseUrl}/uploads/image`, formData, {
       headers: {
         Authorization: `Bearer ${userStore.token}`,
         'Content-Type': 'multipart/form-data',
@@ -196,7 +196,7 @@ function convertGender(gender) {
 
 async function fetchUserProfile() {
   try {
-    const res = await axios.get(`${baseUrl}/api/v1/users/profile`, {
+    const res = await axios.get(`${baseUrl}/users/profile`, {
       headers: { Authorization: `Bearer ${userStore.token}` },
     })
     const user = res.data.user
@@ -264,7 +264,7 @@ async function submitForm() {
 
   try {
     isSubmitting.value = true
-    const response = await axios.patch(`${baseUrl}/api/v1/users/profile`, payload, {
+    const response = await axios.patch(`${baseUrl}/users/profile`, payload, {
       headers: { Authorization: `Bearer ${userStore.token}` },
     })
 

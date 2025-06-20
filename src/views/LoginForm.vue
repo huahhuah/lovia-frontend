@@ -117,7 +117,7 @@ import { Toast } from 'bootstrap'
 
 const router = useRouter()
 const userStore = useUserStore()
-const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
+const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
 const form = reactive({
   email: '',
@@ -143,7 +143,7 @@ onMounted(async () => {
 
   if (code) {
     try {
-      const res = await axios.post(`${baseUrl}/api/v1/auth/google`, { code })
+      const res = await axios.post(`${baseUrl}/auth/google`, { code })
       const { token, users: user } = res.data.data
 
       userStore.setToken(token)
@@ -179,7 +179,7 @@ async function handleLogin() {
   }
 
   try {
-    const res = await axios.post(`${baseUrl}/api/v1/users/signin`, payload)
+    const res = await axios.post(`${baseUrl}/users/signin`, payload)
     const { token, users: user } = res.data.data
 
     if (!token || typeof token !== 'string') throw new Error('回傳 token 格式錯誤')

@@ -1,10 +1,7 @@
 <template>
   <div class="edit-wrapper py-5">
     <div class="container d-flex justify-content-center">
-      <div
-        class="card p-4 rounded-4 shadow"
-        style="width: 100%; max-width: 480px"
-      >
+      <div class="card p-4 rounded-4 shadow" style="width: 100%; max-width: 480px">
         <h5 class="fw-bold mb-4 text-center">修改密碼</h5>
 
         <form @submit.prevent="submitForm" novalidate>
@@ -54,9 +51,7 @@
               tabindex="0"
               aria-label="切換新密碼顯示"
             ></i>
-            <div class="invalid-feedback">
-              密碼需包含英文大小寫及數字，長度 8~16 字
-            </div>
+            <div class="invalid-feedback">密碼需包含英文大小寫及數字，長度 8~16 字</div>
           </div>
 
           <!-- 確認新密碼 -->
@@ -69,7 +64,10 @@
               class="form-control"
               :class="{
                 'is-invalid': submitted && form.newPasswordConfirm !== form.newPassword,
-                'is-valid': submitted && form.newPasswordConfirm === form.newPassword && form.newPasswordConfirm !== '',
+                'is-valid':
+                  submitted &&
+                  form.newPasswordConfirm === form.newPassword &&
+                  form.newPasswordConfirm !== '',
               }"
               required
               autocomplete="new-password"
@@ -89,7 +87,7 @@
               type="submit"
               class="btn w-100 text-white fw-bold rounded-pill"
               :disabled="isSubmitting"
-              style="background-color: #FC5B53"
+              style="background-color: #fc5b53"
             >
               <span
                 v-if="isSubmitting"
@@ -115,10 +113,18 @@
       <div class="modal-dialog modal-dialog-centered">
         <div :class="`modal-content border-${modalType === 'success' ? 'success' : 'danger'}`">
           <div class="modal-header">
-            <h5 class="modal-title" :class="modalType === 'success' ? 'text-success' : 'text-danger'">
+            <h5
+              class="modal-title"
+              :class="modalType === 'success' ? 'text-success' : 'text-danger'"
+            >
               提示
             </h5>
-            <button type="button" class="btn-close" @click="modalInstance.hide()" aria-label="Close"></button>
+            <button
+              type="button"
+              class="btn-close"
+              @click="modalInstance.hide()"
+              aria-label="Close"
+            ></button>
           </div>
           <div class="modal-body">{{ modalMessage }}</div>
         </div>
@@ -133,7 +139,7 @@ import axios from 'axios'
 import { Modal } from 'bootstrap'
 import { useUserStore } from '@/stores/auth'
 
-const baseUrl = 'https://lovia-backend-xl4e.onrender.com' 
+const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 const userStore = useUserStore()
 
 const form = reactive({
@@ -196,7 +202,7 @@ async function submitForm() {
       throw new Error('找不到使用者ID，請重新登入')
     }
 
-    const url = `${baseUrl}/api/v1/users/${userId}/password`
+    const url = `${baseUrl}/users/${userId}/password`
     const payload = {
       currentPassword: form.currentPassword,
       newPassword: form.newPassword,
@@ -229,7 +235,7 @@ onMounted(() => {
 
 <style scoped>
 .card {
-  background-color: #FFF9F5;
+  background-color: #fff9f5;
   border: none;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); /* 可留可不留，陰影柔化效果 */
 }

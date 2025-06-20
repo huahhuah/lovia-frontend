@@ -70,7 +70,7 @@ import { ref, onMounted, watchEffect } from 'vue'
 import { useUserStore } from '@/stores/auth'
 import axios from 'axios'
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
+const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
 const props = defineProps({
   project: { type: Object, required: true },
