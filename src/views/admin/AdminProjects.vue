@@ -21,15 +21,15 @@
           <td><button @click="viewDetails(project)">🔍</button></td>
           <td>
             <select 
-              v-model="project.status_id" 
-              :class="statusClass(project.status_id)" 
+              v-model="project.status" 
+              :class="statusClass(project.status)" 
               @change="onStatusChange(project)"
             >
               <option :value=1>審查中</option>
               <option :value=2>提案通過</option>
               <option :value=3>提案退回</option>
             </select>
-            <div v-if="project.status_id === 3" style="margin-top: 4px;">
+            <div v-if="project.status === 3" style="margin-top: 4px;">
               <input 
                 type="text" 
                 v-model="project.reason" 
@@ -123,7 +123,7 @@ async function getAllProjects( page = 1){
 
     projects.value = result.data.map(project => ({
       ...project,
-      status_id: typeof project.projectStatus?.id === 'number' ? project.projectStatus.id : 1,
+      status: project.status?.id || 1,
       reason: ''
     }))
     totalPages.value = result.pagination.totalPages
@@ -153,7 +153,7 @@ const changePage = (page) =>{
   }
 }
 function onStatusChange(project) {
-  if (project.status_id === 3 && !project.reason){
+  if (project.status === 3 && !project.reason){
     project.reason = ''
   }
 }
@@ -172,10 +172,10 @@ function statusClass(status) {
 
 async function submitAllUpdates() {
   const token = userStore.token
-
+  console.log('submitAllUpdates 被觸發')
   try {
     for (const project of projects.value) {
-      const status = project.status_id
+      const status = project.status
       if (![2,3].includes(status)) {
         continue // 只送出通過或退回
       }
@@ -200,6 +200,7 @@ async function submitAllUpdates() {
     }
     alert('所有狀態已更新')
     await getAllProjects(currentPage.value)  // 更新完重新載入列表
+    console.log('重新載入專案列表:',projects.value);
   } catch (error) {
     console.error('更新失敗', error)
     alert('更新失敗，請稍後再試')
