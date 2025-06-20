@@ -138,13 +138,13 @@ onMounted(async () => {
     return
   }
 
+  loading.value = true
+  error.value = ''
+  retryCount = 0
   await fetchResult()
 })
 
 async function fetchResult() {
-  loading.value = true
-  error.value = ''
-
   try {
     const res = await fetch(
       `https://lovia-backend-xl4e.onrender.com/api/v1/users/sponsorships/${orderId}/result`,
@@ -158,12 +158,16 @@ async function fetchResult() {
     const json = await res.json()
     const data = json.data
 
-    if (!json.status || !data) throw new Error(json.message || '查無資料')
+    if (!json.status || !data) {
+      throw new Error(json.message || '查無資料')
+    }
 
     const methodMap = {
       LINE_PAY: 'LINE Pay',
       ATM: '綠界 ATM',
       Credit: '綠界信用卡',
+      Credit_CreditCard: '綠界信用卡',
+      WebATM: '綠界 WebATM',
     }
 
     result.value = {
@@ -185,15 +189,18 @@ async function fetchResult() {
 
     console.log(` [第 ${retryCount + 1} 次] 訂單狀態: ${data.status}`)
 
-    // 若還未付款，自動再嘗試
-    if (data.status !== 'paid' && retryCount < maxRetries) {
+    if (data.status === 'paid') {
+      loading.value = false
+    } else if (data.status !== 'paid' && retryCount < maxRetries) {
       retryCount++
-      setTimeout(fetchResult, 5000) // 每 5 秒輪詢
+      setTimeout(fetchResult, 5000)
+    } else {
+      loading.value = false
+      error.value = '查詢逾時，請稍後再試'
     }
   } catch (err) {
     console.error(' 查詢付款結果失敗:', err)
     error.value = err.message || '查詢付款結果失敗'
-  } finally {
     loading.value = false
   }
 }
