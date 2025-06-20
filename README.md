@@ -66,7 +66,7 @@ src/
 後端伺服器（請依照實際後端環境修改 baseUrl）：
 
 ```js
-const baseUrl = 'https://lovia-backend-xl4e.onrender.com'
+const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 ```
 
 使用 axios 串接並附上 JWT token：

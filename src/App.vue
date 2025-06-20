@@ -7,8 +7,7 @@ import { onMounted } from 'vue'
 import axios from 'axios'
 
 const userStore = useUserStore()
-const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
-
+const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 onMounted(async () => {
   // 儲存過的 token/user 還原
   userStore.restore()

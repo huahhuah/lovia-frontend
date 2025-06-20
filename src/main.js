@@ -27,7 +27,7 @@ app.use(VueAxios, axios)
 const userStore = useUserStore()
 userStore.restore()
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
+const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
 if (userStore.token) {
   axios

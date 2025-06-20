@@ -189,7 +189,7 @@ async function submitPayment() {
 
     const productName = planName.slice(0, 100)
 
-    const baseURL = import.meta.env.VITE_API_BASE_URL
+    const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
     const payload = { amount, email, payment_type: paymentType, productName }
 

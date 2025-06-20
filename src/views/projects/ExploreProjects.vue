@@ -115,7 +115,7 @@ const searchKeyword = ref(route.query.keyword || '')
 const selectedCategory = ref(route.query.category || '')
 const currentPage = ref(Number(route.query.page) || 1)
 const currentFilter = ref(route.query.filter || 'all')
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'
+const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
 const projects = ref([])
 const categories = ref([])
