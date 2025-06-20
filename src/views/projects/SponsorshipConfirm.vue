@@ -1,72 +1,74 @@
 <template>
   <SponsorshipLayout>
-  <div class="container py-5 sponsorship-bg">
-    <div v-if="project && selectedPlan" class="narrow-wrapper mx-auto">
-      <!-- 標題與金額 -->
-      <div class="mb-4 text-center text-md-start">
-        <h3 class="fw-bold">贊助專案名稱：{{ project.title }}</h3>
-        <p class="fs-5 mt-2">方案金額 NT$ {{ selectedPlan.amount }}</p>
-        <hr class="custom-hr" />
-      </div>
-
-      <div class="row">
-        <!-- 左側內容 -->
-        <div class="col-lg-8 mb-4 mb-lg-0">
-          <section class="mb-4">
-            <h6 class="fw-bold">🎁 理念支持回饋品</h6>
-            <p class="text-muted">{{ selectedPlan.feedback }}</p>
-            <img
-              :src="imgSrc"
-              @error="onImageError"
-              class="img-fluid mb-3"
-              style="max-width: 300px"
-            />
-          </section>
-
-          <section class="mb-3">
-            <label class="form-label fw-bold">列名感謝顯示名稱</label>
-            <input v-model="donorName" class="form-control" placeholder="請輸入希望公開的名稱" />
-          </section>
-
-          <section>
-            <label class="form-label fw-bold">備註</label>
-            <textarea
-              v-model="note"
-              class="form-control"
-              rows="4"
-              placeholder="如有特殊需求請填寫"
-            ></textarea>
-          </section>
+    <div class="container py-5 sponsorship-bg">
+      <div v-if="project && selectedPlan" class="narrow-wrapper mx-auto">
+        <!-- 標題與金額 -->
+        <div class="mb-4 text-center text-md-start">
+          <h3 class="fw-bold">贊助專案名稱：{{ project.title }}</h3>
+          <p class="fs-5 mt-2">方案金額 NT$ {{ selectedPlan.amount }}</p>
+          <hr class="custom-hr" />
         </div>
 
-        <!-- 右側卡片 -->
-        <div class="col-lg-4">
-          <div class="sponsor-card p-4 shadow-sm">
-            <p class="mb-1 fw-bold">方案金額：NT$ {{ selectedPlan.amount }}</p>
+        <div class="row">
+          <!-- 左側內容 -->
+          <div class="col-lg-8 mb-4 mb-lg-0">
+            <section class="mb-4">
+              <h6 class="fw-bold">🎁 理念支持回饋品</h6>
+              <p class="text-muted">{{ selectedPlan.feedback }}</p>
+              <img
+                :src="imgSrc"
+                @error="onImageError"
+                class="img-fluid mb-3"
+                style="max-width: 300px"
+              />
+            </section>
 
-            <label class="form-label fw-bold mt-2">額外贊助金額（可輸入加碼）</label>
-            <input
-              type="number"
-              min="0"
-              step="1"
-              v-model.number="extraAmount"
-              class="form-control"
-              :readonly="isLongTerm"
-              placeholder="例如：NT$100"
-            />
+            <section class="mb-3">
+              <label class="form-label fw-bold">列名感謝顯示名稱</label>
+              <input v-model="donorName" class="form-control" placeholder="請輸入希望公開的名稱" />
+            </section>
 
-            <div class="text-end mt-3 fs-5 fw-bold">總金額 NT$ {{ totalAmount }}</div>
+            <section>
+              <label class="form-label fw-bold">備註</label>
+              <textarea
+                v-model="note"
+                class="form-control"
+                rows="4"
+                placeholder="如有特殊需求請填寫"
+              ></textarea>
+            </section>
+          </div>
 
-            <button class="btn btn-primary w-100 mt-3" @click="confirmSponsorship">
-              確認贊助
-            </button>
+          <!-- 右側 -->
+          <div class="col-lg-4">
+            <div class="border rounded-4 p-4 shadow-sm">
+              <p class="mb-1 fw-bold">方案金額：NT$ {{ formattedBaseAmount }}</p>
 
-            <p class="text-muted mt-3 small">備註：「確認贊助」即代表您同意平台付款條款。</p>
+              <label class="form-label fw-bold mt-2">額外贊助金額（可輸入加碼）</label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                v-model.number="extraAmount"
+                class="form-control"
+                :readonly="isLongTerm"
+                placeholder="例如：100"
+              />
+
+              <p class="mt-2">額外贊助：NT$ {{ formattedExtraAmount }}</p>
+
+              <div class="text-end mt-3 fs-5 fw-bold">總金額 NT$ {{ formattedTotalAmount }}</div>
+
+              <button class="btn btn-primary w-100 mt-3" @click="confirmSponsorship">
+                確認贊助
+              </button>
+
+              <p class="text-muted mt-3 small">備註：「確認贊助」即代表您同意平台付款條款。</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
   </SponsorshipLayout>
 </template>
 
@@ -94,9 +96,18 @@ const imgSrc = ref(defaultImg)
 const isLongTerm = ref(false)
 
 const extraAmount = ref(0)
+
+//計算總金額
 const totalAmount = computed(() =>
   selectedPlan.value ? selectedPlan.value.amount + extraAmount.value : 0
 )
+
+// 千分位格式化金額
+const formattedBaseAmount = computed(() =>
+  selectedPlan.value ? selectedPlan.value.amount.toLocaleString() : '0'
+)
+const formattedExtraAmount = computed(() => extraAmount.value.toLocaleString())
+const formattedTotalAmount = computed(() => totalAmount.value.toLocaleString())
 
 const onImageError = () => {
   imgSrc.value = defaultImg
@@ -217,7 +228,6 @@ async function confirmSponsorship() {
 </script>
 
 <style>
-
 .btn.btn-primary {
   background-color: #fc5b53 !important;
   border-color: #fc5b53 !important;

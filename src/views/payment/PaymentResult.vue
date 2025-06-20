@@ -105,6 +105,13 @@ const maskedEmail = computed(() => {
 })
 
 onMounted(async () => {
+  // 清除網址上的 method 與 transactionId 避免錯誤
+  if (route.query.method || route.query.transactionId) {
+    const cleanQuery = { orderId: route.query.orderId }
+    router.replace({ path: '/checkout/result', query: cleanQuery })
+    return // 不繼續執行下面的 fetch，等跳轉後重新執行
+  }
+  // 還原 token（避免 LINE Pay 回來變成未登入）
   const storedToken = sessionStorage.getItem('token') || localStorage.getItem('token')
   if (storedToken && !userStore.token) {
     userStore.setToken(storedToken)
@@ -152,11 +159,17 @@ async function fetchResult() {
 
     if (!json.status || !data) throw new Error(json.message || '查無資料')
 
+    const methodMap = {
+      LINE_PAY: 'LINE Pay',
+      ATM: '綠界 ATM',
+      Credit: '綠界信用卡',
+    }
+
     result.value = {
       transactionId: data.order_uuid,
       amount: data.amount,
       paidAt: data.paid_at,
-      paymentMethod: data.payment_method || '綠界 / LINE Pay',
+      paymentMethod: methodMap[data.payment_method] || '未知方式',
       display_name: data.display_name || '匿名',
       email: data.email || '',
       recipient: data.shipping?.name || '',

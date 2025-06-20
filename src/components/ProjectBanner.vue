@@ -23,15 +23,15 @@
     <div class="info-area d-flex flex-column justify-content-between ms-lg-4 col-12 col-lg-4">
       <!-- 上：標題／團隊／簡介 -->
       <div class="info-area-top">
-       <div class="d-flex justify-content-between align-items-start mb-2">
-         <h5 class="fw-bold mb-0">{{ project?.title || '未命名提案' }}</h5>
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h5 class="fw-bold mb-0">{{ project?.title || '未命名提案' }}</h5>
 
-         <!-- 手機版收藏按鈕 -->
-         <button
-          class="border-0 bg-transparent rounded-circle d-lg-none ms-2"
-          @click="handleToggleFavorite"
-          :style="{ backgroundColor: isFavorited ? '#ffe6e9' : '#fff0f2' }"
-         >
+          <!-- 手機版收藏按鈕 -->
+          <button
+            class="border-0 bg-transparent rounded-circle d-lg-none ms-2"
+            @click="handleToggleFavorite"
+            :style="{ backgroundColor: isFavorited ? '#ffe6e9' : '#fff0f2' }"
+          >
             <img :src="favoriteIcon" alt="收藏" style="width: 38px; height: 38px" />
           </button>
         </div>
@@ -54,18 +54,19 @@
           <div class="d-flex align-items-center gap-1">
             <img src="@/assets/icons/vector.svg" alt="時鐘" style="width: 16px" />
             <span class="fw-bold text-dark">
-              倒數 <span style="color: #FD7269" class="fw-bold">{{ remainingDays }}</span> 天
+              倒數 <span style="color: #fd7269" class="fw-bold">{{ remainingDays }}</span> 天
             </span>
           </div>
 
           <div class="d-flex align-items-center gap-1">
             <img src="@/assets/icons/group.svg" alt="人" style="width: 16px" />
             <span class="fw-bold text-dark">
-              <span style="color: #FD7269" class="fw-bold">{{ project?.supporters ?? 0 }}</span> 人已贊助
+              <span style="color: #fd7269" class="fw-bold">{{ project?.supporters ?? 0 }}</span>
+              人已贊助
             </span>
           </div>
 
-          <span class="ms-auto fw-bold" style="color: #FD7269">
+          <span class="ms-auto fw-bold" style="color: #fd7269">
             {{ project?.progress_percent ?? 0 }}%
           </span>
         </div>
@@ -73,10 +74,11 @@
         <div class="progress rounded-pill mb-2" style="height: 8px">
           <div
             class="progress-bar"
-            :style="{ width: (project?.progress_percent ?? 0) + '%',
-            backgroundImage: 'linear-gradient(to right, #fc7c9d, #ffc443)'
-          }"
-         ></div>
+            :style="{
+              width: (project?.progress_percent ?? 0) + '%',
+              backgroundImage: 'linear-gradient(to right, #fc7c9d, #ffc443)',
+            }"
+          ></div>
         </div>
 
         <p class="fw-bold fs-5 text-dark mb-1">
@@ -100,9 +102,9 @@
           募資期間：{{ formatDate(project?.start_time) }} ~ {{ formatDate(project?.end_time) }}
         </p>
 
-        <div 
-        class="d-none d-lg-flex align-items-center gap-2 mt-2"
-        :class="{ 'justify-content-end': isMobile }"
+        <div
+          class="d-none d-lg-flex align-items-center gap-2 mt-2"
+          :class="{ 'justify-content-end': isMobile }"
         >
           <button
             class="border-0 bg-transparent rounded-circle p-2"
@@ -115,7 +117,7 @@
           <button
             v-if="!isMobile"
             class="btn rounded-pill flex-grow-1 py-2 fw-bold shadow-sm text-white"
-            style="background-color: #FC5B53"
+            style="background-color: #fc5b53"
             @click="$emit('scrollToSponsor')"
           >
             立刻贊助 >>
@@ -137,7 +139,7 @@
 
       <button
         class="btn rounded-pill flex-grow-1 py-2 fw-bold shadow-sm text-white"
-        style="background-color: #FC5B53"
+        style="background-color: #fc5b53"
         @click="$emit('scrollToSponsor')"
       >
         立刻贊助 >>
@@ -147,28 +149,38 @@
 </template>
 
 <script setup>
-import { ref, computed, watchEffect } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { toggleFavorite as toggleFavoriteAPI } from '@/api/user'
 import { useRoute } from 'vue-router'
+import { useUserStore } from '@/stores/auth'
 
 const emit = defineEmits(['scrollToSponsor'])
 const route = useRoute()
 const props = defineProps({
   project: Object,
 })
-const imgSrc = ref('')
+
+const userStore = useUserStore()
+
+const imgSrc = ref('/images/default.jpg')
 const isFavorited = ref(false)
 
-watchEffect(() => {
-  imgSrc.value = props.project?.cover || '/images/default.jpg'
-  isFavorited.value = !!props.project?.follow
-})
+// 改為 watch，避免 props.project 初始為 undefined 時誤觸
+watch(
+  () => props.project,
+  (project) => {
+    if (project) {
+      imgSrc.value = project.cover || '/images/default.jpg'
+      isFavorited.value = !!project.follow
+    }
+  },
+  { immediate: true }
+)
 
 function onImageError(e) {
   e.target.src = '/images/default.jpg'
 }
 
-// 收藏邏輯
 const projectId = parseInt(route.params.id)
 
 const favoriteIcon = computed(() =>
@@ -214,7 +226,7 @@ const isMobile = window.innerWidth < 992
 
 <style>
 .project-banner {
-  margin-top: -40px; 
+  margin-top: -40px;
 }
 
 .project-banner-img {
@@ -271,7 +283,7 @@ const isMobile = window.innerWidth < 992
     padding-top: 0.5rem;
     margin-top: 0;
     padding-bottom: 0.5rem !important; /* ✅ 保留按鈕空間但不太大 */
-    margin-bottom: 0 !important;     /* ✅ 去掉與下方的空白 */
+    margin-bottom: 0 !important; /* ✅ 去掉與下方的空白 */
   }
 
   .progress {
@@ -307,9 +319,8 @@ const isMobile = window.innerWidth < 992
   bottom: 0;
   left: 0;
   width: 100%;
-  background-image: linear-gradient(to right, #FFEDF2, #FFF6E3);
+  background-image: linear-gradient(to right, #ffedf2, #fff6e3);
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
   z-index: 999;
 }
-
 </style>

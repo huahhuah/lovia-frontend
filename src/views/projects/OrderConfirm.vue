@@ -15,7 +15,7 @@
                 <input type="text" class="form-control" :value="orderData.amount" disabled />
               </div>
               <div class="col-md-6">
-                <label class="form-label">贊助人資料</label>
+                <label class="form-label">會員名稱</label>
                 <input type="text" class="form-control" :value="orderData.name" disabled />
               </div>
               <div class="col-md-6">
@@ -38,7 +38,7 @@
               </div>
               <div class="col-md-6">
                 <label class="form-label">郵遞區號</label>
-                <input type="text" class="form-control" :value="orderData.zipcode || '未提供'" />
+                <input type="text" class="form-control" :value="orderData.zipcode" disabled />
               </div>
               <div class="col-md-6">
                 <label class="form-label">地址</label>
