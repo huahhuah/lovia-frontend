@@ -1,6 +1,7 @@
 <template>
   <SponsorshipLayout>
     <div class="container py-5">
+      <div class="narrow-wrapper">
       <div class="row">
         <div class="col-lg-8">
           <section class="mb-5">
@@ -85,6 +86,7 @@
           </div>
         </div>
       </div>
+    </div>
     </div>
   </SponsorshipLayout>
 </template>
@@ -254,5 +256,33 @@ async function handleEcpayPayment(payload, token, url) {
   border-radius: 1rem;
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #eee;
+}
+.narrow-wrapper {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.btn.btn-primary {
+  background-color: #fc5b53 !important;
+  border-color: #fc5b53 !important;
+  color: white !important;
+  border-radius: 50px !important;
+  font-weight: bold;
+}
+
+.btn.btn-primary:hover {
+  background-color: #e0433b !important;
+  border-color: #e0433b !important;
+  color: white !important;
+}
+
+.btn.btn-primary:disabled {
+  background-color: #fc5b53 !important;
+  border-color: #fc5b53 !important;
+  opacity: 0.65;
+  border-radius: 50px !important;
 }
 </style>
