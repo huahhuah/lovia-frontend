@@ -1,7 +1,7 @@
 <template>
   <div
     class="plan-card rounded-4 px-2 py-4 mb-4 shadow-sm border"
-    :class="{ 'opacity-50': projectType === '歷年專案' }"
+    :class="{ 'opacity-50': type === '歷年專案' }"
   >
     <!-- 標題 -->
     <h6 class="fw-bold mb-2 text-dark">{{ plan.plan_name }}</h6>
@@ -42,11 +42,15 @@
       class="btn w-100 mt-3 fw-bold rounded-pill py-2 text-white"
       style="background-color: #fc5b53"
       @click="handleSponsor"
-      :disabled="projectType === '歷年專案'"
-      :title="projectType === '歷年專案' ? '此為歷年專案，無法再贊助' : '立即贊助此方案'"
+      :disabled="type === '歷年專案'"
+      :title="type === '歷年專案' ? '此為歷年專案，無法再贊助' : '立即贊助此方案'"
     >
-      {{ projectType === '歷年專案' ? '無法贊助' : '立即贊助 >' }}
+      {{ type === '歷年專案' ? '無法贊助' : '立即贊助 >' }}
     </button>
+    <!-- 額外提示 -->
+    <p v-if="type === '歷年專案'" class="mt-2 text-center text-muted small">
+      此為歷年專案，僅供瀏覽，無法再贊助
+    </p>
   </div>
 </template>
 
@@ -63,6 +67,9 @@ const props = defineProps({
   projectType: String,
 })
 
+//  預設為「募資中」避免空字串造成誤判
+const type = props.projectType?.trim?.() || '募資中'
+
 const imgSrc = ref(defaultImg)
 
 onMounted(() => {
@@ -73,6 +80,13 @@ onMounted(() => {
 })
 
 function handleSponsor() {
+  //  僅當 type === '歷年專案' 時擋下
+  if (type === '歷年專案') {
+    console.warn(' 無法贊助：該專案為歷年專案', type)
+    alert('此為歷年專案，無法贊助')
+    return
+  }
+
   const numericProjectId = Number(props.projectId)
   const planId = Number(props.plan.plan_id)
 
@@ -98,7 +112,11 @@ function handleSponsor() {
   background-color: transparent;
   border: 1px solid #fd7269 !important; /*  強制紅色外框 */
 }
-.plan-card.opacity-50 {
+.plan-card.opacity-50 .btn {
   pointer-events: none;
+}
+button:disabled {
+  pointer-events: none;
+  cursor: not-allowed;
 }
 </style>
