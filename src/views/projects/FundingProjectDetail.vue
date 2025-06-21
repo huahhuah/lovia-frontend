@@ -26,12 +26,13 @@
           <div v-if="activeTab === '專案介紹'" class="project-content-box p-4 rounded-4 shadow-sm">
             <div
               class="text-muted project-description mb-4"
-              :class="{ collapsed: !isContentExpanded }"
+              :class="{ collapsed: !isContentExpanded && isMobile }"
               style="white-space: pre-line"
             >
               {{ project.full_content || '尚無提案內容。' }}
             </div>
 
+            <!-- 手機版展開/收起按鈕 -->
             <div class="text-center mt-3 d-lg-none">
               <div class="divider-with-button">
                 <hr class="dashed-line" />
@@ -147,6 +148,7 @@ const plans = ref([])
 const activeTab = ref('專案介紹')
 const tabs = ['專案介紹', '問與答', '常見問題', '進度分享']
 const isContentExpanded = ref(false)
+const isMobile = ref(false)
 const faqs = ref([])
 const progresses = ref([])
 
@@ -188,6 +190,7 @@ async function loadData() {
 }
 
 onMounted(() => {
+  isMobile.value = window.innerWidth <= 991
   loadData()
 })
 </script>
