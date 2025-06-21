@@ -15,7 +15,7 @@
         <div class="empty-icon">💝</div>
         <h3>還沒有贊助紀錄</h3>
         <p>開始探索精彩專案，成為第一個支持者！</p>
-        <button class="explore-button" @click="$router.push('/projects')">探索專案</button>
+        <button class="explore-button" @click="goToExploreProjects">探索專案</button>
       </div>
 
       <!-- 贊助卡片列表 -->
@@ -26,25 +26,11 @@
           class="sponsorship-card"
           @click="goToProject(item.project?.id)"
         >
-          <!-- 專案封面 -->
-          <div class="card-image-container">
-            <img
-              v-if="item.project?.cover"
-              class="project-img"
-              :src="item.project.cover"
-              :alt="item.project?.title || '專案封面'"
-              @error="handleImageError"
-            />
-            <div v-else class="project-img-placeholder">
-              <span>📋</span>
-            </div>
-
-            <!-- 狀態標籤 -->
-            <div class="status-overlay">
-              <span :class="['status-badge', `status-${item.status}`]">
-                {{ getStatusText(item.status) }}
-              </span>
-            </div>
+          <!-- 專案狀態標籤 -->
+          <div class="status-overlay" style="margin-bottom: 8px;">
+            <span :class="['status-badge', `status-${item.status}`]">
+              {{ getStatusText(item.status) }}
+            </span>
           </div>
 
           <!-- 專案資訊 -->
@@ -92,9 +78,6 @@
                 @click.stop="viewProjectDetails(item.project?.id)"
               >
                 查看專案
-              </button>
-              <button class="action-button secondary" @click.stop="viewSponsorshipDetails(item.id)">
-                贊助詳情
               </button>
             </div>
           </div>
@@ -234,13 +217,12 @@ export default {
 
     viewProjectDetails(projectId) {
       if (projectId) {
-        this.$router.push(`/projects/${projectId}`)
+        this.$router.push(`/projects/funding/${projectId}`)
       }
     },
 
-    viewSponsorshipDetails(sponsorshipId) {
-      // 實現查看贊助詳情的邏輯
-      console.log('查看贊助詳情:', sponsorshipId)
+    goToExploreProjects() {
+      window.location.href = 'https://lovia-frontend.vercel.app/projects/explore-projects'
     },
   },
 
