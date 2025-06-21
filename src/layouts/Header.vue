@@ -91,7 +91,7 @@
                   </ul>
                 </li>
                 <li v-else>
-                  <router-link to="/orders" class="dropdown-item">我的贊助</router-link>
+                  <router-link to="/user/sponsorships" class="dropdown-item">我的贊助</router-link>
                 </li>
 
                 <!-- 專案提問 -->
@@ -109,7 +109,7 @@
                   </ul>
                 </li>
                 <li v-else>
-                  <router-link to="/questions" class="dropdown-item">我的提問</router-link>
+                  <router-link to="/user/questions" class="dropdown-item">我的提問</router-link>
                 </li>
               </template>
 
