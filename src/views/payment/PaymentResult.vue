@@ -19,7 +19,7 @@
       <div v-else>
         <!-- ATM 未付款提示 -->
         <div
-          v-if="result.paymentMethod === 'ATM' && result.status !== 'paid'"
+          v-if="result.paymentMethod === '綠界 ATM' && result.status !== 'paid'"
           class="bg-warning bg-opacity-25 p-4 text-center mb-4 border rounded"
         >
           <h4 class="fw-bold text-warning mb-3">⚠️ 此筆交易尚未完成付款</h4>
@@ -61,7 +61,7 @@
 
         <div class="text-center mt-5">
           <router-link to="/" class="btn btn-outline-secondary me-2">返回首頁</router-link>
-          <router-link to="/projects/mine" class="btn btn-success">查看我的贊助</router-link>
+          <router-link to="/user/sponsorships" class="btn btn-success">查看我的贊助</router-link>
         </div>
       </div>
     </div>
@@ -106,26 +106,21 @@ const maskedEmail = computed(() => {
 })
 
 let retryCount = 0
-const maxRetries = 6 // 最多輪詢 6 次（每 5 秒）
+const maxRetries = 6
 
 onMounted(async () => {
   if (route.query.method || route.query.transactionId) {
-    const cleanQuery = { orderId: route.query.orderId }
-    router.replace({ path: '/checkout/result', query: cleanQuery })
+    router.replace({ path: '/checkout/result', query: { orderId } })
     return
   }
 
   const storedToken = sessionStorage.getItem('token') || localStorage.getItem('token')
   if (storedToken && !userStore.token) {
     userStore.setToken(storedToken)
-    console.log(' token 已還原至 userStore')
+    console.log('🔑 token 還原至 userStore')
   }
 
-  // 強制補 token.value，避免 userStore.token 還沒設好
   token.value = userStore.token || storedToken || ''
-  console.log(' token:', token.value)
-  console.log(' orderId:', orderId)
-
   if (!token.value) {
     error.value = '登入憑證不存在，請重新登入'
     loading.value = false
@@ -138,9 +133,6 @@ onMounted(async () => {
     return
   }
 
-  loading.value = true
-  error.value = ''
-  retryCount = 0
   await fetchResult()
 })
 
@@ -154,7 +146,6 @@ async function fetchResult() {
         },
       }
     )
-
     const json = await res.json()
     const data = json.data
 
@@ -187,11 +178,11 @@ async function fetchResult() {
       expire_date: data.expire_date || '',
     }
 
-    console.log(` [第 ${retryCount + 1} 次] 訂單狀態: ${data.status}`)
+    console.log(` 第 ${retryCount + 1} 次輪詢結果：${data.status}`)
 
     if (data.status === 'paid') {
       loading.value = false
-    } else if (data.status !== 'paid' && retryCount < maxRetries) {
+    } else if (retryCount < maxRetries) {
       retryCount++
       setTimeout(fetchResult, 5000)
     } else {

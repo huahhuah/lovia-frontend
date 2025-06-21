@@ -276,7 +276,7 @@ onMounted(() => {
 }
 /* 常見問題 */
 .faq-box {
-  background-color: #FFF9F6;
+  background-color: #fff9f6;
   border-radius: 1rem;
   padding: 20px;
   margin-bottom: 10px;
@@ -337,9 +337,9 @@ onMounted(() => {
 }
 
 .progress-table {
-  background-color: #FFF8F9; /* 淺灰色底 */
-  border-radius: 0.75rem;    /* 四個角圓角 */
-  overflow: hidden;          /* 裁掉超出圓角的線 */
+  background-color: #fff8f9; /* 淺灰色底 */
+  border-radius: 0.75rem; /* 四個角圓角 */
+  overflow: hidden; /* 裁掉超出圓角的線 */
   border-collapse: separate; /* 為了讓 border-radius 生效 */
   border-spacing: 0;
   border: 1px solid #ddd;

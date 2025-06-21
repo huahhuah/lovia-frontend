@@ -59,7 +59,11 @@
 
               <div class="text-end mt-3 fs-5 fw-bold">總金額 NT$ {{ formattedTotalAmount }}</div>
 
-              <button class="btn btn-primary w-100 mt-3" @click="confirmSponsorship">
+              <button
+                class="btn btn-primary w-100 mt-3"
+                @click="confirmSponsorship"
+                :disabled="project?.project_type === '歷年專案'"
+              >
                 確認贊助
               </button>
 
@@ -151,6 +155,11 @@ onMounted(async () => {
 })
 
 async function confirmSponsorship() {
+  if (project.value?.project_type === '歷年專案') {
+    alert('此為歷年專案，無法贊助')
+    return
+  }
+
   if (!authStore.token) {
     alert('請先登入才能贊助')
     router.push('/login')
