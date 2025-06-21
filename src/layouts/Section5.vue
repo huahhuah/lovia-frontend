@@ -19,7 +19,7 @@
               <p>讓你的願景發聲，讓好點子成真！</p>
               <button
                 class="btn btn-dark rounded-pill px-4 py-2"
-                onclick="window.location.href='#/projects/create'"
+                onclick="window.location.href='projects/create'"
               >
                 GO &gt;
               </button>
@@ -39,7 +39,7 @@
               <p>每一份支持，都是實現夢想的起點！</p>
               <button
                 class="btn btn-dark rounded-pill px-4 py-2"
-                onclick="window.location.href='#/projects/explore-projects'"
+                onclick="window.location.href='projects/explore-projects'"
               >
                 GO &gt;
               </button>
