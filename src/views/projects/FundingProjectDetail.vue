@@ -131,12 +131,7 @@ import { useRoute } from 'vue-router'
 import ProjectBanner from '@/components/ProjectBanner.vue'
 import ProjectPlans from '@/components/ProjectPlans.vue'
 import QnaBlock from '@/components/QnaBlock.vue'
-import {
-  getProjectOverview,
-  getProjectPlans,
-  getProjectFaqs,
-  getProjectProgresses,
-} from '@/api/project'
+import { getProjectOverview, getProjectPlans, getProjectFaqs, getProgress } from '@/api/project'
 
 const route = useRoute()
 const projectId = ref(parseInt(route.params.id) || 0)
@@ -177,7 +172,7 @@ async function loadData() {
       getProjectOverview(projectId.value),
       getProjectPlans(projectId.value),
       getProjectFaqs(projectId.value),
-      getProjectProgresses(projectId.value),
+      getProgress(projectId.value),
     ])
 
     project.value = resOverview.data.data || null
