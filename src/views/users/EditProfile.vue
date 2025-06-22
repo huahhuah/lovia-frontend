@@ -83,6 +83,41 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal 放在這裡 -->
+  <div
+    class="modal fade"
+    tabindex="-1"
+    role="dialog"
+    ref="modalRef"
+    aria-labelledby="modalTitle"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content border-0 rounded-4 shadow">
+        <div class="modal-header">
+          <h5
+            class="modal-title"
+            :class="{
+              'text-success': modalType === 'success',
+              'text-danger': modalType === 'danger'
+            }"
+            id="modalTitle"
+          >
+            {{ modalType === 'success' ? '成功' : '錯誤' }}
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>{{ modalMessage }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </template>
 
 <script setup>
@@ -211,14 +246,16 @@ async function fetchUserProfile() {
     if (err.response?.status === 401) {
       showModal('登入已過期，請重新登入')
       setTimeout(() => {
-        userStore.clear()
-        modalInstance.hide()
-        const backdrop = document.querySelector('.modal-backdrop')
-        if (backdrop) backdrop.remove()
-        document.body.classList.remove('modal-open')
-        document.body.style = ''
-        router.push('/login')
-      }, 1500)
+  userStore.clear()
+  if (modalInstance) {
+    modalInstance.hide()
+  }
+  const backdrop = document.querySelector('.modal-backdrop')
+  if (backdrop) backdrop.remove()
+  document.body.classList.remove('modal-open')
+  document.body.style = ''
+  router.push('/login')
+}, 1500)
     } else {
       showModal('載入個人資料失敗')
     }
@@ -263,24 +300,27 @@ async function submitForm() {
   console.log('🔍 PATCH payload：', payload)
 
   try {
-    isSubmitting.value = true
-    const response = await axios.patch(`${baseUrl}/users/profile`, payload, {
-      headers: { Authorization: `Bearer ${userStore.token}` },
-    })
+  isSubmitting.value = true
+  const response = await axios.patch(`${baseUrl}/users/profile`, payload, {
+    headers: { Authorization: `Bearer ${userStore.token}` },
+  })
 
-    showModal('修改成功！', 'success')
-    userStore.setUser(response.data.data.user)
-    setTimeout(() => {
+  showModal('修改成功！', 'success')
+  userStore.setUser(response.data.data.user)
+  setTimeout(() => {
+    if (modalInstance) {
       modalInstance.hide()
       const backdrop = document.querySelector('.modal-backdrop')
       if (backdrop) backdrop.remove()
-    }, 1500)
-  } catch (error) {
-    console.error('修改失敗:', error)
-    showModal(error.response?.data?.message || '修改失敗')
-  } finally {
-    isSubmitting.value = false
-  }
+    }
+  }, 1500)
+} catch (error) {
+  console.error('修改失敗:', error)
+  showModal(error.response?.data?.message || '修改失敗')
+} finally {
+  isSubmitting.value = false
+}
+
 }
 </script>
 
