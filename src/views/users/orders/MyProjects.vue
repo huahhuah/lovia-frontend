@@ -33,6 +33,7 @@
                   </span>
                 </td>
                 <td>{{ project.rewardItem || '無' }}</td>
+              <td class="progress-cell">  
                 <router-link
                   :to="{ name: 'ProgressFormCreate', params: { projectId: project.id } }"
                   class="icon-button icon-button--modern"
@@ -48,6 +49,7 @@
                   </svg>
                   新增進度
                 </router-link>
+              </td>
                 <td class="actions">
                   <!-- 編輯按鈕（用 edit.png） -->
                   <router-link
@@ -265,6 +267,10 @@ export default {
   vertical-align: middle; /* 確保所有內容垂直居中 */
 }
 
+.progress-cell {
+  white-space: nowrap;
+}
+
 .project-table tbody tr:hover {
   background-color: #f8f9fa;
 }
@@ -377,7 +383,8 @@ export default {
 
 .icon-button--modern:hover {
   box-shadow: 0 2px 6px rgba(255, 154, 158, 0.3);
-  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+  background: rgba(95, 99, 104, 1);
+  color: white;
 }
 
 /* 只有圖標的按鈕樣式 */

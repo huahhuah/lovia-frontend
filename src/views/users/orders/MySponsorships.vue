@@ -251,35 +251,16 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   min-height: 100vh;
-  background: linear-gradient(
-    135deg,
-    #ffe4e1 0%,
-    #ffcccb 30%,
-    #ffb6c1 60%,
-    rgba(255, 105, 180, 0) 100%
-  );
 }
 
 .section-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #d5006d;
+  font-size: 16px;
+  font-weight: 400;
+  color: #1a1a1a;
   margin: 0 0 24px 0;
   text-align: left;
   position: relative;
-  padding-left: 16px;
-}
-
-.section-title::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 24px;
-  background: linear-gradient(135deg, #ff1493, #ff69b4);
-  border-radius: 2px;
+  padding-left: 12px;
 }
 
 /* 載入狀態 */
@@ -300,7 +281,7 @@ export default {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(255, 105, 180, 0.2);
-  border-top: 4px solid #ff1493;
+  border-top: 4px solid #FD7269;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 16px;
@@ -316,7 +297,7 @@ export default {
 }
 
 .loading-container p {
-  color: #d5006d;
+  color: #1a1a1a;
   font-size: 16px;
   margin: 0;
   font-weight: 500;
@@ -341,34 +322,34 @@ export default {
 
 .no-sponsorships h3 {
   font-size: 24px;
-  color: #d5006d;
+  color: #1a1a1a;
   margin: 0 0 12px;
   font-weight: 600;
 }
 
 .no-sponsorships p {
-  color: #c71585;
+  color: #1a1a1a;
   font-size: 16px;
   margin: 0 0 32px;
 }
 
 .explore-button {
-  background: linear-gradient(135deg, #ff69b4, #ff1493);
+  background: #FC5B53;
   color: white;
   border: none;
   padding: 14px 32px;
-  border-radius: 16px;
+  border-radius: 50px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
+  box-shadow: 0 6px;
 }
 
 .explore-button:hover {
+  background: #e94a45;
+  box-shadow: 0 6px 20px rgba(252, 91, 83, 0.4);
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(255, 105, 180, 0.5);
-  background: linear-gradient(135deg, #ff1493, #db2777);
 }
 
 /* 贊助卡片網格 */
@@ -393,7 +374,7 @@ export default {
 .sponsorship-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 20px 50px rgba(255, 105, 180, 0.25);
-  border-color: #ff69b4;
+  border-color: #FFB6A7;
 }
 
 /* 圖片容器 */
@@ -417,7 +398,6 @@ export default {
 .project-img-placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #ffe4e1, #ffcccb);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -444,22 +424,22 @@ export default {
 }
 
 .status-paid {
-  background: rgba(76, 175, 80, 0.9); /* 綠色底 */
+  background: rgba(46, 116, 21, 0.5);
   color: white;
 }
 
 .status-pending {
-  background: rgba(255, 182, 193, 0.9);
+  background: rgba(217, 114, 5, 0.5);
   color: white;
 }
 
 .status-completed {
-  background: rgba(255, 20, 147, 0.9);
+  background: rgba(2, 31, 0, 0.5);
   color: white;
 }
 
 .status-cancelled {
-  background: rgba(255, 105, 180, 0.9);
+  background: rgba(194, 34, 34, 0.5);
   color: white;
 }
 
@@ -475,7 +455,7 @@ export default {
 .project-title {
   font-size: 20px;
   font-weight: 700;
-  color: #d5006d;
+  color: #1a1a1a;
   margin: 0 0 8px;
   line-height: 1.3;
   overflow: hidden;
@@ -487,13 +467,12 @@ export default {
 
 .project-category {
   display: inline-block;
-  background: linear-gradient(135deg, #ffe4e1, #ffcccb);
-  color: #d5006d;
+  background: #fc7c9d;
+  color: #fc7c9d;
   padding: 6px 16px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
-  border: 1px solid rgba(255, 105, 180, 0.2);
 }
 
 /* 贊助詳情 */
@@ -510,28 +489,28 @@ export default {
 }
 
 .detail-item.amount-highlight {
-  background: linear-gradient(135deg, #ffe4e1, #ffcccb);
   border-radius: 12px;
+  background-image: linear-gradient(to right, #ffedf2, #fff6e3);
   padding: 16px 20px;
   margin: 0 -8px 16px;
-  border: 1px solid rgba(255, 105, 180, 0.2);
+  border: 1px solid #C4C4C4;
 }
 
 .detail-label {
   font-size: 14px;
-  color: #c71585;
+  color: rgba(95, 99, 104, 1);
   font-weight: 500;
 }
 
 .detail-value {
   font-size: 14px;
-  color: #d5006d;
+  color: #1a1a1a;
   font-weight: 600;
 }
 
 .detail-value.amount {
   font-size: 20px;
-  color: #ff1493;
+  color: #1a1a1a;
   font-weight: 700;
 }
 
@@ -545,7 +524,7 @@ export default {
   justify-content: space-between;
   margin-bottom: 8px;
   font-size: 14px;
-  color: #c71585;
+  color: #1a1a1a;
   font-weight: 500;
 }
 
@@ -559,7 +538,6 @@ export default {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #ff69b4, #ff1493);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -582,29 +560,16 @@ export default {
 }
 
 .action-button.primary {
-  background: linear-gradient(135deg, #ff69b4, #ff1493);
+  background: #FC5B53;
   color: white;
-  box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+  box-shadow: 0 4px 15px;
+  border-radius: 50px;
 }
 
 .action-button.primary:hover {
-  background: linear-gradient(135deg, #ff1493, #db2777);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
-}
-
-.action-button.secondary {
-  background: rgba(255, 255, 255, 0.7);
-  color: #d5006d;
-  border: 1px solid rgba(255, 105, 180, 0.3);
-  backdrop-filter: blur(10px);
-}
-
-.action-button.secondary:hover {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: #ff69b4;
-  color: #ff1493;
-  transform: translateY(-1px);
+  background: #e94a45; /* 比原本的 #FC5B53 深一點 */
+  box-shadow: 0 6px 20px rgba(252, 91, 83, 0.4);
+  transform: translateY(-2px);
 }
 
 /* 統計資訊 */
@@ -631,26 +596,24 @@ export default {
   display: block;
   font-size: 36px;
   font-weight: 700;
-  color: #ff1493;
+  color: #5F6368;
   margin-bottom: 8px;
-  text-shadow: 0 2px 4px rgba(255, 105, 180, 0.2);
 }
 
 .stat-label {
   font-size: 16px;
-  color: #d5006d;
+  color: #5F6368;
   font-weight: 500;
 }
 
-/* 響應式設計 */
 @media (max-width: 768px) {
   .my-sponsorships {
     padding: 16px;
   }
 
   .section-title {
-    font-size: 20px;
-    margin-bottom: 20px;
+    font-size: 18px;
+    padding-left: 5px;
   }
 
   .sponsorships-grid {
@@ -658,12 +621,40 @@ export default {
     gap: 16px;
   }
 
+  .sponsorship-card {
+    padding: 16px;
+  }
+
   .card-content {
-    padding: 20px;
+    padding: 16px;
   }
 
   .project-title {
     font-size: 18px;
+  }
+
+  .detail-item.amount-highlight {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .detail-value.amount {
+    font-size: 18px;
+  }
+
+  .card-actions {
+    flex-direction: column;
+  }
+
+  .action-button {
+    width: 100%;
+  }
+
+  .sponsorship-stats {
+    padding: 24px 16px;
   }
 
   .stats-card {
@@ -671,134 +662,42 @@ export default {
     gap: 24px;
   }
 
-  .stat-number {
-    font-size: 28px;
-  }
-}
-
-@media (max-width: 480px) {
-  .my-sponsorships {
-    padding: 12px;
-  }
-
-  .card-content {
-    padding: 16px;
-  }
-
-  .card-actions {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .detail-item.amount-highlight {
-    margin: 0 -4px 16px;
-    padding: 12px 16px;
-  }
-}
-
-/* 深色模式適配粉暖色系 */
-@media (prefers-color-scheme: dark) {
-  .my-sponsorships {
-    background: linear-gradient(135deg, #4c1d95 0%, #7c2d12 30%, #92400e 60%, #d5006d 100%);
-  }
-
-  .section-title {
-    color: #ffeb3b;
-  }
-
-  .section-title::before {
-    background: linear-gradient(135deg, #ffeb3b, #ff9800);
-  }
-
-  .sponsorship-card,
   .loading-container,
-  .no-sponsorships,
-  .sponsorship-stats {
-    background: rgba(39, 39, 42, 0.9);
-    border-color: rgba(255, 235, 59, 0.2);
-    box-shadow: 0 8px 32px rgba(255, 235, 59, 0.1);
+  .no-sponsorships {
+    padding: 60px 16px;
   }
 
-  .project-title {
-    color: #ffeb3b;
+  .no-sponsorships h3 {
+    font-size: 20px;
   }
 
-  .detail-label {
-    color: #ff9800;
-  }
-
-  .detail-value {
-    color: #ffeb3b;
-  }
-
-  .detail-value.amount {
-    color: #ff9800;
-  }
-
-  .project-category {
-    background: rgba(39, 39, 42, 0.8);
-    color: #ffeb3b;
-    border-color: rgba(255, 235, 59, 0.3);
-  }
-
-  .detail-item.amount-highlight {
-    background: rgba(39, 39, 42, 0.6);
-    border-color: rgba(255, 235, 59, 0.3);
-  }
-
-  .progress-bar {
-    background: rgba(39, 39, 42, 0.8);
-  }
-
-  .progress-fill {
-    background: linear-gradient(90deg, #ffeb3b, #ff9800);
-  }
-
-  .action-button.primary {
-    background: linear-gradient(135deg, #ffeb3b, #ff9800);
-    box-shadow: 0 4px 15px rgba(255, 235, 59, 0.3);
-  }
-
-  .action-button.primary:hover {
-    background: linear-gradient(135deg, #ff9800, #ff5722);
-    box-shadow: 0 6px 20px rgba(255, 235, 59, 0.4);
-  }
-
-  .action-button.secondary {
-    background: rgba(39, 39, 42, 0.7);
-    border-color: rgba(255, 235, 59, 0.3);
-    color: #ffeb3b;
-  }
-
-  .action-button.secondary:hover {
-    background: rgba(39, 39, 42, 0.9);
-    border-color: #ffeb3b;
-    color: #ff9800;
-  }
-
-  .stat-number {
-    color: #ffeb3b;
-    text-shadow: 0 2px 4px rgba(255, 235, 59, 0.2);
-  }
-
-  .stat-label {
-    color: #ff9800;
-  }
-
-  .loading-container p,
-  .no-sponsorships h3,
-  .no-sponsorships p {
-    color: #ffeb3b;
+  .no-sponsorships p,
+  .loading-container p {
+    font-size: 14px;
   }
 
   .explore-button {
-    background: linear-gradient(135deg, #ffeb3b, #ff9800);
-    box-shadow: 0 6px 20px rgba(255, 235, 59, 0.4);
+    font-size: 14px;
+    padding: 12px 24px;
   }
 
-  .explore-button:hover {
-    background: linear-gradient(135deg, #ff9800, #ff5722);
-    box-shadow: 0 10px 30px rgba(255, 235, 59, 0.5);
+  .detail-label,
+  .detail-value {
+    font-size: 13px;
+  }
+
+  .progress-label {
+    font-size: 13px;
+  }
+
+  .project-category {
+    font-size: 11px;
+    padding: 4px 12px;
+  }
+
+  .status-badge {
+    font-size: 10px;
+    padding: 6px 12px;
   }
 }
 </style>
