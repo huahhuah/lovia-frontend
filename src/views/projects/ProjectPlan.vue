@@ -91,6 +91,7 @@ import {
   getProjectPlans,
   updateProjectPlan,
 } from '@/api/project'
+import { deleteProjectPlan } from '@/api/project'
 import { uploadImage } from '@/api/upload'
 import { useRestoreAuth } from '@/composables/useRestoreAuth'
 
@@ -154,9 +155,26 @@ export default {
     }
 
     // 移除指定方案
-    const removePlan = (index) => {
+    const removePlan = async (index) => {
+  const plan = form.plans[index]
+  const confirmed = confirm(`確定要刪除方案「${plan.plan_name}」嗎？`)
+  if (!confirmed) return
+
+  if (plan.id) {
+    // 舊資料 → 呼叫後端刪除
+    try {
+      await deleteProjectPlan(form.project_id, plan.id, token)
       form.plans.splice(index, 1)
+      alert('方案已刪除')
+    } catch (err) {
+      console.error('刪除方案失敗', err)
+      alert('刪除失敗，請稍後再試')
     }
+  } else {
+    // 還沒送出的新資料，直接從陣列中移除即可
+    form.plans.splice(index, 1)
+  }
+}
 
     const handlePlanImageUpload = async (event, index) => {
       const file = event.target.files[0]
