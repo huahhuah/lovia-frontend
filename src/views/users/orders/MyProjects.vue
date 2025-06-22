@@ -83,7 +83,9 @@
 <script>
 import { getMyProjects, deleteProject } from '@/api/project'
 import ProjectDetailModal from '@/views/users/orders/ProjectDetailModal.vue' // ← 加這一行
+import { useRestoreAuth } from '@/composables/useRestoreAuth'
 
+useRestoreAuth()
 export default {
   name: 'MyProjects',
   components: {
@@ -224,7 +226,8 @@ export default {
   text-align: left;
 }
 
-.loading, .no-projects {
+.loading,
+.no-projects {
   text-align: center;
   padding: 40px;
   color: #666;
@@ -258,7 +261,8 @@ export default {
   color: #333;
 }
 
-.project-table th, .project-table td {
+.project-table th,
+.project-table td {
   padding: 12px;
   border-bottom: 1px solid #e9ecef;
   text-align: left;
@@ -343,21 +347,21 @@ export default {
 
 /* 現代化漸變效果按鈕 - 粉色系暖漸層 */
 .icon-button--modern {
-  background: transparent;         /* 背景透明 */
-  color: black;                    /* 文字改成黑色 */
-  border: 1px solid black;         /* 加上黑色邊框 */
-  box-shadow: none;               /* 拿掉原本的陰影 */
+  background: transparent; /* 背景透明 */
+  color: black; /* 文字改成黑色 */
+  border: 1px solid black; /* 加上黑色邊框 */
+  box-shadow: none; /* 拿掉原本的陰影 */
   overflow: hidden;
   padding: 6px 10px;
   min-height: 32px;
   vertical-align: middle;
   margin-top: 12px;
-  transition: all 0.3s ease;      /* 增加滑過動畫效果 */
+  transition: all 0.3s ease; /* 增加滑過動畫效果 */
 }
 
 .icon-button--modern:hover {
-  background: black;              /* 滑過變黑底 */
-  color: white;                   /* 文字變白色 */
+  background: black; /* 滑過變黑底 */
+  color: white; /* 文字變白色 */
 }
 
 .icon-button--modern::before {

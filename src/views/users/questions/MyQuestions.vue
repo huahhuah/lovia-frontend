@@ -41,7 +41,9 @@
 
 <script>
 import axios from 'axios'
+import { useRestoreAuth } from '@/composables/useRestoreAuth'
 
+useRestoreAuth()
 const BASE_URL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
 export default {

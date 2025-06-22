@@ -1,18 +1,19 @@
 <script setup>
-// { RouterLink, RouterView } from "vue-router";
 import Header from './layouts/Header.vue'
 import Footer from './layouts/Footer.vue'
 import { useUserStore } from './stores/auth'
 import { onMounted } from 'vue'
 import axios from 'axios'
+import { useRestoreAuth } from '@/composables/useRestoreAuth'
 
 const userStore = useUserStore()
-const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
-onMounted(async () => {
-  // 儲存過的 token/user 還原
-  userStore.restore()
 
-  // 如果有 token 但沒有 user，就從 /users/me 補資料
+useRestoreAuth()
+
+const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
+
+onMounted(async () => {
+  // 如果 token 有但 user 沒有，就補 /users/me
   if (userStore.token && !userStore.user) {
     try {
       const res = await axios.get(`${baseUrl}/users/me`, {
@@ -40,7 +41,6 @@ onMounted(async () => {
 </template>
 
 <style>
-/* 全站最外層保險網 */
 .app-container {
   overflow-x: hidden;
   max-width: 100vw;

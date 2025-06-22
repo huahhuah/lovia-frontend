@@ -83,7 +83,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { getProjectOverview, getProjectPlans, sponsorProjectPlan } from '@/api/project'
 import defaultImg from '@/assets/images/default.png'
 import { useUserStore } from '@/stores/auth'
+import { useRestoreAuth } from '@/composables/useRestoreAuth'
 
+useRestoreAuth()
 const route = useRoute()
 const router = useRouter()
 const authStore = useUserStore()

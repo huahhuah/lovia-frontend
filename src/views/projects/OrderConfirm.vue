@@ -2,91 +2,93 @@
   <SponsorshipLayout>
     <div class="container py-5">
       <div class="narrow-wrapper">
-      <div class="row">
-        <div class="col-lg-8">
-          <section class="mb-5">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">訂單編號</label>
-                <input type="text" class="form-control" :value="orderData.order_uuid" disabled />
+        <div class="row">
+          <div class="col-lg-8">
+            <section class="mb-5">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">訂單編號</label>
+                  <input type="text" class="form-control" :value="orderData.order_uuid" disabled />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">贊助金額</label>
+                  <input type="text" class="form-control" :value="orderData.amount" disabled />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">會員名稱</label>
+                  <input type="text" class="form-control" :value="orderData.name" disabled />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">電子信箱</label>
+                  <input type="text" class="form-control" :value="orderData.email" disabled />
+                </div>
               </div>
-              <div class="col-md-6">
-                <label class="form-label">贊助金額</label>
-                <input type="text" class="form-control" :value="orderData.amount" disabled />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">會員名稱</label>
-                <input type="text" class="form-control" :value="orderData.name" disabled />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">電子信箱</label>
-                <input type="text" class="form-control" :value="orderData.email" disabled />
-              </div>
-            </div>
-          </section>
+            </section>
 
-          <section class="mb-5">
-            <h5 class="fw-bold">確認寄送資料</h5>
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">收件人</label>
-                <input type="text" class="form-control" :value="orderData.recipient" disabled />
+            <section class="mb-5">
+              <h5 class="fw-bold">確認寄送資料</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">收件人</label>
+                  <input type="text" class="form-control" :value="orderData.recipient" disabled />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">電話</label>
+                  <input type="text" class="form-control" :value="orderData.phone" disabled />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">郵遞區號</label>
+                  <input type="text" class="form-control" :value="orderData.zipcode" disabled />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">地址</label>
+                  <input type="text" class="form-control" :value="orderData.address" disabled />
+                </div>
               </div>
-              <div class="col-md-6">
-                <label class="form-label">電話</label>
-                <input type="text" class="form-control" :value="orderData.phone" disabled />
+              <div class="mt-3">
+                <label class="form-label">備註</label>
+                <textarea class="form-control" rows="3" :value="orderData.note" disabled></textarea>
               </div>
-              <div class="col-md-6">
-                <label class="form-label">郵遞區號</label>
-                <input type="text" class="form-control" :value="orderData.zipcode" disabled />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">地址</label>
-                <input type="text" class="form-control" :value="orderData.address" disabled />
-              </div>
-            </div>
-            <div class="mt-3">
-              <label class="form-label">備註</label>
-              <textarea class="form-control" rows="3" :value="orderData.note" disabled></textarea>
-            </div>
-          </section>
+            </section>
 
-          <p class="text-muted small">確認內容無誤後請點選右側按鈕完成付款，我們將為您處理訂單。</p>
-        </div>
-
-        <div class="col-lg-4">
-          <div class="card p-4 shadow-sm">
-            <h6 class="fw-bold">訂單摘要</h6>
-            <p class="mb-1">專案名稱: {{ sponsorData.project_title }}</p>
             <p class="text-muted small">
-              贊助方案：{{ sponsorData.feedback }}（NT$ {{ baseAmount }}）
+              確認內容無誤後請點選右側按鈕完成付款，我們將為您處理訂單。
             </p>
-            <hr />
-            <div class="d-flex justify-content-between">
-              <span>原始金額</span>
-              <span>NT$ {{ baseAmount }}</span>
-            </div>
-            <div class="d-flex justify-content-between">
-              <span>額外贊助</span>
-              <span>NT$ {{ extraAmount }}</span>
-            </div>
-            <div class="d-flex justify-content-between fw-bold mt-2">
-              <span>總計</span>
-              <span>NT$ {{ orderData.amount }}</span>
-            </div>
-            <p class="text-muted small mt-3">備註：{{ orderData.note || '無' }}</p>
+          </div>
 
-            <button
-              class="btn btn-primary w-100 mt-3"
-              @click="submitPayment"
-              :disabled="isSubmitting"
-            >
-              {{ isSubmitting ? '正在跳轉中...' : '立即付款' }}
-            </button>
+          <div class="col-lg-4">
+            <div class="card p-4 shadow-sm">
+              <h6 class="fw-bold">訂單摘要</h6>
+              <p class="mb-1">專案名稱: {{ sponsorData.project_title }}</p>
+              <p class="text-muted small">
+                贊助方案：{{ sponsorData.feedback }}（NT$ {{ baseAmount }}）
+              </p>
+              <hr />
+              <div class="d-flex justify-content-between">
+                <span>原始金額</span>
+                <span>NT$ {{ baseAmount }}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span>額外贊助</span>
+                <span>NT$ {{ extraAmount }}</span>
+              </div>
+              <div class="d-flex justify-content-between fw-bold mt-2">
+                <span>總計</span>
+                <span>NT$ {{ orderData.amount }}</span>
+              </div>
+              <p class="text-muted small mt-3">備註：{{ orderData.note || '無' }}</p>
+
+              <button
+                class="btn btn-primary w-100 mt-3"
+                @click="submitPayment"
+                :disabled="isSubmitting"
+              >
+                {{ isSubmitting ? '正在跳轉中...' : '立即付款' }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   </SponsorshipLayout>
 </template>
@@ -95,7 +97,9 @@
 import SponsorshipLayout from '@/layouts/SponsorshipLayout.vue'
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useRestoreAuth } from '@/composables/useRestoreAuth'
 
+useRestoreAuth()
 const router = useRouter()
 const orderData = ref({})
 const sponsorData = ref({ project_title: '', feedback: '' })
