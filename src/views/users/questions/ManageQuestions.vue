@@ -227,17 +227,13 @@ async function submitReply() {
   }
   try {
     const token = localStorage.getItem('token')
-    const endpoint = currentQuestion.value.reply
-      ? `${BASE_URL}/projects/comments/${currentQuestion.value.id}/reply/${currentQuestion.value.reply.id}`
-      : `${BASE_URL}/projects/comments/${currentQuestion.value.comment_id}/reply`
+    const endpoint = `${BASE_URL}/projects/comments/${currentQuestion.value.id}/reply`
 
-    const method = currentQuestion.value.reply ? 'put' : 'post'
-
-    await axios[method](
-      endpoint,
-      { content: replyContent.value },
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
+await axios.post(
+  endpoint,
+  { content: replyContent.value },
+  { headers: { Authorization: `Bearer ${token}` } }
+)
 
     alert(currentQuestion.value.reply ? '回覆更新成功' : '回覆成功')
     closeReplyModal()
