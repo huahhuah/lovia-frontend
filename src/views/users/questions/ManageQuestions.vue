@@ -1,20 +1,26 @@
 <template>
   <div class="container py-5">
-    <h2>提問管理</h2>
+    <h2 class="section-title">提問管理</h2>
 
     <div v-if="loading">載入中...</div>
     <div v-if="error" class="text-danger">{{ error }}</div>
-    <div v-if="!loading && questions.length === 0">目前沒有任何提問</div>
+    <div v-if="!loading && questions.length === 0" class="text-muted text-center mt-4">
+      😶 目前沒有任何提問
+    </div>
 
     <ul v-if="questions.length > 0" class="list-group">
-      <li v-for="q in questions" :key="q.id" class="list-group-item">
-        <strong>專案：</strong> {{ q.project?.title }}<br />
-        <strong>提問者：</strong> {{ q.user?.name || q.user?.email || '匿名' }}<br />
-        <strong>提問內容：</strong> {{ q.comment || q.content || '無內容' }}<br />
-        <small class="text-muted">提問時間：{{ new Date(q.created_at).toLocaleString() }}</small>
+      <li
+        v-for="q in questions"
+        :key="q.id"
+        class="list-group-item shadow-sm rounded-3 mb-3 border border-light"
+      >
+        <div class="fw-semibold mb-1">📌 專案：{{ q.project?.title }}</div>
+        <div><strong>提問者：</strong> {{ q.user?.name || q.user?.email || '匿名' }}</div>
+        <div class="my-2"><strong>提問內容：</strong> {{ q.comment || q.content || '無內容' }}</div>
+        <div class="text-muted small">提問時間：{{ new Date(q.created_at).toLocaleString() }}</div>
 
         <button
-          class="btn btn-outline-primary btn-sm mt-2"
+          class="btn btn-outline-danger btn-sm mt-3 float-end"
           @click="openReplyModal(q)"
         >
           回覆提問
@@ -132,10 +138,34 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.modal {
-  background-color: rgba(0, 0, 0, 0.5);
+h2 {
+  font-size: 16px;
+  font-weight: 400;
+  color: #1a1a1a;
 }
-.modal-dialog {
-  margin-top: 10vh;
+
+.modal-content {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+.modal-header {
+  background-color: #fff8f9;
+  border-bottom: none;
+}
+.modal-title {
+  font-weight: 600;
+  font-size: 18px;
+}
+.modal-footer {
+  border-top: none;
+}
+.btn-primary {
+  background-color: #fc7c9d;
+  border-color: #fc7c9d;
+}
+.btn-primary:hover {
+  background-color: #fc5b53;
+  border-color: #fc5b53;
 }
 </style>
