@@ -24,15 +24,15 @@
     </div>
 
     <!-- 🔵 問與答列表 -->
-    <div
-      class="qa-card border rounded-4 p-4 mb-4"
-      v-for="qa in questions"
-      :key="qa.id"
-    >
+    <div class="qa-card border rounded-4 p-4 mb-4" v-for="qa in questions" :key="qa.id">
       <!-- 提問者 -->
       <div class="qa-question mb-3">
         <div class="d-flex align-items-center mb-1">
-          <img :src="qa.userAvatar || '/default-avatar.png'" class="rounded-circle me-2" style="width: 36px; height: 36px; object-fit: cover" />
+          <img
+            :src="qa.userAvatar || '/default-avatar.png'"
+            class="rounded-circle me-2"
+            style="width: 36px; height: 36px; object-fit: cover"
+          />
           <strong>{{ qa.userName }}</strong>
           <small class="text-muted ms-auto">{{ qa.date }}</small>
         </div>
@@ -40,13 +40,14 @@
       </div>
 
       <!-- 回覆 -->
-      <div
-        class="qa-reply mt-3"
-        v-for="reply in qa.replies"
-        :key="reply.id"
-      >
+      <div class="qa-reply mt-3" v-for="reply in qa.replies" :key="reply.id">
         <div class="d-flex align-items-center mb-1">
-          <img :src="reply.avatar_url || '/default-admin.png'" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover" />
+          <img
+            v-if="reply.avatar_url"
+            :src="reply.avatar_url"
+            class="rounded-circle me-2"
+            style="width: 32px; height: 32px; object-fit: cover"
+          />
           <strong>{{ reply.adminName }}</strong>
           <small class="text-muted ms-auto">{{ reply.date }}</small>
         </div>
@@ -59,23 +60,24 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { createProjectComment, getProjectCommets } from '@/api/project'
+import { createProjectComment, getProjectComments } from '@/api/project'
 
 const props = defineProps({
   projectId: {
     type: Number,
-    require: true
-  }, 
+    required: true,
+  },
   isLogin: {
     type: Boolean,
-    require: true
-  }
+    required: true,
+  },
 })
 
 const newQuestion = ref('')
 const questions = ref([])
 const user = ref({})
 
+// 取得 localStorage 使用者資料
 try {
   const raw = localStorage.getItem('user')
   user.value = raw ? JSON.parse(raw) : {}
@@ -86,14 +88,23 @@ try {
 
 async function fetchComments() {
   try {
-    const res = await getProjectCommets(props.projectId)
-    questions.value = res.data.data.map(comment => ({
+    const res = await getProjectComments(props.projectId)
+    questions.value = res.data.data.map((comment) => ({
       id: comment.comment_id,
       userName: comment.user.name,
-      userAvatar: comment.user.avatar_url || '/default-avatar.png', // 假設後端有 avatar_url
+      userAvatar: comment.user.avatar_url || '/default-avatar.png',
       date: new Date(comment.created_at).toLocaleString(),
       content: comment.content,
-      replies: comment.replies || [] // 後端尚未提供回覆，預設為空陣列
+      replies: comment.reply_content
+        ? [
+            {
+              id: comment.comment_id,
+              adminName: '提案者',
+              content: comment.reply_content,
+              date: new Date(comment.reply_at).toLocaleString(),
+            },
+          ]
+        : [],
     }))
   } catch (err) {
     console.error('取得留言失敗', err)
@@ -104,10 +115,13 @@ async function fetchComments() {
 async function handleSubmit() {
   if (!newQuestion.value.trim()) return
 
-try {
-    await createProjectComment(props.projectId, newQuestion.value, localStorage.getItem('token'))
+  try {
+    const token = localStorage.getItem('token')
+    if (!token) throw new Error('未登入，無法留言')
+
+    await createProjectComment(props.projectId, newQuestion.value, token)
     newQuestion.value = ''
-    await fetchComments() // 提交後重新獲取留言
+    await fetchComments() // 提交後重新取得留言
   } catch (err) {
     console.error('留言失敗', err)
   }
@@ -119,20 +133,19 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
 .qna-wrapper {
   margin-top: 2rem;
 }
 
 /* 提問區 */
 .comment-box {
-  background-color: #FFF8F9;
+  background-color: #fff8f9;
   border-radius: 1rem;
   border: 1px solid #ddd;
 }
 
 .comment-box textarea {
-  background-color: #FFF8F9;
+  background-color: #fff8f9;
   border-radius: 1rem;
   padding: 1rem;
   border: 1px solid #ddd;
@@ -140,7 +153,7 @@ onMounted(() => {
 
 /* 問與答主體 */
 .qa-card {
-  background-color: #FFF8F9;
+  background-color: #fff8f9;
   border-radius: 1rem;
   padding: 1rem;
   border: 1px solid #ddd;
@@ -164,5 +177,4 @@ onMounted(() => {
   margin-top: 1rem;
   position: relative;
 }
-
 </style>
