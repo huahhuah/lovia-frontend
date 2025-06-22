@@ -75,7 +75,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/auth'
 import SponsorshipLayout from '@/layouts/SponsorshipLayout.vue'
-import { getDistrictByZipcode } from '@/utils/zipcode'
+import { getDistrictByZipcode } from '@/utils/zipcodeMap'
 import { useRestoreAuth } from '@/composables/useRestoreAuth'
 
 //  嘗試從 URL 還原 token（LINE Pay 付款後回來用）
