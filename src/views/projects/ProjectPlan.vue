@@ -92,7 +92,9 @@ import {
   updateProjectPlan,
 } from '@/api/project'
 import { uploadImage } from '@/api/upload'
+import { useRestoreAuth } from '@/composables/useRestoreAuth'
 
+useRestoreAuth()
 export default {
   name: 'ProjectPlan',
   setup() {

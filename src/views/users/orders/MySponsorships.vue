@@ -27,7 +27,7 @@
           @click="goToProject(item.project?.id)"
         >
           <!-- 專案狀態標籤 -->
-          <div class="status-overlay" style="margin-bottom: 8px;">
+          <div class="status-overlay" style="margin-bottom: 8px">
             <span :class="['status-badge', `status-${item.status}`]">
               {{ getStatusText(item.status) }}
             </span>
@@ -107,7 +107,9 @@
 
 <script>
 import axios from 'axios'
+import { useRestoreAuth } from '@/composables/useRestoreAuth'
 
+useRestoreAuth()
 const BASE_URL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
 export default {

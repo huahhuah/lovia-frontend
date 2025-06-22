@@ -55,9 +55,10 @@
           <strong>NT$ {{ project.amount.toLocaleString() }}</strong>
           <router-link
             :to="`/projects/funding/${project.id}`"
-            class="btn btn-sm btn-danger rounded-pill px-3"
+            class="btn btn-sm rounded-pill px-3"
+            :class="isArchived ? 'btn-view-project' : 'btn-danger'"
           >
-            立刻贊助 >
+            {{ isArchived ? '查看專案 >' : '立刻贊助 >' }}
           </router-link>
         </div>
       </div>
@@ -259,5 +260,14 @@ const toggleFavorite = async () => {
 
 .favorite-wrapper.is-favorite .favorite-icon {
   filter: none !important;
+}
+.btn-view-project {
+  background-color: #000;
+  color: #fff;
+  border: none;
+}
+.btn-view-project:hover {
+  background-color: #2f2e2e;
+  color: #fff;
 }
 </style>
