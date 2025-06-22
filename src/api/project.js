@@ -44,6 +44,14 @@ export const deleteProject = (projectId, token) => {
   })
 }
 
+export function deleteProjectPlan(projectId, planId, token) {
+  return axios.delete(`${BASE_URL}/projects/${projectId}/plans/${planId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
 /** ───── 查詢資料 ───── **/
 
 // 取得所有專案（首頁 or 探索頁用）
