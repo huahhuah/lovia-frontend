@@ -5,13 +5,15 @@
 
       <!-- 載入中 -->
       <div v-if="loading" class="text-center py-5 fs-5">🔄 資料載入中，請稍候...</div>
+      <p v-if="polling && result.status !== 'paid'" class="text-muted small">
+        系統正在確認付款狀態中，請稍候...
+      </p>
 
       <!-- 錯誤訊息 -->
       <div v-else-if="error" class="text-center text-danger py-5">
         ⚠️ {{ error }}
         <div class="mt-4">
           <router-link to="/" class="btn btn-outline-secondary me-2">返回首頁</router-link>
-          <router-link to="/checkout" class="btn btn-primary">重新贊助</router-link>
         </div>
       </div>
 
@@ -73,15 +75,29 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/auth'
 import SponsorshipLayout from '@/layouts/SponsorshipLayout.vue'
+import { getDistrictByZipcode } from '@/utils/zipcode'
+import { useRestoreAuth } from '@/composables/useRestoreAuth'
 
+//  嘗試從 URL 還原 token（LINE Pay 付款後回來用）
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 
+const tokenFromUrl = route.query.token
+if (tokenFromUrl && typeof tokenFromUrl === 'string') {
+  localStorage.setItem('token', tokenFromUrl)
+  sessionStorage.setItem('token', tokenFromUrl)
+  userStore.setToken(tokenFromUrl)
+  console.log(' 從 URL 還原 token')
+}
+
+useRestoreAuth()
+
 const orderId = route.query.orderId
-const token = ref('')
+const token = ref(userStore.token || '')
 const loading = ref(true)
 const error = ref('')
+const polling = ref(false)
 
 const result = ref({
   transactionId: '',
@@ -105,27 +121,32 @@ const maskedEmail = computed(() => {
   return email.replace(/^(.{3})(.*)(@.*)$/, (_, a, _b, c) => `${a}***${c}`)
 })
 
-let retryCount = 0
-const maxRetries = 6 // 最多輪詢 6 次（每 5 秒）
-
 onMounted(async () => {
-  if (route.query.method || route.query.transactionId) {
+  // 抓 URL query 參數
+  const tokenFromUrl = route.query.token
+  const method = route.query.method
+  const transactionId = route.query.transactionId
+
+  // [1] 還原 token
+  if (tokenFromUrl && typeof tokenFromUrl === 'string') {
+    localStorage.setItem('token', tokenFromUrl)
+    sessionStorage.setItem('token', tokenFromUrl)
+    userStore.setToken(tokenFromUrl)
+    console.log(' 從 URL 還原 token 並寫入 userStore')
+  }
+
+  // [2] 呼叫 useRestoreAuth（自動處理 token + /me 資料）
+  await useRestoreAuth()
+
+  // [3] 清除 URL 中的多餘參數（避免重複觸發或外洩 token）
+  if (method || transactionId || tokenFromUrl) {
     const cleanQuery = { orderId: route.query.orderId }
     router.replace({ path: '/checkout/result', query: cleanQuery })
     return
   }
 
-  const storedToken = sessionStorage.getItem('token') || localStorage.getItem('token')
-  if (storedToken && !userStore.token) {
-    userStore.setToken(storedToken)
-    console.log(' token 已還原至 userStore')
-  }
-
-  // 強制補 token.value，避免 userStore.token 還沒設好
-  token.value = userStore.token || storedToken || ''
-  console.log(' token:', token.value)
-  console.log(' orderId:', orderId)
-
+  // [4] 驗證 token 與 orderId 是否存在
+  token.value = userStore.token || ''
   if (!token.value) {
     error.value = '登入憑證不存在，請重新登入'
     loading.value = false
@@ -138,70 +159,91 @@ onMounted(async () => {
     return
   }
 
-  loading.value = true
-  error.value = ''
-  retryCount = 0
-  await fetchResult()
+  // [5] 開始輪詢交易結果
+  await pollResult()
 })
 
-async function fetchResult() {
+// 輪詢最多 6 次
+let retryCount = 0
+const maxRetry = 6
+const retryInterval = 5000
+
+async function pollResult() {
+  loading.value = true
+  polling.value = true
+  error.value = ''
+
   try {
-    const res = await fetch(
-      `https://lovia-backend-xl4e.onrender.com/api/v1/users/sponsorships/${orderId}/result`,
-      {
-        headers: {
-          Authorization: `Bearer ${token.value}`,
-        },
-      }
-    )
+    await fetchResult()
 
-    const json = await res.json()
-    const data = json.data
-
-    if (!json.status || !data) {
-      throw new Error(json.message || '查無資料')
-    }
-
-    const methodMap = {
-      LINE_PAY: 'LINE Pay',
-      ATM: '綠界 ATM',
-      Credit: '綠界信用卡',
-      Credit_CreditCard: '綠界信用卡',
-      WebATM: '綠界 WebATM',
-    }
-
-    result.value = {
-      transactionId: data.order_uuid,
-      amount: data.amount,
-      paidAt: data.paid_at,
-      paymentMethod: methodMap[data.payment_method] || '未知方式',
-      display_name: data.display_name || '匿名',
-      email: data.email || '',
-      recipient: data.shipping?.name || '',
-      phone: data.shipping?.phone || '',
-      address: data.shipping?.address || '',
-      note: data.note || '',
-      status: data.status || '',
-      bank_code: data.bank_code || '',
-      v_account: data.v_account || '',
-      expire_date: data.expire_date || '',
-    }
-
-    console.log(` [第 ${retryCount + 1} 次] 訂單狀態: ${data.status}`)
-
-    if (data.status === 'paid') {
-      loading.value = false
-    } else if (data.status !== 'paid' && retryCount < maxRetries) {
+    if (result.value.status !== 'paid' && retryCount < maxRetry) {
       retryCount++
-      setTimeout(fetchResult, 5000)
+      console.log(`第 ${retryCount} 次輪詢未付款，再等 ${retryInterval / 1000} 秒...`)
+      setTimeout(pollResult, retryInterval)
+    } else if (result.value.status !== 'paid') {
+      polling.value = false
+      error.value = '付款狀態尚未確認，請稍後再試或聯繫客服'
     } else {
-      loading.value = false
-      error.value = '查詢逾時，請稍後再試'
+      polling.value = false
     }
   } catch (err) {
-    console.error(' 查詢付款結果失敗:', err)
-    error.value = err.message || '查詢付款結果失敗'
+    console.error('輪詢付款狀態失敗:', err)
+    error.value = err.message || '輪詢查詢失敗'
+    polling.value = false
+  } finally {
     loading.value = false
+  }
+}
+
+async function fetchResult() {
+  const res = await fetch(
+    `https://lovia-backend-xl4e.onrender.com/api/v1/orders/${orderId}/payment/success`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token.value}`,
+      },
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(`錯誤 ${res.status}：${res.statusText}`)
+  }
+
+  const json = await res.json()
+  const data = json.data
+
+  if (!json.status || !data) throw new Error(json.message || '查無資料')
+
+  const zipcode = data.shipping?.zipcode?.toString()
+  if (!zipcode || !getDistrictByZipcode(zipcode)) {
+    error.value = '郵遞區號無效，請重新輸入'
+    return
+  }
+
+  const methodMap = {
+    LINE_PAY: 'LINE Pay',
+    ATM: '綠界 ATM',
+    Credit: '綠界信用卡',
+    Credit_CreditCard: '綠界信用卡',
+  }
+
+  result.value = {
+    transactionId: data.orderId,
+    amount: data.amount,
+    paidAt: data.paidAt,
+    paymentMethod: methodMap[data.paymentMethod] || '未知方式',
+    display_name: data.display_name || '匿名',
+    email: data.email || '',
+    recipient: data.recipient || '',
+    phone: data.phone || '',
+    address: data.address || '',
+    note: data.note || '',
+    status: 'paid',
+    bank_code: data.bank_code || '',
+    v_account: data.v_account || '',
+    expire_date: data.expire_date || '',
   }
 }
 </script>

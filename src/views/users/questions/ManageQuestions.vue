@@ -19,10 +19,7 @@
         <div class="my-2"><strong>提問內容：</strong> {{ q.comment || q.content || '無內容' }}</div>
         <div class="text-muted small">提問時間：{{ new Date(q.created_at).toLocaleString() }}</div>
 
-        <button
-          class="btn btn-outline-danger btn-sm mt-3 float-end"
-          @click="openReplyModal(q)"
-        >
+        <button class="btn btn-outline-primary btn-sm mt-2" @click="openReplyModal(q)">
           回覆提問
         </button>
       </li>
@@ -33,7 +30,7 @@
       class="modal fade"
       tabindex="-1"
       :class="{ show: showModal }"
-      style="display: block;"
+      style="display: block"
       v-if="showModal"
       @click.self="closeReplyModal"
     >
@@ -45,7 +42,9 @@
           </div>
           <div class="modal-body">
             <p><strong>專案：</strong> {{ currentQuestion.project?.title }}</p>
-            <p><strong>提問內容：</strong> {{ currentQuestion.comment || currentQuestion.content }}</p>
+            <p>
+              <strong>提問內容：</strong> {{ currentQuestion.comment || currentQuestion.content }}
+            </p>
 
             <textarea
               v-model="replyContent"
@@ -67,7 +66,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { useRestoreAuth } from '@/composables/useRestoreAuth'
 
+useRestoreAuth()
 const BASE_URL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
 const questions = ref([])

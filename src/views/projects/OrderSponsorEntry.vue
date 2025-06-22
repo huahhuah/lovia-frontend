@@ -3,196 +3,198 @@
   <SponsorshipLayout>
     <div class="container py-5">
       <div class="narrow-wrapper mx-auto">
-      <div class="row">
-        <div class="col-lg-8">
-          <section class="mb-5">
-            <h5 class="fw-bold">購買人（贊助人）</h5>
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label">會員名稱</label>
-                <input v-model="form.name" class="form-control" placeholder="會員名稱" readonly />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">電子信箱</label>
-                <input
-                  v-model="form.account"
-                  class="form-control"
-                  placeholder="電子信箱"
-                  readonly
-                />
-              </div>
-            </div>
-          </section>
-
-          <section class="mb-5">
-            <h5 class="fw-bold">發票類型</h5>
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                value="donate"
-                v-model="form.invoiceType"
-                id="donateInvoice"
-              />
-              <label class="form-check-label" for="donateInvoice">捐贈發票</label>
-            </div>
-
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="radio"
-                value="mobile"
-                v-model="form.invoiceType"
-                id="mobileInvoice"
-              />
-              <label class="form-check-label" for="mobileInvoice">個人發票（手機條碼）</label>
-            </div>
-
-            <div v-if="form.invoiceType === 'mobile'" class="form-group mt-2">
-              <input
-                v-model="form.mobileBarcode"
-                class="form-control"
-                placeholder="請輸入手機載具條碼"
-                @input="errors.mobileBarcode = ''"
-              />
-              <p class="text-danger small mt-1" v-if="errors.mobileBarcode">
-                {{ errors.mobileBarcode }}
-              </p>
-            </div>
-
-            <div class="form-check mt-2">
-              <input
-                class="form-check-input"
-                type="radio"
-                value="paper"
-                v-model="form.invoiceType"
-                id="paperInvoice"
-              />
-              <label class="form-check-label" for="paperInvoice">個人發票（紙本寄送）</label>
-            </div>
-
-            <div v-if="form.invoiceType === 'paper'" class="form-group mt-2">
-              <input
-                v-model="form.taxId"
-                class="form-control"
-                placeholder="請輸入統一編號（8碼數字，可留空）"
-                @input="errors.taxId = ''"
-              />
-              <p class="text-danger small mt-1" v-if="errors.taxId">{{ errors.taxId }}</p>
-            </div>
-            <p class="text-danger small mt-2" v-if="errors.invoiceType">{{ errors.invoiceType }}</p>
-          </section>
-
-          <section class="mb-5">
-            <h5 class="fw-bold">寄送資料</h5>
-            <div class="row g-3">
-              <div class="col-md-6">
-                <input
-                  v-model="form.recipient"
-                  class="form-control"
-                  placeholder="收件人姓名"
-                  @input="errors.recipient = ''"
-                />
-                <p class="text-danger small" v-if="errors.recipient">{{ errors.recipient }}</p>
-              </div>
-              <div class="col-md-6">
-                <input
-                  v-model="form.phone"
-                  class="form-control"
-                  placeholder="聯絡電話"
-                  @input="errors.phone = ''"
-                />
-                <p class="text-danger small" v-if="errors.phone">{{ errors.phone }}</p>
-              </div>
-            </div>
-            <div class="row g-3 mt-3">
-              <div class="col-md-4">
-                <input
-                  v-model="form.zipcode"
-                  class="form-control"
-                  placeholder="郵遞區號"
-                  @input="errors.zipcode = ''"
-                />
-                <p class="text-danger small" v-if="errors.zipcode">{{ errors.zipcode }}</p>
-              </div>
-              <div class="col-md-8">
-                <input
-                  v-model="form.address"
-                  class="form-control"
-                  placeholder="地址"
-                  @input="errors.address = ''"
-                />
-                <p class="text-danger small" v-if="errors.address">{{ errors.address }}</p>
-              </div>
-            </div>
-            <textarea
-              v-model="form.note"
-              class="form-control mt-3"
-              rows="3"
-              placeholder="備註（選填）"
-            ></textarea>
-          </section>
-
-          <section class="mb-5">
-            <h5 class="fw-bold">付款方式</h5>
-            <div class="row g-3">
-              <div class="col-4" v-for="option in paymentList" :key="option.value">
-                <label
-                  class="payment-radio w-100 d-flex flex-column align-items-center justify-content-center"
-                  :class="{ active: form.payment === option.value }"
-                >
+        <div class="row">
+          <div class="col-lg-8">
+            <section class="mb-5">
+              <h5 class="fw-bold">購買人（贊助人）</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">會員名稱</label>
+                  <input v-model="form.name" class="form-control" placeholder="會員名稱" readonly />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">電子信箱</label>
                   <input
-                    type="radio"
-                    class="d-none"
-                    :value="option.value"
-                    v-model="form.payment"
-                    @change="errors.payment = ''"
+                    v-model="form.account"
+                    class="form-control"
+                    placeholder="電子信箱"
+                    readonly
                   />
-                  <img
-                    :src="option.icon"
-                    :alt="option.label"
-                    :class="['payment-icon', { 'large-linepay': option.value === 'linepay' }]"
-                  />
-                  <div>{{ option.label }}</div>
-                </label>
+                </div>
               </div>
-            </div>
-            <p class="text-danger small mt-2" v-if="errors.payment">{{ errors.payment }}</p>
-          </section>
-        </div>
+            </section>
 
-        <div class="col-lg-4 d-flex justify-content-end">
-          <div class="card p-4 shadow-sm" style="width: 100%; max-width: 320px">
-            <h6 class="fw-bold">訂單明細</h6>
-            <p class="mb-1">專案名稱: {{ sponsorData.project_title || '專案名稱載入中' }}</p>
-            <p class="text-muted small">
-              贊助方案：{{ sponsorData.feedback || '方案資訊載入中' }}（NT$ {{ baseAmount }}）
-            </p>
-            <hr />
-            <div class="d-flex justify-content-between">
-              <span>方案贊助</span>
-              <span>NT$ {{ baseAmount }}</span>
+            <section class="mb-5">
+              <h5 class="fw-bold">發票類型</h5>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  value="donate"
+                  v-model="form.invoiceType"
+                  id="donateInvoice"
+                />
+                <label class="form-check-label" for="donateInvoice">捐贈發票</label>
+              </div>
+
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  value="mobile"
+                  v-model="form.invoiceType"
+                  id="mobileInvoice"
+                />
+                <label class="form-check-label" for="mobileInvoice">個人發票（手機條碼）</label>
+              </div>
+
+              <div v-if="form.invoiceType === 'mobile'" class="form-group mt-2">
+                <input
+                  v-model="form.mobileBarcode"
+                  class="form-control"
+                  placeholder="請輸入手機載具條碼"
+                  @input="errors.mobileBarcode = ''"
+                />
+                <p class="text-danger small mt-1" v-if="errors.mobileBarcode">
+                  {{ errors.mobileBarcode }}
+                </p>
+              </div>
+
+              <div class="form-check mt-2">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  value="paper"
+                  v-model="form.invoiceType"
+                  id="paperInvoice"
+                />
+                <label class="form-check-label" for="paperInvoice">個人發票（紙本寄送）</label>
+              </div>
+
+              <div v-if="form.invoiceType === 'paper'" class="form-group mt-2">
+                <input
+                  v-model="form.taxId"
+                  class="form-control"
+                  placeholder="請輸入統一編號（8碼數字，可留空）"
+                  @input="errors.taxId = ''"
+                />
+                <p class="text-danger small mt-1" v-if="errors.taxId">{{ errors.taxId }}</p>
+              </div>
+              <p class="text-danger small mt-2" v-if="errors.invoiceType">
+                {{ errors.invoiceType }}
+              </p>
+            </section>
+
+            <section class="mb-5">
+              <h5 class="fw-bold">寄送資料</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <input
+                    v-model="form.recipient"
+                    class="form-control"
+                    placeholder="收件人姓名"
+                    @input="errors.recipient = ''"
+                  />
+                  <p class="text-danger small" v-if="errors.recipient">{{ errors.recipient }}</p>
+                </div>
+                <div class="col-md-6">
+                  <input
+                    v-model="form.phone"
+                    class="form-control"
+                    placeholder="聯絡電話"
+                    @input="errors.phone = ''"
+                  />
+                  <p class="text-danger small" v-if="errors.phone">{{ errors.phone }}</p>
+                </div>
+              </div>
+              <div class="row g-3 mt-3">
+                <div class="col-md-4">
+                  <input
+                    v-model="form.zipcode"
+                    class="form-control"
+                    placeholder="郵遞區號"
+                    @input="errors.zipcode = ''"
+                  />
+                  <p class="text-danger small" v-if="errors.zipcode">{{ errors.zipcode }}</p>
+                </div>
+                <div class="col-md-8">
+                  <input
+                    v-model="form.address"
+                    class="form-control"
+                    placeholder="地址"
+                    @input="errors.address = ''"
+                  />
+                  <p class="text-danger small" v-if="errors.address">{{ errors.address }}</p>
+                </div>
+              </div>
+              <textarea
+                v-model="form.note"
+                class="form-control mt-3"
+                rows="3"
+                placeholder="備註（選填）"
+              ></textarea>
+            </section>
+
+            <section class="mb-5">
+              <h5 class="fw-bold">付款方式</h5>
+              <div class="row g-3">
+                <div class="col-4" v-for="option in paymentList" :key="option.value">
+                  <label
+                    class="payment-radio w-100 d-flex flex-column align-items-center justify-content-center"
+                    :class="{ active: form.payment === option.value }"
+                  >
+                    <input
+                      type="radio"
+                      class="d-none"
+                      :value="option.value"
+                      v-model="form.payment"
+                      @change="errors.payment = ''"
+                    />
+                    <img
+                      :src="option.icon"
+                      :alt="option.label"
+                      :class="['payment-icon', { 'large-linepay': option.value === 'linepay' }]"
+                    />
+                    <div>{{ option.label }}</div>
+                  </label>
+                </div>
+              </div>
+              <p class="text-danger small mt-2" v-if="errors.payment">{{ errors.payment }}</p>
+            </section>
+          </div>
+
+          <div class="col-lg-4 d-flex justify-content-end">
+            <div class="card p-4 shadow-sm" style="width: 100%; max-width: 320px">
+              <h6 class="fw-bold">訂單明細</h6>
+              <p class="mb-1">專案名稱: {{ sponsorData.project_title || '專案名稱載入中' }}</p>
+              <p class="text-muted small">
+                贊助方案：{{ sponsorData.feedback || '方案資訊載入中' }}（NT$ {{ baseAmount }}）
+              </p>
+              <hr />
+              <div class="d-flex justify-content-between">
+                <span>方案贊助</span>
+                <span>NT$ {{ baseAmount }}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span>額外贊助</span>
+                <span>NT$ {{ extraAmount }}</span>
+              </div>
+              <hr />
+              <div class="d-flex justify-content-between fw-bold">
+                <span>總計</span>
+                <span>NT$ {{ totalAmount }}</span>
+              </div>
+              <button
+                class="btn btn-primary w-100 mt-3"
+                @click="submitOrder"
+                :disabled="isSubmitting"
+              >
+                {{ isSubmitting ? '送出中...' : '送出訂單' }}
+              </button>
             </div>
-            <div class="d-flex justify-content-between">
-              <span>額外贊助</span>
-              <span>NT$ {{ extraAmount }}</span>
-            </div>
-            <hr />
-            <div class="d-flex justify-content-between fw-bold">
-              <span>總計</span>
-              <span>NT$ {{ totalAmount }}</span>
-            </div>
-            <button
-              class="btn btn-primary w-100 mt-3"
-              @click="submitOrder"
-              :disabled="isSubmitting"
-            >
-              {{ isSubmitting ? '送出中...' : '送出訂單' }}
-            </button>
           </div>
         </div>
       </div>
-    </div>
     </div>
   </SponsorshipLayout>
 </template>
@@ -207,11 +209,14 @@ import { zipcodeMap, getDistrictByZipcode } from '@/utils/zipcodeMap'
 import creditIcon from '@/assets/images/credit.png'
 import atmIcon from '@/assets/icons/atm.png'
 import linePayIcon from '@/assets/icons/LINE_Pay.png'
+import { useRestoreAuth } from '@/composables/useRestoreAuth'
+
+useRestoreAuth()
 
 const paymentList = [
   { value: 'card', label: '信用卡', icon: creditIcon },
   { value: 'atm', label: 'ATM', icon: atmIcon },
-  { value: 'linepay', icon: linePayIcon }
+  { value: 'linepay', icon: linePayIcon },
 ]
 
 const authStore = useUserStore()

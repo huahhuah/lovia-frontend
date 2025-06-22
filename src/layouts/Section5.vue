@@ -17,10 +17,7 @@
             <div class="content text-start">
               <h4 class="fw-bold">我要提案</h4>
               <p>讓你的願景發聲，讓好點子成真！</p>
-              <button
-                class="btn btn-dark rounded-pill px-4 py-2"
-                onclick="window.location.href='projects/create'"
-              >
+              <button class="btn btn-dark rounded-pill px-4 py-2" @click="goToProposal">
                 GO &gt;
               </button>
             </div>
@@ -39,7 +36,7 @@
               <p>每一份支持，都是實現夢想的起點！</p>
               <button
                 class="btn btn-dark rounded-pill px-4 py-2"
-                onclick="window.location.href='projects/explore-projects'"
+                @click="router.push('/projects/explore-projects')"
               >
                 GO &gt;
               </button>
@@ -50,7 +47,28 @@
     </div>
   </section>
 </template>
+<script setup>
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/auth'
 
+const router = useRouter()
+const userStore = useUserStore()
+
+const goToProposal = () => {
+  if (!userStore.user) {
+    // 未登入導向登入頁
+    router.push('/login')
+    return
+  }
+
+  const role = userStore.user?.role?.role_type
+  if (role === '提案者') {
+    router.push('/projects/create')
+  } else {
+    router.push('/users/postApplication')
+  }
+}
+</script>
 <style scoped>
 .section5 {
   background: linear-gradient(to right, #ffedf2, #fff6e3);

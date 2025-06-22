@@ -191,6 +191,7 @@ async function handleLogin() {
     })
 
     localStorage.setItem('token', token)
+    localStorage.setItem('user', JSON.stringify(user))
     sessionStorage.setItem('token', token)
     showToast('登入成功', 'success')
 

@@ -59,7 +59,11 @@
 
               <div class="text-end mt-3 fs-5 fw-bold">總金額 NT$ {{ formattedTotalAmount }}</div>
 
-              <button class="btn btn-primary w-100 mt-3" @click="confirmSponsorship">
+              <button
+                class="btn btn-primary w-100 mt-3"
+                @click="confirmSponsorship"
+                :disabled="project?.project_type === '歷年專案'"
+              >
                 確認贊助
               </button>
 
@@ -79,7 +83,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { getProjectOverview, getProjectPlans, sponsorProjectPlan } from '@/api/project'
 import defaultImg from '@/assets/images/default.png'
 import { useUserStore } from '@/stores/auth'
+import { useRestoreAuth } from '@/composables/useRestoreAuth'
 
+useRestoreAuth()
 const route = useRoute()
 const router = useRouter()
 const authStore = useUserStore()
@@ -151,6 +157,11 @@ onMounted(async () => {
 })
 
 async function confirmSponsorship() {
+  if (project.value?.project_type === '歷年專案') {
+    alert('此為歷年專案，無法贊助')
+    return
+  }
+
   if (!authStore.token) {
     alert('請先登入才能贊助')
     router.push('/login')
