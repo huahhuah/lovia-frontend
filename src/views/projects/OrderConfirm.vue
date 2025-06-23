@@ -168,7 +168,6 @@ async function submitPayment() {
   try {
     const token = localStorage.getItem('token')
     if (!token) return redirectError('請先登入才能付款')
-    sessionStorage.setItem('token', token)
 
     const orderId = orderData.value.order_uuid
     if (!orderId || typeof orderId !== 'string') {
@@ -184,7 +183,7 @@ async function submitPayment() {
     const rawType = (orderData.value.payment || '').toLowerCase()
     const paymentType = ['linepay', 'credit', 'atm'].includes(rawType) ? rawType : 'credit'
 
-    // 安全抓取 sponsorFormData 中的 selectedPlan
+    // 安全取得 productName（回饋名稱）
     const sponsorFormDataRaw = localStorage.getItem('sponsorFormData') || '{}'
     const selectedPlan = JSON.parse(sponsorFormDataRaw)?.selectedPlan || {}
     const planName =
@@ -194,15 +193,15 @@ async function submitPayment() {
       '贊助支持方案'
 
     const productName = planName.slice(0, 100)
-
     const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
+    const url = `${baseURL}/users/orders/${orderId}/payment`
 
-    const payload = { amount, email, payment_type: paymentType, productName }
-
-    const url =
-      paymentType === 'linepay'
-        ? `${baseURL}/users/orders/${orderId}/payment`
-        : `${baseURL}/users/orders/${orderId}/ecpay`
+    const payload = {
+      amount,
+      email,
+      payment_type: paymentType,
+      productName,
+    }
 
     if (paymentType === 'linepay') {
       await handleLinePayPayment(payload, token, url)
