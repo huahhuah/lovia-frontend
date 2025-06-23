@@ -251,7 +251,6 @@ onMounted(() => {
 <style scoped>
 .question-management {
   min-height: 100vh;
-  background: linear-gradient(135deg, #fef7f0 0%, #fdf2f8 100%);
 }
 
 .container {
@@ -261,15 +260,10 @@ onMounted(() => {
 }
 
 .page-title {
-  font-size: 32px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #FC7D9D 0%, #FFC443 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-align: center;
-  margin-bottom: 40px;
-  text-shadow: 0 2px 4px rgba(252, 125, 157, 0.1);
+  font-size: 16px;
+  font-weight: 400;
+  text-align: left;
+  margin-bottom: 30px;
 }
 
 /* Loading Styles */
@@ -362,13 +356,6 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.question-card.has-reply {
-  border-left: 6px solid #10b981;
-  box-shadow:
-    0 20px 40px rgba(16, 185, 129, 0.1),
-    0 10px 20px rgba(252, 125, 157, 0.05);
-}
-
 .question-card:hover {
   transform: translateY(-4px);
   box-shadow:
@@ -383,7 +370,7 @@ onMounted(() => {
 }
 
 .question-card-header {
-  background: linear-gradient(135deg, #FC7D9D 0%, #FFC443 100%);
+  background: rgba(194, 34, 34, 0.5);
   padding: 20px;
   color: white;
   display: flex;
@@ -393,7 +380,7 @@ onMounted(() => {
 }
 
 .question-card.has-reply .question-card-header {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: rgba(46, 116, 21, 0.7);
 }
 
 .project-badge {
@@ -419,7 +406,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(9, 3, 3, 0.2);
   padding: 6px 12px;
   border-radius: 16px;
   font-size: 12px;
@@ -429,7 +416,7 @@ onMounted(() => {
 }
 
 .reply-status-badge.pending {
-  background: rgba(255, 193, 7, 0.3);
+  background: rgba(194, 34, 34, 0.4);
   color: #fff3cd;
 }
 
@@ -461,12 +448,12 @@ onMounted(() => {
 .questioner-avatar {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #FC7D9D 0%, #FFC443 100%);
+  background: rgba(252, 91, 83, 0.4);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: black;
   font-weight: 700;
   font-size: 20px;
   box-shadow: 0 4px 12px rgba(252, 125, 157, 0.3);
@@ -487,16 +474,15 @@ onMounted(() => {
 
 .question-content {
   background: rgba(252, 125, 157, 0.02);
-  border-radius: 16px;
   padding: 20px;
-  border-left: 4px solid #FC7D9D;
+  border-left: 2px solid rgba(194, 34, 34, 0.5);
   margin-bottom: 20px;
 }
 
 .content-label {
   font-size: 12px;
   font-weight: 600;
-  color: #FC7D9D;
+  color: rgba(194, 34, 34, 0.5);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 12px;
@@ -511,13 +497,12 @@ onMounted(() => {
 /* Reply Content Styles */
 .reply-content {
   background: rgba(16, 185, 129, 0.02);
-  border-radius: 16px;
   padding: 20px;
-  border-left: 4px solid #10b981;
+  border-left: 2px solid rgba(46, 116, 21, 0.7);
 }
 
 .reply-content .content-label {
-  color: #10b981;
+  color: rgba(46, 116, 21, 0.7);
 }
 
 .reply-text {
@@ -529,7 +514,7 @@ onMounted(() => {
 .reply-avatar {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: rgba(46, 116, 21, 0.7);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -551,7 +536,7 @@ onMounted(() => {
 }
 
 .reply-meta strong {
-  color: #10b981;
+  color: rgba(46, 116, 21, 0.7);
   font-size: 14px;
 }
 
@@ -582,11 +567,11 @@ onMounted(() => {
 }
 
 .reply-btn {
-  background: linear-gradient(135deg, #FC7D9D 0%, #FFC443 100%);
+  background: rgba(194, 34, 34, 0.5);
   color: white;
   border: none;
   padding: 12px 24px;
-  border-radius: 20px;
+  border-radius: 50px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
@@ -600,8 +585,8 @@ onMounted(() => {
 }
 
 .reply-btn.replied {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  background: rgba(46, 116, 21, 0.7);
+  box-shadow: 0 4px 15px;
 }
 
 .reply-btn::before {
@@ -669,7 +654,7 @@ onMounted(() => {
 }
 
 .modal-content {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+  background: white;
   backdrop-filter: blur(20px);
   border-radius: 24px;
   overflow: hidden;
@@ -678,9 +663,8 @@ onMounted(() => {
 }
 
 .modal-header {
-  background: linear-gradient(135deg, #FC7D9D 0%, #FFC443 100%);
   padding: 24px;
-  color: white;
+  color: black;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -688,11 +672,11 @@ onMounted(() => {
 
 .modal-title {
   margin: 0;
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 400;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .modal-icon {
@@ -743,11 +727,11 @@ onMounted(() => {
   display: inline-block;
   font-size: 12px;
   font-weight: 600;
-  color: #FC7D9D;
+  color: white;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
-  background: rgba(252, 125, 157, 0.1);
+  background: rgba(194, 34, 34, 0.5);
   padding: 4px 12px;
   border-radius: 12px;
 }
@@ -762,8 +746,7 @@ onMounted(() => {
 .summary-content {
   background: white;
   padding: 16px;
-  border-radius: 12px;
-  border-left: 4px solid #FC7D9D;
+  border-left: 2px solid rgba(194, 34, 34, 0.5);
   margin-top: 8px;
   line-height: 1.6;
   color: #2d3748;
@@ -788,13 +771,13 @@ onMounted(() => {
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #2d3748;
+  color: rgba(194, 34, 34, 0.5);
   margin-bottom: 12px;
 }
 
 .reply-textarea {
   width: 100%;
-  border: 2px solid rgba(252, 125, 157, 0.2);
+  border: 1px solid rgba(252, 125, 157, 0.2);
   border-radius: 16px;
   padding: 16px;
   font-size: 14px;
@@ -807,7 +790,7 @@ onMounted(() => {
 
 .reply-textarea:focus {
   outline: none;
-  border-color: #FC7D9D;
+  border-color: rgba(194, 34, 34, 0.5);
   box-shadow: 0 0 0 3px rgba(252, 125, 157, 0.1);
   background: white;
 }
@@ -823,8 +806,8 @@ onMounted(() => {
 
 .btn-cancel {
   background: transparent;
-  border: 2px solid rgba(252, 125, 157, 0.3);
-  color: #FC7D9D;
+  border: 1px solid rgba(194, 34, 34, 0.5);
+  color: rgba(194, 34, 34, 0.5);
   padding: 12px 24px;
   border-radius: 16px;
   font-weight: 600;
@@ -838,8 +821,8 @@ onMounted(() => {
 }
 
 .btn-submit {
-  background: linear-gradient(135deg, #FC7D9D 0%, #FFC443 100%);
   border: none;
+  background-color: rgba(194, 34, 34, 0.5);
   color: white;
   padding: 12px 24px;
   border-radius: 16px;
@@ -854,7 +837,7 @@ onMounted(() => {
 
 .btn-submit:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(252, 125, 157, 0.4);
+  box-shadow: 0 8px 25px rgba(194, 34, 34, 0.4);
 }
 
 .submit-icon {
@@ -939,7 +922,6 @@ onMounted(() => {
 }
 
 .modal-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #FC7D9D 0%, #FFC443 100%);
   border-radius: 4px;
 }
 

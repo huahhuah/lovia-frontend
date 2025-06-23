@@ -470,7 +470,7 @@ export default {
 .project-category {
   display: inline-block;
   background: #fc7c9d;
-  color: #fc7c9d;
+  color: white;
   padding: 6px 16px;
   border-radius: 20px;
   font-size: 12px;

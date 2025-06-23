@@ -256,7 +256,7 @@ router.beforeEach(async (to, from, next) => {
   // 重新計算最新權限狀態
   const isAdmin = userStore.user?.role?.role_type === '管理員'
 
-  if (to.meta.requiresAuth && !isLoggedIn) {
+    if (to.meta.requiresAuth && !isLoggedIn) {
     return next('/login')
   }
 
