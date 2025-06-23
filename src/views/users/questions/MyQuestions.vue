@@ -153,17 +153,12 @@ export default {
 }
 
 .section-title {
-  font-size: 28px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #fc7d9d, #ffc443);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: transparent;
+  font-size: 16px;
+  font-weight: 400;
+  color: black;
   margin-left: 18px;
   text-align: left;
   margin-bottom: 30px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .loading,
@@ -205,11 +200,11 @@ export default {
 }
 
 .project-table th {
-  background: linear-gradient(135deg, #fc7d9d, #ffc443);
-  color: white;
+  background:  rgba(252, 91, 83, 0.4);
+  color: rgba(95, 99, 104, 1);
   white-space: nowrap;
-  font-weight: 600;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  font-weight: 500;
+  text-shadow: 1px ;
   position: relative;
 }
 
@@ -220,7 +215,6 @@ export default {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, #ffc443, #fc7d9d);
 }
 
 .project-table th,
@@ -248,10 +242,10 @@ export default {
 
 /* 專案名稱連結樣式 */
 .project-link {
-  color: #fc7d9d;
+  color: blue;
   text-decoration: none;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 400;
   position: relative;
   transition: all 0.3s ease;
 }
@@ -268,7 +262,7 @@ export default {
 }
 
 .project-link:hover {
-  color: #ffc443;
+  color: rgba(26, 26, 26, 0.4);
   transform: translateY(-1px);
 }
 
@@ -301,7 +295,7 @@ export default {
 
 /* 按鈕樣式 */
 .toggle-btn {
-  background: linear-gradient(135deg, #fc7d9d, #ffc443);
+  background: black;
   color: white;
   border: none;
   padding: 8px 16px;
