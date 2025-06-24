@@ -69,7 +69,16 @@
       <p><strong>完整內容：</strong></p>
       <p v-html="formatMultilineText(selectedProject.full_content)"></p>
       <p><strong>提案團隊：</strong>{{ selectedProject.project_team }}</p>
-      <p><strong>問與答：</strong>{{ selectedProject.faq || '無' }}</p>
+      <p><strong>問與答：</strong></p>
+        <div v-if="selectedProject.parseFaq?.length">
+          <ul>
+            <li v-for="(item, index) in selectedProject.parseFaq" :key="index">
+              <p><strong>Q:</strong> {{ item.question }}</p>
+              <p><strong>A:</strong> {{ item.answer }}</p>
+            </li>
+          </ul>
+        </div>
+        <p v-else>無</p>
       <div v-if="selectedProject.plans?.length">
         <h5>回饋方案</h5>   
         <ul>
@@ -134,7 +143,20 @@ async function getAllProjects( page = 1){
 }
 
 function viewDetails(project) {
-  selectedProject.value = project
+  selectedProject.value = {
+    ...project,
+    parseFaq: []
+  } 
+  try {
+    if(typeof project.faq === 'string'){
+      selectedProject.value.parseFaq = JSON.parse(project.faq)
+    } else if (Array.isArray(project.faq)){
+      selectedProject.value.parseFaq = project.faq
+    } 
+  } catch (e){
+      console.warn('問與答解析失敗',e )
+      selectedProject.value.parseFaq = []
+  }
   showDetailModal.value = true
 }
 
