@@ -152,7 +152,7 @@ const router = createRouter({
       children: [
         {
           path: '',
-          redirect: '/user/sponsorships',
+          redirect: '@/views/user/favorites',
         },
         {
           path: 'edit',
@@ -173,6 +173,11 @@ const router = createRouter({
           path: 'sponsorships',
           name: 'MySponsorships',
           component: () => import('@/views/users/orders/MySponsorships.vue'),
+        },
+        {
+          path: 'favorites', // ✅ 這行是你新增的收藏頁面
+          name: 'MyFavorites',
+          component: () => import('@/views/users/orders/MyFavorites.vue'),
         },
         {
           path: 'questions',
