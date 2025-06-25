@@ -8,7 +8,9 @@
 
     <!-- 價格 + 贊助人數 -->
     <div class="d-flex align-items-center justify-content-between mb-3">
-      <p class="fw-bold text-dark fs-5 mb-0">NT$ {{ plan.amount }}</p>
+      <p class="fw-bold text-dark mb-0 fs-smaller">
+      NT$ {{ plan.amount.toLocaleString() }}
+    </p>
       <div class="d-flex align-items-center small fw-bold">
         <img
           src="@/assets/icons/group.svg"
@@ -118,5 +120,13 @@ function handleSponsor() {
 button:disabled {
   pointer-events: none;
   cursor: not-allowed;
+}
+
+.fs-regular {
+  font-size: 1.25rem;
+}
+
+::v-deep(.fs-smaller) {
+  font-size: 1rem;
 }
 </style>

@@ -63,7 +63,7 @@
 
         <div class="text-center mt-5">
           <router-link to="/" class="btn btn-outline-secondary me-2">返回首頁</router-link>
-          <router-link to="/projects/mine" class="btn btn-success">查看我的贊助</router-link>
+          <router-link to="/user/sponsorships" class="btn btn-success">查看我的贊助</router-link>
         </div>
       </div>
     </div>
