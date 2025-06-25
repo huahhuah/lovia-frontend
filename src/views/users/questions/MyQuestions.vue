@@ -200,8 +200,8 @@ export default {
 }
 
 .project-table th {
-  background:  rgba(252, 91, 83, 0.4);
-  color: rgba(95, 99, 104, 1);
+  background: #FFD2CF;
+  color: black;
   white-space: nowrap;
   font-weight: 500;
   text-shadow: 1px ;
@@ -242,7 +242,7 @@ export default {
 
 /* 專案名稱連結樣式 */
 .project-link {
-  color: blue;
+  color: #0D6EFD;
   text-decoration: none;
   cursor: pointer;
   font-weight: 400;
@@ -282,15 +282,15 @@ export default {
 }
 
 .status-badge.replied {
-  background: linear-gradient(135deg, #4caf50, #81c784);
+  background: rgba(46, 116, 21, 0.5);
   color: white;
-  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 2px 8px;
 }
 
 .status-badge.pending {
-  background: linear-gradient(135deg, #ff9800, #ffb74d);
+  background: rgba(217, 114, 5, 0.5);
   color: white;
-  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+  box-shadow: 0 2px 8px;
 }
 
 /* 按鈕樣式 */

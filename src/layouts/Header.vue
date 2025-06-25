@@ -244,6 +244,8 @@ const handleClickOutside = (event) => {
 }
 
 const handlePropose = () => {
+  isMenuOpen.value = false
+  
   if (!user.value) {
     router.push('/login')
     return
