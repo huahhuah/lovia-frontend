@@ -1,5 +1,5 @@
 <template>
-  <div class="card shadow-sm rounded-5 d-flex flex-column overflow-hidden">
+  <div class="card shadow-sm rounded-5 hover-animate d-flex flex-column overflow-hidden">
     <!-- 封面 + 標籤 + 收藏 -->
     <div class="position-relative">
       <img
@@ -52,7 +52,14 @@
           <div class="progress-bar" :style="{ width: project.percentage + '%' }"></div>
         </div>
         <div class="d-flex justify-content-between align-items-center">
-          <strong>NT$ {{ project.amount.toLocaleString() }}</strong>
+          <strong
+            :class="{
+              'fs-normal': project.amount.toString().length <= 6,
+              'fs-smaller': project.amount.toString().length > 6
+            }"
+          >
+            NT$ {{ project.amount.toLocaleString() }}
+          </strong>
           <router-link
             :to="`/projects/funding/${project.id}`"
             class="btn btn-sm rounded-pill px-3"
@@ -162,6 +169,16 @@ const toggleFavorite = async () => {
   flex-direction: column;
 }
 
+.hover-animate {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-animate:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 0 20px rgba(252, 123, 157, 0.25);
+  z-index: 3;
+}
+
 .card-img-top {
   width: 100%;
   height: 200px;
@@ -269,5 +286,12 @@ const toggleFavorite = async () => {
 .btn-view-project:hover {
   background-color: #2f2e2e;
   color: #fff;
+}
+
+.fs-normal {
+  font-size: 1rem; /* 原本大小 */
+}
+.fs-smaller {
+  font-size: 0.9rem; /* 縮小後 */
 }
 </style>
