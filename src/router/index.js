@@ -152,7 +152,7 @@ const router = createRouter({
       children: [
         {
           path: '',
-          redirect: '@/views/user/favorites',
+          redirect: '/user/sponsorships',
         },
         {
           path: 'edit',

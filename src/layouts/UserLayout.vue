@@ -269,5 +269,13 @@ const closeDropdown = (type) => {
   .user-nav .nav-item {
     margin-bottom: -40px; /* 預設可能是 8px～16px，這裡改小一點 */
   }
+
+  .user-nav .nav-link.active::after {
+    left: 25%;
+    right: 25%;
+    bottom: 8px; /* 更靠近文字 */
+    height: 2px;
+    background-color: #f45c7f;
+  }
 }
 </style>

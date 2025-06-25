@@ -25,7 +25,7 @@
       >
         <!-- 收藏按鈕 -->
         <img
-          :src="isFavorite ? '/heart.png' : '/favorite.png'"
+          :src="isFavorite ? '/favoriteselect.png' : '/favorite.png'"
           :key="isFavorite"
           alt="收藏"
           class="favorite-icon"
