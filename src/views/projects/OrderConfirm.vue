@@ -117,12 +117,11 @@ function redirectError(msg) {
 }
 
 onMounted(() => {
-  // 回 sessionStorage 的 token，避免 LINE Pay 回來變成未登入
   const sessionToken = sessionStorage.getItem('token')
   const localToken = localStorage.getItem('token')
   if (!sessionToken && localToken) {
     sessionStorage.setItem('token', localToken)
-    location.reload() // 重新整理頁面才能讓後續 API 成功取得 token
+    location.reload()
     return
   }
 
@@ -181,9 +180,8 @@ async function submitPayment() {
 
     const email = orderData.value.email?.trim() || 'test@example.com'
     const rawType = (orderData.value.payment || '').toLowerCase()
-    const paymentType = ['linepay', 'credit', 'atm'].includes(rawType) ? rawType : 'credit'
+    const paymentType = ['linepay', 'credit', 'webatm'].includes(rawType) ? rawType : 'credit'
 
-    // 安全取得 productName（回饋名稱）
     const sponsorFormDataRaw = localStorage.getItem('sponsorFormData') || '{}'
     const selectedPlan = JSON.parse(sponsorFormDataRaw)?.selectedPlan || {}
     const planName =
@@ -194,6 +192,7 @@ async function submitPayment() {
 
     const productName = planName.slice(0, 100)
     const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
+
     const url = `${baseURL}/users/orders/${orderId}/payment`
 
     const payload = {
@@ -209,7 +208,7 @@ async function submitPayment() {
       await handleEcpayPayment(payload, token, url)
     }
   } catch (err) {
-    console.error('submitPayment 錯誤:', err)
+    console.error(' submitPayment 錯誤:', err)
     alert('付款建立失敗：' + (err.message || '未知錯誤'))
   } finally {
     isSubmitting.value = false
@@ -236,6 +235,8 @@ async function handleLinePayPayment(payload, token, url) {
 }
 
 async function handleEcpayPayment(payload, token, url) {
+  console.log('🟡 [ECPAY] 發送資料：', payload)
+
   const res = await fetch(url, {
     method: 'POST',
     headers: {
@@ -245,11 +246,12 @@ async function handleEcpayPayment(payload, token, url) {
     body: JSON.stringify(payload),
   })
 
+  const text = await res.text()
+
   if (!res.ok) throw new Error(`綠界金流建立失敗：${res.status}`)
 
-  const formHTML = await res.text()
   document.open()
-  document.write(formHTML)
+  document.write(text)
   document.close()
 }
 </script>

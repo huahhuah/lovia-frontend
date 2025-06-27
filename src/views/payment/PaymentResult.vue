@@ -1,3 +1,4 @@
+<!-- 交易結果頁 -->
 <template>
   <SponsorshipLayout>
     <div class="container py-5">
@@ -5,9 +6,6 @@
 
       <!-- 載入中 -->
       <div v-if="loading" class="text-center py-5 fs-5">🔄 資料載入中，請稍候...</div>
-      <p v-if="polling && result.status !== 'paid'" class="text-muted small text-center">
-        系統正在確認付款狀態中，請稍候...
-      </p>
 
       <!-- 錯誤訊息 -->
       <div v-else-if="error" class="text-center text-danger py-5">
@@ -17,54 +15,49 @@
         </div>
       </div>
 
-      <!-- 成功畫面 -->
-      <div v-else>
-        <!-- ATM 未付款提示 -->
-        <div
-          v-if="result.paymentMethod === '綠界 ATM' && result.status !== 'paid'"
-          class="bg-warning bg-opacity-25 p-4 text-center mb-4 border rounded"
-        >
-          <h4 class="fw-bold text-warning mb-3">⚠️ 此筆交易尚未完成付款</h4>
-          <p class="mb-3">請依下列虛擬帳號資訊於期限內完成轉帳：</p>
-          <p><strong>銀行代碼：</strong>{{ result.bank_code || '未提供' }}</p>
-          <p><strong>虛擬帳號：</strong>{{ result.v_account || '未提供' }}</p>
-          <p><strong>繳費期限：</strong>{{ result.expire_date || '未提供' }}</p>
-          <p class="mt-3 text-muted">轉帳完成後，系統會自動確認付款並寄出通知。</p>
-        </div>
+      <!-- 已付款成功 -->
+      <div v-else class="bg-light p-4 text-center mb-4 border rounded">
+        <h4 class="fw-bold text-success mb-3">🎉 感謝您的贊助！</h4>
+        <p class="text-muted">
+          一封確認信已寄送至 <strong>{{ maskedEmail }}</strong
+          >，請記得查收。
+        </p>
+      </div>
 
-        <!-- 已付款成功 -->
-        <div v-else class="bg-light p-4 text-center mb-4 border rounded">
-          <h4 class="fw-bold text-success mb-3">🎉 感謝您的贊助！</h4>
-          <p class="text-muted">
-            一封確認信已寄送至 <strong>{{ maskedEmail }}</strong
-            >，請記得查收。
-          </p>
-        </div>
+      <!-- 付款資料 -->
+      <div class="bg-body-tertiary border p-4 mb-4 rounded">
+        <h5 class="fw-bold mb-3">💳 付款資訊</h5>
+        <p><strong>交易編號：</strong>{{ result.transactionId || '未提供' }}</p>
+        <p><strong>付款金額：</strong>NT$ {{ result.amount || '未提供' }}</p>
+        <p><strong>付款時間：</strong>{{ result.paidAt || '尚未付款' }}</p>
+        <p><strong>付款方式：</strong>{{ result.paymentMethod || '未提供' }}</p>
+      </div>
 
-        <!-- 付款資料 -->
-        <div class="bg-body-tertiary border p-4 mb-4 rounded">
-          <h5 class="fw-bold mb-3">💳 付款資訊</h5>
-          <p><strong>交易編號：</strong>{{ result.transactionId || '未提供' }}</p>
-          <p><strong>付款金額：</strong>NT$ {{ result.amount || '未提供' }}</p>
-          <p><strong>付款時間：</strong>{{ result.paidAt || '尚未付款' }}</p>
-          <p><strong>付款方式：</strong>{{ result.paymentMethod || '未提供' }}</p>
-        </div>
+      <!-- 贊助人資料 -->
+      <div class="bg-body-tertiary border p-4 rounded">
+        <h5 class="fw-bold mb-3">🙋 贊助者資訊</h5>
+        <p><strong>會員名稱：</strong>{{ result.display_name || '未提供' }}</p>
+        <p><strong>電子信箱：</strong>{{ result.email || '未提供' }}</p>
+        <p><strong>收件人：</strong>{{ result.recipient || '未提供' }}</p>
+        <p><strong>電話：</strong>{{ result.phone || '未提供' }}</p>
+        <p><strong>地址：</strong>{{ result.address || '未提供' }}</p>
+        <p><strong>備註：</strong>{{ result.note || '無' }}</p>
+      </div>
 
-        <!-- 贊助人資料 -->
-        <div class="bg-body-tertiary border p-4 rounded">
-          <h5 class="fw-bold mb-3">🙋 贊助者資訊</h5>
-          <p><strong>贊助姓名：</strong>{{ result.display_name || '未提供' }}</p>
-          <p><strong>電子信箱：</strong>{{ result.email || '未提供' }}</p>
-          <p><strong>收件人：</strong>{{ result.recipient || '未提供' }}</p>
-          <p><strong>電話：</strong>{{ result.phone || '未提供' }}</p>
-          <p><strong>地址：</strong>{{ result.address || '未提供' }}</p>
-          <p><strong>備註：</strong>{{ result.note || '無' }}</p>
-        </div>
+      <!-- 贊助人資料 -->
+      <div class="bg-body-tertiary border p-4 rounded">
+        <h5 class="fw-bold mb-3">🙋 贊助者資訊</h5>
+        <p><strong>贊助姓名：</strong>{{ result.display_name || '未提供' }}</p>
+        <p><strong>電子信箱：</strong>{{ result.email || '未提供' }}</p>
+        <p><strong>收件人：</strong>{{ result.recipient || '未提供' }}</p>
+        <p><strong>電話：</strong>{{ result.phone || '未提供' }}</p>
+        <p><strong>地址：</strong>{{ result.address || '未提供' }}</p>
+        <p><strong>備註：</strong>{{ result.note || '無' }}</p>
+      </div>
 
-        <div class="text-center mt-5">
-          <router-link to="/" class="btn btn-outline-secondary me-2">返回首頁</router-link>
-          <router-link to="/user/sponsorships" class="btn btn-success">查看我的贊助</router-link>
-        </div>
+      <div class="text-center mt-5">
+        <router-link to="/" class="btn btn-outline-secondary me-2">返回首頁</router-link>
+        <router-link to="/user/sponsorships" class="btn btn-success">查看我的贊助</router-link>
       </div>
     </div>
   </SponsorshipLayout>
@@ -73,14 +66,16 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useRestoreAuth } from '@/composables/useRestoreAuth'
 import SponsorshipLayout from '@/layouts/SponsorshipLayout.vue'
+
+useRestoreAuth()
 
 const route = useRoute()
 const router = useRouter()
 
 const loading = ref(true)
 const error = ref('')
-const polling = ref(false)
 const orderId = route.query.orderId || ''
 const transactionId = route.query.transactionId || ''
 
@@ -106,8 +101,9 @@ const maskedEmail = computed(() => {
   return email.replace(/^(.{3})(.*)(@.*)$/, (_, a, _b, c) => `${a}***${c}`)
 })
 
-let retryCount = 0
-const maxRetry = 6
+const displayPaidTime = computed(() => {
+  return result.value.paidAt ? dayjs(result.value.paidAt).format('YYYY/MM/DD HH:mm') : '尚未付款'
+})
 
 onMounted(async () => {
   if (!orderId) {
@@ -116,29 +112,29 @@ onMounted(async () => {
     return
   }
 
-  await pollResult()
+  await fetchResult()
 
+  // 移除 URL 中多餘的參數（如果有）
   if (route.query.transactionId) {
     router.replace({ path: '/checkout/result', query: { orderId } })
+    window.history.replaceState({}, '', `/checkout/result?orderId=${orderId}`)
   }
 })
 
-async function pollResult() {
+async function fetchResult() {
   loading.value = true
-  polling.value = true
   error.value = ''
 
   try {
-    const res = await fetch(
-      `https://lovia-backend-xl4e.onrender.com/api/v1/users/orders/${orderId}/payment/success/public`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ transactionId }),
-      }
-    )
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+
+    const res = await fetch(`${baseUrl}/orders/${orderId}/payment/success/public`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ transactionId }),
+    })
 
     const json = await res.json()
     const data = json.data
@@ -148,18 +144,21 @@ async function pollResult() {
     const methodMap = {
       LINE_PAY: 'LINE Pay',
       linepay: 'LINE Pay',
-      ATM: '綠界 ATM',
-      atm: '綠界 ATM',
+      webatm: 'WebATM 線上轉帳',
+      WebATM: 'WebATM 線上轉帳',
       Credit: '綠界信用卡',
       credit: '綠界信用卡',
       Credit_CreditCard: '綠界信用卡',
     }
 
+    let paymentMethod = data.paymentMethod || ''
+    const mappedMethod = methodMap[paymentMethod] || paymentMethod || '未知方式'
+
     result.value = {
       transactionId: data.transactionId || data.orderId,
       amount: data.amount,
       paidAt: data.paidAt,
-      paymentMethod: methodMap[data.paymentMethod] || data.paymentMethod || '未知方式',
+      paymentMethod: mappedMethod,
       display_name: data.display_name || '匿名',
       email: data.email || '',
       recipient: data.recipient || '',
@@ -172,18 +171,12 @@ async function pollResult() {
       expire_date: data.expire_date || '',
     }
 
-    if (result.value.status !== 'paid' && retryCount < maxRetry) {
-      retryCount++
-      setTimeout(pollResult, 5000)
-    } else if (result.value.status !== 'paid') {
-      error.value = '付款尚未完成，請稍後再試或聯繫客服'
-    }
+    console.log(' 查詢成功 result:', result.value)
   } catch (err) {
-    console.error('❌ 查詢錯誤:', err)
+    console.error(' 查詢錯誤:', err)
     error.value = err.message || '查詢失敗'
   } finally {
     loading.value = false
-    polling.value = false
   }
 }
 </script>
