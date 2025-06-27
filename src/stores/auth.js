@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import axios from 'axios'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -24,6 +25,7 @@ export const useUserStore = defineStore('user', {
     setToken(token) {
       this.token = token
       localStorage.setItem('token', token)
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`
     },
     setUser(user) {
       this.user = {
@@ -31,18 +33,21 @@ export const useUserStore = defineStore('user', {
         ...user, // 用新資料更新
       }
       localStorage.setItem('user', JSON.stringify(this.user))
-      console.log('已設置使用者:', this.user)
     },
     clear() {
       this.token = ''
       this.user = null
       localStorage.removeItem('token')
       localStorage.removeItem('user')
+      delete axios.defaults.headers.common.Authorization
     },
     restore() {
       const token = localStorage.getItem('token')
       const user = localStorage.getItem('user')
-      if (token) this.token = token
+      if (token) {
+        this.token = token
+        axios.defaults.headers.common.Authorization = `Bearer ${token}`
+      }
       if (user) {
         try {
           this.user = JSON.parse(user)

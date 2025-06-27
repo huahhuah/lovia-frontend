@@ -215,7 +215,7 @@ useRestoreAuth()
 
 const paymentList = [
   { value: 'card', label: '信用卡', icon: creditIcon },
-  { value: 'atm', label: 'ATM', icon: atmIcon },
+  { value: 'webatm', label: 'WebATM', icon: atmIcon },
   { value: 'linepay', icon: linePayIcon },
 ]
 
@@ -277,7 +277,6 @@ onMounted(() => {
     const storedToken = localStorage.getItem('token')
     if (storedToken) {
       authStore.setToken(storedToken)
-      console.log(' token 還原成功：', storedToken)
     }
   }
 
