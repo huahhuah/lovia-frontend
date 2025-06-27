@@ -44,17 +44,6 @@
         <p><strong>備註：</strong>{{ result.note || '無' }}</p>
       </div>
 
-      <!-- 贊助人資料 -->
-      <div class="bg-body-tertiary border p-4 rounded">
-        <h5 class="fw-bold mb-3">🙋 贊助者資訊</h5>
-        <p><strong>贊助姓名：</strong>{{ result.display_name || '未提供' }}</p>
-        <p><strong>電子信箱：</strong>{{ result.email || '未提供' }}</p>
-        <p><strong>收件人：</strong>{{ result.recipient || '未提供' }}</p>
-        <p><strong>電話：</strong>{{ result.phone || '未提供' }}</p>
-        <p><strong>地址：</strong>{{ result.address || '未提供' }}</p>
-        <p><strong>備註：</strong>{{ result.note || '無' }}</p>
-      </div>
-
       <div class="text-center mt-5">
         <router-link to="/" class="btn btn-outline-secondary me-2">返回首頁</router-link>
         <router-link to="/user/sponsorships" class="btn btn-success">查看我的贊助</router-link>
@@ -128,7 +117,7 @@ async function fetchResult() {
   try {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
 
-    const res = await fetch(`${baseUrl}/orders/${orderId}/payment/success/public`, {
+    const res = await fetch(`${baseUrl}/users/orders/${orderId}/payment/success/public`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
