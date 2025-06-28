@@ -72,7 +72,7 @@ const goToProposal = () => {
 <style scoped>
 .section5 {
   background: linear-gradient(to right, #ffedf2, #fff6e3);
-  padding: 8rem 0;
+  padding: 6rem 0;
   position: relative;
   overflow: hidden;
 }

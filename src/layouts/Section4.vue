@@ -12,10 +12,30 @@
     <div v-else-if="visibleCards.length > 0">
       <h2 class="section-title text-danger fs-4 fw-bold mb-5">歷年專案</h2>
       <div class="container" style="padding-left: 10rem; padding-right: 10rem">
-        <div class="row justify-content-center g-4">
-          <div class="col-md-4" v-for="(card, index) in visibleCards" :key="index">
+        <!-- 桌機版 -->
+        <div class="row justify-content-center g-4 d-none d-md-flex">
+          <div class="col-md-4" v-for="(card, index) in visibleCards" :key="'pc-' + index">
             <ProjectCard :project="card" isArchived />
           </div>
+        </div>
+
+        <!-- 手機版橫向滑動 -->
+        <div class="project-scroll-wrapper d-md-none" ref="scrollContainer" @scroll="onScroll">
+          <div class="project-scroll">
+            <div class="card-wrapper" v-for="(card, index) in visibleCards" :key="'mobile-' + index">
+              <ProjectCard :project="card" isArchived />
+            </div>
+          </div>
+        </div>
+
+        <!-- 圓點指示器 -->
+        <div class="dot-indicator d-md-none">
+          <span
+            v-for="(card, index) in visibleCards.slice(0, 5)"
+            :key="'dot-' + index"
+            class="dot"
+            :class="{ active: currentIndex === index }"
+          ></span>
         </div>
 
         <!-- 查看更多 -->
@@ -80,6 +100,20 @@ function onToggleFollow({ projectId, follow }) {
   if (target) {
     target.isFollowed = follow
   }
+}
+
+const scrollContainer = ref(null)
+const currentIndex = ref(0)
+
+function onScroll() {
+  const container = scrollContainer.value
+  if (!container) return
+
+  const scrollLeft = container.scrollLeft
+  const cardWidth = container.offsetWidth * 0.8 + 16 // 卡片寬 + 間距
+  const index = Math.round(scrollLeft / cardWidth)
+
+  currentIndex.value = Math.min(index, 4)
 }
 </script>
 
@@ -248,5 +282,42 @@ function onToggleFollow({ projectId, follow }) {
     max-width: 320px;
     z-index: 0;
   }
+  .project-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-left: -1rem;
+  margin-right: -1rem;
+  padding: 0 1rem;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+.project-scroll-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+.project-scroll {
+  display: flex;
+  gap: 1rem;
+}
+.card-wrapper {
+  flex: 0 0 auto;
+  width: 80vw;
+  max-width: 320px;
+}
+.dot-indicator {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+  gap: 8px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: #ddd;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+:deep(.dot.active) {
+  background-color: #fc5b53;
+}
 }
 </style>

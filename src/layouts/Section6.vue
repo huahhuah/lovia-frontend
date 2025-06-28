@@ -135,7 +135,7 @@
 
 @media (max-width: 768px) {
   .section6 {
-    padding: 1rem 1rem 6rem;
+    padding: 1rem 1rem 10rem;
   }
 
   .section6-bg {

@@ -58,7 +58,7 @@ onMounted( async () => {
   try {
     const token = userStore.token
     const res = await axios.get(`https://lovia-backend-xl4e.onrender.com/api/v1/users/my_follows`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}`}
     })
     const rawData = res.data.result
     projectList.value = rawData.map(project =>{
@@ -124,15 +124,19 @@ onMounted( async () => {
   display: flex;
   gap: 16px;
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .project-card {
   position: relative;
   width: 640px;
+  min-width: 640px;
+  max-width: 640px;
   height: 176px;
+  overflow: hidden; /* 避免內容撐高卡片 */
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start; /* ✅ 避免 align-items: stretch 被繼承影響 */
   padding: 16px;
   gap: 12px;
   background-color: #fff8f9;
@@ -162,6 +166,13 @@ onMounted( async () => {
   font-size: 18px;
   color: #1a1a1a;
   margin-top: 20px;
+  line-height: 1.4;
+  height: 2.8em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .meta {

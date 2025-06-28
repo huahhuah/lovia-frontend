@@ -9,7 +9,8 @@
       <h2 class="section-title text-danger fs-4 fw-bold mb-5">募資中</h2>
 
       <div class="container" style="padding-left: 10rem; padding-right: 10rem">
-        <div class="row justify-content-center g-4">
+        <!-- 桌機版卡片 -->
+        <div class="row justify-content-center g-4 d-none d-md-flex">
           <div class="col-md-4" v-for="(card, index) in visibleCards" :key="index">
             <ProjectCard
               :project="card"
@@ -18,6 +19,30 @@
               @toggle-follow="onToggleFollow"
             />
           </div>
+        </div>
+
+        <!-- 手機版滑動卡片 -->
+        <div class="project-scroll-wrapper d-md-none" ref="scrollContainer" @scroll="onScroll">
+          <div class="project-scroll">
+            <div class="card-wrapper" v-for="(card, index) in visibleCards" :key="'mobile-' + index">
+              <ProjectCard
+                :project="card"
+                :is-archived="card.status === '已結束'"
+                :isFollowed="card.is_followed"
+                @toggle-follow="onToggleFollow"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- 圓點指示器 -->
+        <div class="dot-indicator d-md-none">
+          <span
+            v-for="(card, index) in visibleCards.slice(0, 5)"
+            :key="'dot-' + index"
+            class="dot"
+            :class="{ active: currentIndex === index }"
+          ></span>
         </div>
 
         <button
@@ -69,6 +94,21 @@ function onToggleFollow({ projectId, follow }) {
   if (target) {
     target.is_followed = follow
   }
+}
+
+const currentIndex = ref(0)
+const scrollContainer = ref(null)
+
+const onScroll = () => {
+  const container = scrollContainer.value
+  if (!container) return
+
+  const scrollLeft = container.scrollLeft
+  const cardWidth = container.offsetWidth * 0.8 + 16 // 卡片寬 + gap (16px)
+  const index = Math.round(scrollLeft / cardWidth)
+
+  // 最多只顯示 0~5 的圓點
+  currentIndex.value = Math.min(index, 5)
 }
 </script>
 
@@ -253,5 +293,49 @@ function onToggleFollow({ projectId, follow }) {
     max-width: 300px;
     z-index: 0;
   }
+  /* 橫向滑動區容器 */
+.project-scroll-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-left: -1rem;
+  margin-right: -1rem;
+  padding: 0 1rem;
+  scrollbar-width: none; /* Firefox */
+}
+
+.project-scroll-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.project-scroll {
+  display: flex;
+  gap: 1rem;
+}
+
+/* 卡片容器 */
+.card-wrapper {
+  flex: 0 0 auto;
+  width: 80vw;
+  max-width: 320px;
+}
+
+.dot-indicator {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: #ddd;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.dot.active {
+  background-color: #fc5b53;
+}
 }
 </style>

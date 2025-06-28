@@ -202,7 +202,6 @@ const toggleFavorite = async () => {
   right: 12px;
   width: 44px; /* 放大 */
   height: 44px;
-  background-color: rgba(26, 26, 26, 0.2);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -266,13 +265,6 @@ const toggleFavorite = async () => {
   width: 120px;
   transform: translate(-50%, -50%);
   z-index: 2;
-}
-
-.favorite-icon {
-  width: 20px;
-  height: 20px;
-  filter: grayscale(100%) brightness(1.2); /* 預設灰色 */
-  transition: filter 0.2s ease;
 }
 
 .favorite-wrapper.is-favorite .favorite-icon {
