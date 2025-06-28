@@ -235,8 +235,6 @@ async function handleLinePayPayment(payload, token, url) {
 }
 
 async function handleEcpayPayment(payload, token, url) {
-  console.log('🟡 [ECPAY] 發送資料：', payload)
-
   const res = await fetch(url, {
     method: 'POST',
     headers: {

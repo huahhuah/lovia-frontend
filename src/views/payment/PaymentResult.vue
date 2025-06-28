@@ -16,12 +16,21 @@
       </div>
 
       <!-- 已付款成功 -->
-      <div v-else class="bg-light p-4 text-center mb-4 border rounded">
+      <div
+        v-else-if="result.status === 'paid'"
+        class="bg-light p-4 text-center mb-4 border rounded"
+      >
         <h4 class="fw-bold text-success mb-3">🎉 感謝您的贊助！</h4>
         <p class="text-muted">
           一封確認信已寄送至 <strong>{{ maskedEmail }}</strong
           >，請記得查收。
         </p>
+      </div>
+
+      <!-- 尚未付款 -->
+      <div v-else class="bg-warning-subtle p-4 text-center mb-4 border rounded">
+        <h4 class="fw-bold text-warning mb-3">⚠️ 尚未完成付款</h4>
+        <p class="text-muted">此筆訂單尚未付款或已被取消，請重新操作。</p>
       </div>
 
       <!-- 付款資料 -->
@@ -30,14 +39,25 @@
         <p><strong>交易編號：</strong>{{ result.transactionId || '未提供' }}</p>
         <p><strong>付款金額：</strong>NT$ {{ result.amount || '未提供' }}</p>
         <p><strong>付款時間：</strong>{{ result.paidAt || '尚未付款' }}</p>
+        <p>
+          <strong>付款狀態：</strong>
+          <span
+            :class="{
+              'text-success': result.status === 'paid',
+              'text-warning': result.status !== 'paid',
+            }"
+          >
+            {{ result.status === 'paid' ? '已付款' : '尚未付款' }}
+          </span>
+        </p>
         <p><strong>付款方式：</strong>{{ result.paymentMethod || '未提供' }}</p>
       </div>
 
       <!-- 贊助人資料 -->
       <div class="bg-body-tertiary border p-4 rounded">
         <h5 class="fw-bold mb-3">🙋 贊助者資訊</h5>
-        <p><strong>會員名稱：</strong>{{ result.display_name || '未提供' }}</p>
-        <p><strong>電子信箱：</strong>{{ result.email || '未提供' }}</p>
+
+        <p><strong>贊助人名稱：</strong>{{ result.display_name || '匿名' }}</p>
         <p><strong>收件人：</strong>{{ result.recipient || '未提供' }}</p>
         <p><strong>電話：</strong>{{ result.phone || '未提供' }}</p>
         <p><strong>地址：</strong>{{ result.address || '未提供' }}</p>

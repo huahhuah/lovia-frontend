@@ -116,7 +116,11 @@
                     @input="errors.zipcode = ''"
                   />
                   <p class="text-danger small" v-if="errors.zipcode">{{ errors.zipcode }}</p>
+                  <p class="text-muted small mt-1" v-if="zipcodeDistrict">
+                    郵遞區號對應行政區：{{ zipcodeDistrict }}
+                  </p>
                 </div>
+
                 <div class="col-md-8">
                   <input
                     v-model="form.address"
@@ -271,6 +275,10 @@ const totalAmount = computed(() => {
   return Number.isFinite(total) && total >= 0 ? total : baseAmount.value
 })
 
+const zipcodeDistrict = computed(() => {
+  return getDistrictByZipcode(form.value.zipcode) || ''
+})
+
 onMounted(() => {
   //  強制還原 token（若沒有）以防刷新後失效
   if (!authStore.token) {
@@ -330,7 +338,7 @@ onMounted(() => {
   form.value.account = authStore.user?.account || ''
 })
 
-// 發票驗證：含手機條碼、統一編號格式、邏輯限制
+// 發票驗證：含手機條碼、統一編號格式、完整郵遞區號 + 地址檢查
 function validateInvoiceForm(form) {
   errors.value.invoiceType = ''
   errors.value.mobileBarcode = ''
@@ -395,6 +403,18 @@ function validateOrderForm(form) {
   if (!form.address.trim()) {
     errors.value.address = '請填寫地址'
     isValid = false
+  } else if (form.address.length < 6) {
+    errors.value.address = '地址太短，請輸入完整地址'
+    isValid = false
+  } else if (/https?:\/\//i.test(form.address)) {
+    errors.value.address = '地址格式錯誤，請勿輸入網址'
+    isValid = false
+  } else {
+    const district = getDistrictByZipcode(form.zipcode)
+    if (district && !form.address.includes(district)) {
+      errors.value.address = `地址需包含所屬區域名稱：${district}`
+      isValid = false
+    }
   }
 
   if (!form.payment) {
