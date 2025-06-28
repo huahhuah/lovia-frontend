@@ -8,7 +8,7 @@
         <router-link 
           v-for="(project, index) in projectList"
           :key="index"
-          :to="`/projects/${project.id}`"
+          :to="`/projects/funding/${project.id}`"
           class="project-card"
         >
           <div class="favorite-icon">
