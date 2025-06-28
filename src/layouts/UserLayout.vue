@@ -13,7 +13,7 @@
       <ul class="nav gap-4 user-nav">
         <!-- 會員中心 -->
         <li class="nav-item">
-          <router-link to="/user" class="nav-link" exact-active-class="active"
+          <router-link to="/user/favorites" class="nav-link" exact-active-class="active"
             >會員中心</router-link
           >
         </li>

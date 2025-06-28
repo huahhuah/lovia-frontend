@@ -72,7 +72,7 @@
               <!-- ✅ 一般會員（贊助者 + 提案者）功能 -->
               <template v-else>
                 <!-- 通用項目 -->
-                <li><router-link to="/user" class="dropdown-item">會員中心</router-link></li>
+                <li><router-link to="/user/favorites" class="dropdown-item">會員中心</router-link></li>
                 <li><router-link to="/user/edit" class="dropdown-item">個人資料</router-link></li>
                 <li>
                   <router-link to="/user/password" class="dropdown-item">修改密碼</router-link>
@@ -180,7 +180,7 @@
         >
         <!--  已登入時 -->
         <template v-else>
-          <router-link to="/user" class="menu-link" @click="isMenuOpen = false"
+          <router-link to="/user/favorites" class="menu-link" @click="isMenuOpen = false"
             >會員中心</router-link
           >
           <span class="menu-link text-danger" @click="handleLogout">登出</span>
