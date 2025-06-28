@@ -5,36 +5,41 @@
       <h5 class="section-title">已收藏專案</h5>
       <div class="project-list">
         <!-- ✅ 卡片列表（示意兩筆資料） -->
-        <div class="project-card" v-for="(project, index) in projectList" :key="index">
+        <router-link 
+          v-for="(project, index) in projectList"
+          :key="index"
+          :to="`/projects/${project.id}`"
+          class="project-card"
+        >
           <div class="favorite-icon">
             <img src="/favoriteselect.png" alt="收藏愛心" />
           </div>
-          <img class="project-img" :src="project.image" alt="project" />
-          <div class="project-info">
-            <h6 class="project-name">{{ project.name }}</h6>
+            <img class="project-img" :src="project.image" alt="project" />
+            <div class="project-info">
+              <h6 class="project-name">{{ project.name }}</h6>
 
-            <p class="meta-top">
-              <span class="tag">
-                <img src="@/assets/icons/vector.svg" class="icon" />
-                倒數 <span class="highlight">{{ project.daysLeft }}</span> 天
-              </span>
-              <span class="tag">
-                <img src="@/assets/icons/group.svg" class="icon" />
-                <span class="highlight">{{ project.supporters }}</span> 人已贊助
-              </span>
-              <span class="tag pink percent">{{ project.percent }}%</span>
-            </p>
-            <!-- ✅ 進度條 -->
-            <div class="progress-bar">
-              <div class="progress-inner" :style="{ width: project.percent + '%' }"></div>
+              <p class="meta-top">
+                <span class="tag">
+                  <img src="@/assets/icons/vector.svg" class="icon" />
+                  倒數 <span class="highlight">{{ project.daysLeft }}</span> 天
+                </span>
+                <span class="tag">
+                  <img src="@/assets/icons/group.svg" class="icon" />
+                  <span class="highlight">{{ project.supporters }}</span> 人已贊助
+                </span>
+                <span class="tag pink percent">{{ project.percent }}%</span>
+              </p>
+              <!-- ✅ 進度條 -->
+              <div class="progress-bar">
+                <div class="progress-inner" :style="{ width: project.percent + '%' }"></div>
+              </div>
+              <p class="amount">
+                已募得 {{ project.raised }}
+                <span class="target-text"> / 目標 {{ project.target }}</span>
+              </p>
+              <p class="date">募資期間：{{ project.period }}</p>
             </div>
-            <p class="amount">
-              已募得 {{ project.raised }}
-              <span class="target-text"> / 目標 {{ project.target }}</span>
-            </p>
-            <p class="date">募資期間：{{ project.period }}</p>
-          </div>
-        </div>
+        </router-link>
       </div>
     </div>
   </div>
@@ -67,6 +72,7 @@ onMounted( async () => {
       const percent = Math.floor((raised/total)*100)
 
       return {
+        id: project.id,
         name: project.title,
         image: project.cover,
         daysLeft: end.diff(today, 'day'),
@@ -85,6 +91,12 @@ onMounted( async () => {
 </script>
 
 <style scoped>
+.project-card {
+  text-decoration: none; /* 移除底線 */
+  color: inherit;         /* 繼承文字顏色 */
+  display: block;         /* 讓整個區塊可點 */
+}
+
 .user-dashboard-content {
   display: flex;
   flex-direction: column;
