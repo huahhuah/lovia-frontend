@@ -41,28 +41,47 @@
 </template>
 
 <script setup>
-const projectList = [
-  {
-    name: '失能長者不憂鬱，幸福沐浴車到宅計畫',
-    image: '/favorite-1.png',
-    daysLeft: 10,
-    supporters: 99,
-    percent: 7,
-    raised: 'NT$399,000',
-    target: 'NT$5,000,000',
-    period: '2025/1/1–2025/4/30',
-  },
-  {
-    name: '讓孩子安心上學的早餐支持計畫',
-    image: '/favorite-2.jpg',
-    daysLeft: 5,
-    supporters: 45,
-    percent: 40,
-    raised: 'NT$120,000',
-    target: 'NT$300,000',
-    period: '2025/3/1–2025/6/30',
-  },
-]
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+import dayjs from 'dayjs'
+import { useUserStore } from '@/stores/auth'
+
+const projectList = ref([])
+const userStore = useUserStore()
+
+onMounted( async () => {
+  try {
+    const token = userStore.token
+    const res = await axios.get(`https://lovia-backend-xl4e.onrender.com/api/v1/users/my_follows`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    const rawData = res.data.result
+    projectList.value = rawData.map(project =>{
+      const start = dayjs(project.start_time)
+      const end = dayjs(project.end_time)
+      const today = dayjs()
+
+      const duration = `${start.format('YYYY/MM/DD')}-${end.format('YYYY/MM/DD')}`
+      const total = project.total_amount || 1
+      const raised = project.amount || 0
+      const percent = Math.floor((raised/total)*100)
+
+      return {
+        name: project.title,
+        image: project.cover,
+        daysLeft: end.diff(today, 'day'),
+        supporters: Math.floor(raised / 1000), // 推估的結果，目前沒有人數API
+        percent,
+        raised: `NT$${raised.toLocaleString()}`,
+        target: `NT$${total.toLocaleString()}`,
+        period: duration,
+      }
+    })
+  } catch (error) {
+    console.error('取得專案失敗', error)
+  }
+})
+
 </script>
 
 <style scoped>
