@@ -2,6 +2,28 @@
   <div class="homepage-bg">
     <!-- Carousel -->
     <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+      <div class="carousel-indicators">
+        <button
+          type="button"
+          data-bs-target="#heroCarousel"
+          data-bs-slide-to="0"
+          class="active"
+          aria-current="true"
+          aria-label="Slide 1"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#heroCarousel"
+          data-bs-slide-to="1"
+          aria-label="Slide 2"
+        ></button>
+        <button
+          type="button"
+          data-bs-target="#heroCarousel"
+          data-bs-slide-to="2"
+          aria-label="Slide 3"
+        ></button>
+      </div>
       <div class="carousel-inner">
         <div class="carousel-item active position-relative">
           <img src="/homepageS1-banner 01.png" class="d-block w-100 hero-img" alt="Hero 1" />
@@ -83,7 +105,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
 
 .homepage-bg {
@@ -152,9 +174,13 @@ onMounted(() => {
 .hero-illustration img {
   max-width: 400px;
 }
+
 .carousel-control-prev {
-  left: 12px;
-  width: 40px; /* 預設是 15%，你只要保留實際箭頭範圍即可 */
+  left: 0.1rem; /* ✅ 可依需求調大，例如 3rem、4rem */
+}
+
+.carousel-control-next {
+  right: 0.1rem; /* ✅ 同上 */
 }
 
 .carousel-control-prev,
@@ -261,6 +287,21 @@ onMounted(() => {
 
 .hero-glow {
   animation: glow 3s ease-in-out infinite;
+}
+
+.carousel-indicators [data-bs-target] {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  opacity: 0.4;
+}
+
+.carousel-indicators .active {
+  background-color: #fc5b53; /* 主色 */
+}
+
+.carousel-indicators .active {
+  opacity: 1;
 }
 
 @media (max-width: 768px) {
