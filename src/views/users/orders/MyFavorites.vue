@@ -61,28 +61,36 @@ onMounted( async () => {
       headers: { Authorization: `Bearer ${token}`}
     })
     const rawData = res.data.result
-    projectList.value = rawData.map(project =>{
-      const start = dayjs(project.start_time)
-      const end = dayjs(project.end_time)
-      const today = dayjs()
 
-      const duration = `${start.format('YYYY/MM/DD')}-${end.format('YYYY/MM/DD')}`
-      const total = project.total_amount || 1
-      const raised = project.amount || 0
-      const percent = Math.floor((raised/total)*100)
+    projectList.value = rawData
+      .filter(project => {
+        if (!project){
+          return false
+        }
+        return true
+      })
+      .map(project =>{
+        const start = dayjs(project.start_time)
+        const end = dayjs(project.end_time)
+        const today = dayjs()
 
-      return {
-        id: project.id,
-        name: project.title,
-        image: project.cover,
-        daysLeft: end.diff(today, 'day'),
-        supporters: Math.floor(raised / 1000), // 推估的結果，目前沒有人數API
-        percent,
-        raised: `NT$${raised.toLocaleString()}`,
-        target: `NT$${total.toLocaleString()}`,
-        period: duration,
-      }
-    })
+        const duration = `${start.format('YYYY/MM/DD')}-${end.format('YYYY/MM/DD')}`
+        const total = project.total_amount || 1
+        const raised = project.amount || 0
+        const percent = Math.floor((raised/total)*100)
+
+        return {
+          id: project.id,
+          name: project.title,
+          image: project.cover,
+          daysLeft: end.diff(today, 'day'),
+          supporters: Math.floor(raised / 1000), // 推估的結果，目前沒有人數API
+          percent,
+          raised: `NT$${raised.toLocaleString()}`,
+          target: `NT$${total.toLocaleString()}`,
+          period: duration,
+        }
+      })
   } catch (error) {
     console.error('取得專案失敗', error)
   }
