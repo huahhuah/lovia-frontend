@@ -6,7 +6,7 @@
     <!-- 使用者頭像 + 名稱 + 導覽列 -->
     <section class="user-header container">
       <div class="avatar-area">
-        <img :src="user?.avatar || defaultAvatar" class="user-avatar" alt="avatar" />
+        <img :src="user?.avatar_url || defaultAvatar" class="user-avatar" alt="avatar" />
         <h5 class="username-text">{{ user?.username || '使用者' }}</h5>
       </div>
 
