@@ -6,7 +6,7 @@
     <!-- 使用者頭像 + 名稱 + 導覽列 -->
     <section class="user-header container">
       <div class="avatar-area">
-        <img :src="user?.avatar_url || defaultAvatar" class="user-avatar" alt="avatar" />
+        <img :src="avatarUrl" class="user-avatar" alt="avatar" />
         <h5 class="username-text">{{ user?.username || '使用者' }}</h5>
       </div>
 
@@ -96,7 +96,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/auth'
 import defaultAvatar from '@/assets/images/default-avatar.png'
 
@@ -156,6 +156,12 @@ const closeDropdown = (type) => {
     showQuestions.value = false
   }
 }
+
+const timestamp = Date.now()
+const avatarUrl = computed(() => {
+  const avatar = userStore.user?.avatar_url
+  return avatar ? `${avatar}?t=${timestamp}` : defaultAvatar
+})
 </script>
 
 <style scoped>
