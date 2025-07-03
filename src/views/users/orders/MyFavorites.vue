@@ -102,7 +102,8 @@ onMounted( async () => {
   flex-direction: column;
   align-items: flex-start;
   gap: 40px;
-  width: 1296px;
+  width: 100%;
+  max-width: 1296px;
   min-height: 349px;
   margin: 0 auto;
 }
@@ -129,14 +130,11 @@ onMounted( async () => {
 
 .project-card {
   position: relative;
-  width: 640px;
-  min-width: 640px;
-  max-width: 640px;
-  height: 176px;
+  min-height: 176px;
   overflow: hidden; /* 避免內容撐高卡片 */
   display: flex;
   flex-direction: row;
-  align-items: flex-start; /* ✅ 避免 align-items: stretch 被繼承影響 */
+  align-items: center; /* ✅ 避免 align-items: stretch 被繼承影響 */
   padding: 16px;
   gap: 12px;
   background-color: #fff8f9;
@@ -158,21 +156,23 @@ onMounted( async () => {
 .project-info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  justify-content: space-between; /* 將內容均分上下 */
+  height: 100%;
+  gap: 6px;
   flex: 1;
 }
 
 .project-name {
   font-size: 18px;
   color: #1a1a1a;
-  margin-top: 20px;
   line-height: 1.4;
   height: 2.8em;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 2;/* 限制最多顯示兩行 */
   -webkit-box-orient: vertical;
+  max-width: calc(100% - 48px);
 }
 
 .meta {
@@ -180,7 +180,7 @@ onMounted( async () => {
   gap: 12px;
   font-size: 14px;
   color: #5f6368;
-  margin-top: -40px;
+  margin-top: -30px;
 }
 
 .meta .tag {
@@ -200,7 +200,7 @@ onMounted( async () => {
 
 .amount {
   font-size: 14px;
-  color: #1a1a1a;
+  color: #5f6368;
 }
 
 .date {
@@ -292,137 +292,105 @@ onMounted( async () => {
   height: 18px;
 }
 
+@media (min-width: 992px) {
+  .project-card {
+    width: 640px;
+    min-width: 640px;
+    max-width: 640px;
+  }
+}
+
 @media (max-width: 768px) {
   .user-dashboard-content {
     width: 100%;
-    padding: 0;
-    gap: 24px;
+    padding: 0 16px;
+    box-sizing: border-box;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 24px;
   }
 
   .donate-section {
     width: 100%;
-    max-width: 375px;
-    margin: -35px auto 0 auto;
   }
 
   .section-title {
-    width: 311px;
-    height: 27px;
-    font-family: 'Noto Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
     font-size: 16px;
-    line-height: 24px;
-    display: flex;
-    align-items: center;
-    color: #1A1A1A;
-    margin-bottom: 8px;
-    margin-top: 0;
-    margin-left: 18px;
+    font-weight: 400;
+    margin-left: 8px;
+    color: #1a1a1a;
   }
 
   .project-list {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 16px;
     width: 100%;
-  }
-
-  .favorite-icon {
-    position: absolute;
-    top: 20px;
-    right: 25px;
-    width: 32px;
-    height: 32px;
-    background-color: rgba(255, 255, 255, 0.6); /* 背後半透明圓背景 */
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-  }
-
-  .favorite-icon img {
-    width: 18px;
-    height: 18px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
   }
 
   .project-card {
-    width: 343px;
-    height: 395.33px;
+    width: 100%;
+    height:100%;
     padding: 16px;
-    gap: 12px;
+    border-radius: 20px;
+    background: #fff8f9;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    background: #FFF8F9;
-    border-radius: 20px;
-    margin: 0 auto;
+    gap: 12px;
     position: relative;
+    overflow: hidden;
   }
 
   .project-img {
-    width: 311px;
-    height: 207.33px;
+    width: 100%;
+    aspect-ratio: 3 / 2;
     object-fit: cover;
     border-radius: 12px;
   }
 
   .project-info {
-    width: 311px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    align-items: flex-start;
-    gap: 12px;
+    gap: 8px;
+    width: 100%;
   }
 
   .project-name {
-    width: 311px;
-    height: 27px;
     font-size: 18px;
-    line-height: 27px;
-    font-weight: 400;
+    font-weight: 500;
     color: #1A1A1A;
-    margin: 0;
+    line-height: 1.4;
   }
 
   .meta-top {
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    width: 311px;
+    flex-wrap: wrap;
     font-size: 13px;
+    gap: 8px;
     color: #5f6368;
-    gap: 12px;
+    width: 100%;
   }
 
   .meta-top .tag {
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 13px;
     white-space: nowrap;
   }
 
-  .meta-top .percent {
+  .tag.percent {
     margin-left: auto;
     color: #fc5b53;
     font-weight: 500;
   }
 
-  .meta-top {
-    margin-bottom: 4px; /* 避免把進度條推掉 */
-  }
-
   .progress-bar {
-    width: 311px;
+    width: 100%;
     height: 6px;
     background-color: #D5DAE0;
     border-radius: 4px;
@@ -438,24 +406,28 @@ onMounted( async () => {
   .amount {
     font-size: 13px;
     color: #1a1a1a;
-    width: 311px;
   }
 
   .date {
-    display: flex;
-    align-items: center;
     font-size: 13px;
     color: #a0a0a0;
-    width: 311px;
-    height: 18px;
   }
 
-  .target-text {
-  color: #A0A0A0;
-}
-  .no-proposal-text {
-    margin-left: 18px;
-    width: 311px;
+  .favorite-icon {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .favorite-icon img {
+    width: 18px;
+    height: 18px;
   }
 }
 </style>
