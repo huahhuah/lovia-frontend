@@ -27,7 +27,7 @@
           </select>
         </div>
 
-        <div class="mt-4">
+        <div class="mt-4" v-if="item.selectedStatus === '3'">
           <label class="block font-semibold mb-1">駁回理由：</label>
           <input
             type="text"
@@ -176,5 +176,73 @@ onMounted(async () => {
 
 .submit-btn:hover {
   background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .pagination-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .pagination {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 14px;
+    border-radius: 8px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    margin-top: 16px;
+  }
+
+  .submit-btn:hover {
+    background-color: #0056b3;
+  }
+
+  /* 卡片排版調整 */
+  .bg-white.p-4 {
+    padding: 1.25rem !important;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+  }
+
+  p, label {
+    font-size: 15px;
+  }
+
+  select,
+  input[type='text'] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-top: 6px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  a {
+    word-break: break-word;
+    font-size: 14px;
+  }
+
+  /* label 與欄位間距一致 */
+  .mt-4 {
+    margin-top: 1rem;
+  }
+
+  /* 單獨讓駁回理由更清楚 */
+  input[placeholder="請輸入駁回理由"] {
+    background-color: #f9f9f9;
+  }
 }
 </style>

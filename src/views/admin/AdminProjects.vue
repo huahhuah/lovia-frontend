@@ -1,57 +1,63 @@
 <template>
   <div class="container py-5">
     <h2 class="text-xl font-bold mb-4">提案資料</h2>
-    <table border="1" style="width: 100%" class="project-table">
-      <thead>
-        <tr>
-          <th>提案時間</th>
-          <th>標題</th>
-          <th>募資期間</th>
-          <th>提案單位</th>
-          <th>查看詳情</th>
-          <th>提案狀態</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="project in projects" :key="project.id">
-          <td>{{ formatDate(project.created_at) }}</td>
-          <td>{{ project.title }}</td>
-          <td>{{ project.start_time }} ~ {{ project.end_time }}</td>
-          <td>{{ project.project_team }}</td>
-          <td><button @click="viewDetails(project)">🔍</button></td>
-          <td>
-            <select 
-              v-model="project.status" 
-              :class="statusClass(project.status)" 
-              @change="onStatusChange(project)"
-            >
-              <option :value=1>審查中</option>
-              <option :value=2>提案通過</option>
-              <option :value=3>提案退回</option>
-            </select>
-            <div v-if="project.status === 3" style="margin-top: 4px;">
+    <div class="table-responsive">
+      <table class="table project-table">
+        <thead>
+          <tr>
+            <th>提案時間</th>
+            <th>標題</th>
+            <th>募資期間</th>
+            <th>提案單位</th>
+            <th>查看詳情</th>
+            <th>提案狀態</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="project in projects" :key="project.id">
+            <td>{{ formatDate(project.created_at) }}</td>
+            <td class="text-break">{{ project.title }}</td>
+            <td>{{ project.start_time }} ~ {{ project.end_time }}</td>
+            <td>{{ project.project_team }}</td>
+            <td class="text-center align-middle"><button class="btn btn-outline-primary btn-sm" @click="viewDetails(project)">🔍</button></td>
+            <td>
+              <select 
+                class="form-select form-select-sm mt-1" 
+                v-model="project.status" 
+                :class="statusClass(project.status)" 
+                @change="onStatusChange(project)"
+              >
+                <option :value=1>審查中</option>
+                <option :value=2>提案通過</option>
+                <option :value=3>提案退回</option>
+              </select>
               <input 
-                type="text" 
+                v-if="project.status === 3" 
                 v-model="project.reason" 
-                placeholder="請輸入退回原因" 
-                style="width: 100%;"
+                type="text" 
+                class="form-control form-control-sm mt-2" 
+                placeholder="請輸入退回原因"
               />
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div style="margin-top: 20px; text-align: center;">
-      <button @click="submitAllUpdates()">送出更新</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="text-center mt-4">
+      <button class="btn btn-primary" @click="submitAllUpdates">送出更新</button>
     </div>
   </div>
-  <div class="pagination mt-3">
+
+  <div class="pagination mt-4">
     <button 
-    v-for="n in totalPages" 
-    :key="n" 
-    :class="{active: n === currentPage}"
-    @click="changePage(n)">{{ n }}</button>
+      v-for="n in totalPages" 
+      :key="n" 
+      :class="{active: n === currentPage}" 
+      @click="changePage(n)"
+    >{{ n }}</button>
   </div>
+
   <div v-if="showDetailModal" class="modal-overlay" @click.self="closeDetailModal">
     <div class="modal-card">
       <button class="close-btn" @click="closeDetailModal"> ❌ </button>
@@ -70,17 +76,17 @@
       <p v-html="formatMultilineText(selectedProject.full_content)"></p>
       <p><strong>提案團隊：</strong>{{ selectedProject.project_team }}</p>
       <p><strong>問與答：</strong></p>
-        <div v-if="selectedProject.parseFaq?.length">
-          <ul>
-            <li v-for="(item, index) in selectedProject.parseFaq" :key="index">
-              <p><strong>Q:</strong> {{ item.question }}</p>
-              <p><strong>A:</strong> {{ item.answer }}</p>
-            </li>
-          </ul>
-        </div>
-        <p v-else>無</p>
+      <div v-if="selectedProject.parseFaq?.length">
+        <ul>
+          <li v-for="(item, index) in selectedProject.parseFaq" :key="index">
+            <p><strong>Q:</strong> {{ item.question }}</p>
+            <p><strong>A:</strong> {{ item.answer }}</p>
+          </li>
+        </ul>
+      </div>
+      <p v-else>無</p>
       <div v-if="selectedProject.plans?.length">
-        <h5>回饋方案</h5>   
+        <h5>回饋方案</h5>
         <ul>
           <li v-for="(plan, index) in selectedProject.plans" :key="index">
             <p>名稱：{{ plan.plan_name }}</p>
@@ -89,10 +95,10 @@
             <p>回饋品：{{ plan.feedback }}</p>
             <p>寄送時間：{{ plan.delivery_date }}</p>
           </li>
-        </ul>   
+        </ul>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <script setup>
@@ -233,69 +239,53 @@ async function submitAllUpdates() {
 
 <style scoped>
 .project-table th, .project-table td {
-  padding: 12px 16px;
-  text-align: left;
-  border-bottom: none; /* 先不設底線 */
-  background-color: #fff;
+  vertical-align: middle;
+  white-space: nowrap;
 }
-
-/* 交替列底色 */
-.project-table tbody tr:nth-child(even) td {
-  background-color: #eee; /* 偶數行淡灰底 */
-}
-
 .project-table th {
-  background-color: #ddd;
-  border-bottom: 2px solid #ccc;
+  background-color: #f8f9fa;
 }
-
-
-/* 分頁區域置中 */
+.project-table td select,
+.project-table td input {
+  width: 100%;
+}
 .pagination {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
   gap: 8px;
 }
-
-/* 分頁按鈕樣式 */
 .pagination button {
   padding: 6px 12px;
   border: 1px solid #aaa;
   background-color: #fff;
   cursor: pointer;
   border-radius: 4px;
-  transition: background-color 0.2s;
 }
 .pagination button.active {
   background-color: #007bff;
   color: #fff;
   border-color: #007bff;
 }
-.pagination button:hover {
-  background-color: #e0e0e0;
-}
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5); /* 半透明遮罩 */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999; /* 確保在最上層 */
+  z-index: 9999;
 }
-
 .modal-card {
   background-color: white;
   padding: 24px;
   border-radius: 8px;
-  width: 80%;
-  box-shadow: -2px 0 10px rgba(0,0,0,0.3);
+  width: 90%;
+  max-width: 800px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
   position: relative;
-  max-height: 80vh; /* 限制最大高度不超過視窗高度 */
-  overflow-y: auto; /* 超出時可滾動 */
+  max-height: 90vh;
+  overflow-y: auto;
 }
-
 .close-btn {
   position: absolute;
   top: 12px;
@@ -305,5 +295,81 @@ async function submitAllUpdates() {
   font-size: 20px;
   cursor: pointer;
 }
+@media (max-width: 768px) {
+  .project-table {
+    border-collapse: separate;
+    border-spacing: 0 1rem;
+  }
 
+  .project-table thead {
+    display: none;
+  }
+
+  .project-table, .project-table tbody, .project-table tr, .project-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .project-table tr {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    margin-bottom: 1rem;
+  }
+
+  .project-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border: none;
+  }
+
+  .project-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #333;
+    flex-basis: 40%;
+    text-align: left;
+  }
+
+  .project-table td > *:not(:first-child) {
+    flex: 1;
+    text-align: right;
+  }
+
+  .project-table td button,
+  .project-table td select,
+  .project-table td input {
+    width: 100%;
+    margin-top: 0.25rem;
+  }
+
+  .btn-sm {
+    padding: 6px 10px;
+    font-size: 14px;
+  }
+
+  .form-select-sm,
+  .form-control-sm {
+    font-size: 14px;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  :deep(.project-table td input) {
+    display: block !important;
+    flex: 1 0 50% !important;
+    text-align: left !important;
+  }
+
+  .project-table td > *:not(:first-child):not(input) {
+    flex: 1;
+    text-align: right;
+  }
+}
 </style>
