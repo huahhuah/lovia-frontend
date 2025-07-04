@@ -78,8 +78,8 @@ import { ref, onMounted, watchEffect } from 'vue'
 import { useUserStore } from '@/stores/auth'
 import axios from 'axios'
 
-//const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
-const baseUrl = 'http://127.0.0.1:8080/api/v1'
+const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
+
 
 const props = defineProps({
   project: { type: Object, required: true },
