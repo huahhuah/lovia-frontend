@@ -55,7 +55,7 @@
           <strong
             :class="{
               'fs-normal': project.amount.toString().length <= 6,
-              'fs-smaller': project.amount.toString().length > 6
+              'fs-smaller': project.amount.toString().length > 6,
             }"
           >
             NT$ {{ project.amount.toLocaleString() }}
@@ -78,7 +78,8 @@ import { ref, onMounted, watchEffect } from 'vue'
 import { useUserStore } from '@/stores/auth'
 import axios from 'axios'
 
-const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
+//const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
+const baseUrl = 'http://127.0.0.1:8080/api/v1'
 
 const props = defineProps({
   project: { type: Object, required: true },
@@ -170,7 +171,9 @@ const toggleFavorite = async () => {
 }
 
 .hover-animate {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .hover-animate:hover {

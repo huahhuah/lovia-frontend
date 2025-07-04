@@ -6,6 +6,7 @@ import Section3 from '@/layouts/Section3.vue'
 import Section4 from '@/layouts/Section4.vue'
 import Section5 from '@/layouts/Section5.vue'
 import Section6 from '@/layouts/Section6.vue'
+import AiChatWidget from '@/components/AiChatWidget.vue'
 </script>
 
 <template>
@@ -15,6 +16,7 @@ import Section6 from '@/layouts/Section6.vue'
     <Section3 />
     <Section4 />
     <Section5 />
+    <AiChatWidget />
     <Section6 />
   </div>
 </template>

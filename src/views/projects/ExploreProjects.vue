@@ -67,7 +67,7 @@
         <div class="col d-flex" v-for="project in projects" :key="project.id">
           <ProjectCard
             :project="project"
-            :is-archived="project.status === '已結束'"
+            :is-archived="project.status === '已結束' || project.days_left === 0"
             @toggle-follow="onToggleFollow"
             class="w-100"
           />
@@ -121,7 +121,7 @@ const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 const projects = ref([])
 const categories = ref([])
 const isLoading = ref(false)
-const perPage = 9
+const perPage = 12
 const totalPages = ref(1)
 
 const filters = [
@@ -143,11 +143,28 @@ const fetchProjects = async () => {
         search: searchKeyword.value || undefined,
         category_id: selectedCategory.value || undefined,
         page: currentPage.value,
-        filter: currentFilter.value !== 'all' ? currentFilter.value : undefined,
+        per_page: perPage,
+        filter: currentFilter.value,
       },
     })
-    projects.value = res.data.projects || res.data.data || []
-    totalPages.value = Math.ceil((res.data.total || projects.value.length) / perPage)
+
+    const list = (res.data.projects || res.data.data || []).map((p) => {
+      const percentage = p.total_amount === 0 ? 0 : (p.amount / p.total_amount) * 100
+      return {
+        ...p,
+        percentage: parseFloat(percentage.toFixed(2)),
+        status_img: percentage >= 100 ? '/募資達標.png' : '/募資結束.png',
+      }
+    })
+    projects.value = list
+
+    const totalCount = res.data.total || list.length
+    totalPages.value = Math.max(1, Math.ceil(totalCount / perPage))
+
+    if (currentPage.value > totalPages.value) {
+      currentPage.value = totalPages.value
+      updateRouteAndSearch()
+    }
   } catch (err) {
     console.error('搜尋失敗', err)
     projects.value = []
@@ -171,7 +188,7 @@ const updateRouteAndSearch = () => {
       search: searchKeyword.value || undefined,
       category: selectedCategory.value || undefined,
       page: currentPage.value,
-      filter: currentFilter.value !== 'all' ? currentFilter.value : undefined,
+      filter: currentFilter.value,
     },
   })
 }
