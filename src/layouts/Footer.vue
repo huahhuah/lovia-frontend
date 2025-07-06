@@ -42,7 +42,11 @@
             </div>
             <div class="col-6">
               <ul class="list-unstyled small">
-                <li><a href="#" class="text-dark text-decoration-none">關於我們</a></li>
+                <li>
+                  <router-link to="/about" class="text-dark text-decoration-none"
+                    >關於我們</router-link
+                  >
+                </li>
                 <li><a href="#" class="text-dark text-decoration-none">聯絡我們</a></li>
                 <li><a href="#" class="text-dark text-decoration-none">提案說明</a></li>
               </ul>

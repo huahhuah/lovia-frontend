@@ -80,7 +80,6 @@ import axios from 'axios'
 
 const baseUrl = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
-
 const props = defineProps({
   project: { type: Object, required: true },
   isArchived: { type: Boolean, default: false },
