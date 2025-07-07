@@ -22,7 +22,7 @@
         </div>
       </div>
 
-      <div class="service-time">服務時間：週一至週日 09:00~18:00</div>
+      <div class="service-time">服務時間：週一至週日 09:00~21:00</div>
 
       <div class="input-area">
         <textarea
@@ -40,7 +40,7 @@
 
       <!-- 非服務時間顯示 lock icon 與提示 -->
       <div v-if="!withinServiceHours" class="service-lock-msg">
-        🔒 目前非服務時間（09:00~18:00），請稍後再與我們聯繫
+        🔒 目前非服務時間（09:00~21:00），請稍後再與我們聯繫
       </div>
     </div>
   </div>
@@ -65,7 +65,7 @@ const showChat = ref(false)
 function isWithinServiceHours() {
   const now = new Date()
   const hour = now.getHours()
-  return hour >= 9 && hour < 18
+  return hour >= 9 && hour < 21
 }
 const withinServiceHours = computed(() => isWithinServiceHours())
 
