@@ -76,7 +76,7 @@ function toggleChat() {
 
 async function sendMessage() {
   if (!input.value.trim()) return
-  const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
+
   const now = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })
   const userMsg = input.value
   input.value = ''
@@ -85,20 +85,26 @@ async function sendMessage() {
   await nextTick()
   scrollToBottom()
 
+  console.log('送出的 payload:', {
+    message: `你是 Lovia 募資平台的客服 AI，請用親切簡短的方式回答：${userMsg}`
+  })
+
   try {
+    const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
     const res = await axios.post(`${baseURL}/gemini-chat`, {
-      message: `你是 Lovia 募資平台的客服 AI，請用親切簡短的方式回答：${userMsg}`,
+      message: `你是 Lovia 募資平台的客服 AI，請用親切簡短的方式回答：${userMsg}`
     })
+
     chatHistory.value.push({
       sender: 'ai',
-      text: res.data.message,
+      text: res?.data?.message || '抱歉，AI 小幫手暫時沒有回應。',
       time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
     })
   } catch (err) {
     console.error('AI 聊天錯誤', err)
     chatHistory.value.push({
       sender: 'ai',
-      text: '抱歉，AI 小幫手暫時無法回應。',
+      text: '抱歉，AI 小幫手暫時無法回應，請稍後再試試看唷。',
       time: now,
     })
   }
