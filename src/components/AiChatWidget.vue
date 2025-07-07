@@ -86,7 +86,7 @@ async function sendMessage() {
   scrollToBottom()
 
   try {
-    const res = await axios.post('${baseURL}/gemini-chat', {
+    const res = await axios.post(`${baseURL}/gemini-chat`, {
       message: `你是 Lovia 募資平台的客服 AI，請用親切簡短的方式回答：${userMsg}`,
     })
     chatHistory.value.push({
