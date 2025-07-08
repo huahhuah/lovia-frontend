@@ -38,7 +38,7 @@
         <h5 class="fw-bold mb-3">💳 付款資訊</h5>
         <p><strong>交易編號：</strong>{{ result.transactionId || '未提供' }}</p>
         <p><strong>付款金額：</strong>NT$ {{ result.amount || '未提供' }}</p>
-        <p><strong>付款時間：</strong>{{ result.paidAt || '尚未付款' }}</p>
+        <p><strong>付款時間：</strong>{{ displayPaidTime || '尚未付款' }}</p>
         <p>
           <strong>付款狀態：</strong>
           <span
@@ -84,6 +84,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRestoreAuth } from '@/composables/useRestoreAuth'
 import SponsorshipLayout from '@/layouts/SponsorshipLayout.vue'
+import dayjs from 'dayjs'
 
 useRestoreAuth()
 
@@ -195,7 +196,7 @@ async function fetchResult() {
       bank_code: data.bank_code || '',
       v_account: data.v_account || '',
       expire_date: data.expire_date || '',
-      receipt_type: data.invoice_type || '',
+      receipt_type: data.receiptType || '',
       id_number: data.idNumber || '',
     }
 
