@@ -61,6 +61,13 @@
         <p><strong>收件人：</strong>{{ result.recipient || '未提供' }}</p>
         <p><strong>電話：</strong>{{ result.phone || '未提供' }}</p>
         <p><strong>地址：</strong>{{ result.address || '未提供' }}</p>
+        <p>
+          <strong>收據類型：</strong>
+          <span v-if="result.receipt_type === 'email'">電子收據（寄送 Email）</span>
+          <span v-else-if="result.receipt_type === 'paper'">紙本收據（郵寄地址）</span>
+          <span v-else>未提供</span>
+        </p>
+        <p v-if="result.id_number"><strong>身份證字號：</strong>{{ maskedIdNumber }}</p>
         <p><strong>備註：</strong>{{ result.note || '無' }}</p>
       </div>
 
@@ -103,11 +110,21 @@ const result = ref({
   bank_code: '',
   v_account: '',
   expire_date: '',
+  receipt_type: '',
+  id_number: '',
 })
 
 const maskedEmail = computed(() => {
   const email = result.value.email || ''
   return email.replace(/^(.{3})(.*)(@.*)$/, (_, a, _b, c) => `${a}***${c}`)
+})
+
+const maskedIdNumber = computed(() => {
+  const id = (result.value.id_number || '').trim()
+  if (id.length === 10) {
+    return id.slice(0, 3) + '****' + id.slice(-1)
+  }
+  return id
 })
 
 const displayPaidTime = computed(() => {
@@ -178,6 +195,8 @@ async function fetchResult() {
       bank_code: data.bank_code || '',
       v_account: data.v_account || '',
       expire_date: data.expire_date || '',
+      receipt_type: data.receiptType || '',
+      id_number: data.idNumber || '',
     }
 
     console.log(' 查詢成功 result:', result.value)

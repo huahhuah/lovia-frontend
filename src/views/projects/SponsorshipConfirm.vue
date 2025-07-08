@@ -191,17 +191,6 @@ async function confirmSponsorship() {
       quantity: 1,
       amount,
     },
-    invoice: {
-      type: 'donate',
-      carrier_code: null,
-      tax_id: null,
-    },
-    shipping: {
-      name: user?.username || '未提供姓名',
-      phone: '0912345678',
-      address: '未填地址',
-      note: '',
-    },
   }
 
   console.log('傳送 payload:', JSON.stringify(payload, null, 2))
