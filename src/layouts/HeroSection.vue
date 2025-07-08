@@ -119,10 +119,12 @@ onMounted(() => {
 .hero-img {
   height: 100vh;
   object-fit: cover;
-  pointer-events: none;
+  pointer-events: none; /* 圖片不擋點擊 */
 }
 
+/*  讓整個 overlay 不擋點擊，只有裡面的按鈕等可以點 */
 .hero-overlay {
+  pointer-events: none;
   padding-left: 8vw;
   padding-right: 8vw;
   padding-top: 5vh;
@@ -131,6 +133,9 @@ onMounted(() => {
   top: 0;
   left: 0;
   z-index: 2;
+}
+.hero-overlay * {
+  pointer-events: auto;
 }
 
 .hero-stack {
@@ -154,6 +159,7 @@ onMounted(() => {
   z-index: 2;
 }
 
+/* CTA 按鈕樣式 */
 .custom-cta {
   z-index: 10;
   position: relative;
@@ -161,39 +167,11 @@ onMounted(() => {
   color: #fafafa;
   border: none;
   margin-left: 3vw;
+  overflow: hidden;
 }
-
-.hero-illustration {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  padding: 0rem;
-  z-index: 1;
-}
-
-.hero-illustration img {
-  max-width: 400px;
-}
-
-.carousel-control-prev {
-  left: 0.1rem; /* ✅ 可依需求調大，例如 3rem、4rem */
-}
-
-.carousel-control-next {
-  right: 0.1rem; /* ✅ 同上 */
-}
-
-.carousel-control-prev,
-.carousel-control-next {
-  z-index: 3; /* 蓋過 overlay */
-}
-
-.custom-cta {
-  pointer-events: auto;
-  z-index: 10;
-  position: relative;
-  overflow: hidden; /*  關鍵：裁切 ::before 動畫區域 */
-  position: relative; /*  讓 ::before 根據它定位 */
+.custom-cta:hover {
+  background-color: #fd7269;
+  color: #fafafa;
 }
 
 .custom-cta::before {
@@ -207,14 +185,21 @@ onMounted(() => {
   transform: skewX(-20deg);
   animation: shine 2.5s infinite;
 }
-
 @keyframes shine {
   100% {
     left: 125%;
   }
 }
 
+.hero-illustration {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 0rem;
+  z-index: 1;
+}
 .hero-illustration img {
+  max-width: 400px;
   opacity: 0;
   transform: translateY(20px) scale(1);
   animation:
@@ -229,8 +214,7 @@ onMounted(() => {
     transform: translateY(0) scale(1);
   }
 }
-
-/* 呼吸放大動畫 */
+/* 呼吸動畫 */
 @keyframes pulse {
   0%,
   100% {
@@ -241,25 +225,22 @@ onMounted(() => {
   }
 }
 
+/* 文字進場與左右搖擺 */
 .hero-headline {
   opacity: 0;
   transform: translateY(30px);
   animation:
     fadeUp 1s ease-out forwards,
     sway 2.5s ease-in-out infinite;
-  animation-delay: 0.3s, 1.3s; /* 第二個動畫延後啟動，等 fadeUp 結束 */
+  animation-delay: 0.3s, 1.3s;
   transform-origin: bottom center;
 }
-
-/* 進場動畫（向上浮現） */
 @keyframes fadeUp {
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-
-/* 左右搖擺動畫 */
 @keyframes sway {
   0%,
   100% {
@@ -273,6 +254,7 @@ onMounted(() => {
   }
 }
 
+/* subheadline 呼吸發光 */
 @keyframes glow {
   0% {
     opacity: 1;
@@ -284,57 +266,58 @@ onMounted(() => {
     opacity: 1;
   }
 }
-
 .hero-glow {
   animation: glow 3s ease-in-out infinite;
 }
 
+/* carousel 指示器樣式 */
 .carousel-indicators [data-bs-target] {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   opacity: 0.4;
 }
-
 .carousel-indicators .active {
-  background-color: #fc5b53; /* 主色 */
-}
-
-.carousel-indicators .active {
+  background-color: #fc5b53;
   opacity: 1;
 }
 
+/* arrows */
+.carousel-control-prev {
+  left: 135px;
+  width: 40px;
+}
+.carousel-control-next {
+  right: 135px;
+  width: 40px;
+}
+.carousel-control-prev,
+.carousel-control-next {
+  z-index: 3;
+}
+
+/*  RWD */
 @media (max-width: 768px) {
   .hero-img {
     height: 100vh;
     object-fit: cover;
   }
-
   .hero-overlay {
     padding-left: 8vw;
     padding-right: 8vw;
     padding-top: 45vh;
     padding-bottom: 5vh;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 2;
-
-    /* 加這行可以調整靠左 / 置中 / 靠右 */
-    align-items: center; /* 改為 center = 置中 */
+    align-items: center;
   }
-
   .hero-stack {
     margin-left: 0;
     margin-bottom: 1rem;
   }
-
   .hero-subheadline,
   .hero-headline {
     max-width: 80vw;
     height: auto;
   }
-
   .custom-cta {
     background-color: #fc5b53;
     color: #fafafa;
@@ -344,7 +327,6 @@ onMounted(() => {
     text-align: center;
     margin: 0 auto;
   }
-
   .hero-illustration {
     display: none;
   }
