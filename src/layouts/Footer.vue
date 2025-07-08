@@ -10,11 +10,19 @@
         <a href="#" class="me-3">
           <img src="/instagram.png" alt="Instagram" />
         </a>
-        <a href="#">
+        <a href="mailto:loviaworld@gmail.com">
           <img src="/email.png" alt="Email" />
         </a>
       </div>
-      <p class="footer-privacy small text-muted">© Copyright 2025 北十有限公司</p>
+      <p class="small mt-2">
+        客服信箱：
+        <a href="mailto:loviaworld@gmail.com" class="text-dark text-decoration-none">
+          loviaworld@gmail.com
+        </a>
+      </p>
+      <p class="footer-privacy small text-muted">
+        © Copyright 2025 北十有限公司｜本網站僅作為學術專題用途，非商業運營平台。
+      </p>
     </div>
   </footer>
 
@@ -22,15 +30,25 @@
   <footer class="footer-desktop py-5">
     <div class="container custom-container">
       <div class="row align-items-start">
+        <!-- 左邊 LOGO 與社群 -->
         <div class="col-md-3 mb-4 text-center text-md-start order-md-1">
           <img src="/homepageS1-logo.png" alt="Lovia Logo" width="100" class="mb-3" />
           <div class="d-flex justify-content-center justify-content-md-start gap-3">
             <a href="#"><img src="/instagram.png" alt="Instagram" width="28" /></a>
             <a href="#"><img src="/facebook.png" alt="Facebook" width="28" /></a>
-            <a href="#"><img src="/email.png" alt="Email" width="28" /></a>
+            <a href="mailto:loviaworld@gmail.com"
+              ><img src="/email.png" alt="Email" width="28"
+            /></a>
           </div>
+          <p class="small mt-3">
+            客服信箱：
+            <a href="mailto:loviaworld@gmail.com" class="text-dark text-decoration-none">
+              loviaworld@gmail.com
+            </a>
+          </p>
         </div>
 
+        <!-- 中間選單 -->
         <div class="col-md-3 mb-4 text-center text-md-start order-md-2">
           <div class="row">
             <div class="col-6">
@@ -43,9 +61,9 @@
             <div class="col-6">
               <ul class="list-unstyled small">
                 <li>
-                  <router-link to="/about" class="text-dark text-decoration-none"
-                    >關於我們</router-link
-                  >
+                  <router-link to="/about" class="text-dark text-decoration-none">
+                    關於我們
+                  </router-link>
                 </li>
                 <li><a href="#" class="text-dark text-decoration-none">聯絡我們</a></li>
                 <li><a href="#" class="text-dark text-decoration-none">提案說明</a></li>
@@ -54,6 +72,7 @@
           </div>
         </div>
 
+        <!-- 右邊簡介 -->
         <div class="col-md-6 mb-4 text-center text-md-start order-md-3">
           <strong>公益無時無刻在發生</strong>
           <p class="mt-2 mb-0 small">
@@ -64,7 +83,11 @@
           </p>
         </div>
       </div>
-      <div class="text-center mt-4 small text-muted">© Copyright 2025 北十有限公司</div>
+
+      <!-- 版權 -->
+      <div class="text-center mt-4 small text-muted">
+        © Copyright 2025 北十有限公司｜本網站僅作為學術專題用途，非商業運營平台。
+      </div>
     </div>
   </footer>
 </template>
@@ -94,7 +117,7 @@
 
 @media (min-width: 769px) {
   .footer {
-    display: none;
+    display: none; /* 桌機隱藏手機版 */
   }
 }
 
@@ -110,7 +133,7 @@
 
 @media (max-width: 768px) {
   .footer-desktop {
-    display: none;
+    display: none; /* 手機隱藏桌機版 */
   }
 }
 </style>
