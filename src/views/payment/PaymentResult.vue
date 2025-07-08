@@ -195,7 +195,7 @@ async function fetchResult() {
       bank_code: data.bank_code || '',
       v_account: data.v_account || '',
       expire_date: data.expire_date || '',
-      receipt_type: data.receiptType || '',
+      receipt_type: data.invoice_type || '',
       id_number: data.idNumber || '',
     }
 
