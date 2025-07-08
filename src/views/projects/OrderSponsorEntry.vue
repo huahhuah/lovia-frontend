@@ -25,39 +25,18 @@
             </section>
 
             <section class="mb-5">
-              <h5 class="fw-bold">發票類型</h5>
+              <h5 class="fw-bold">收據類型</h5>
               <div class="form-check">
                 <input
                   class="form-check-input"
                   type="radio"
-                  value="donate"
-                  v-model="form.invoiceType"
-                  id="donateInvoice"
+                  value="email"
+                  v-model="form.receiptType"
+                  id="emailReceipt"
                 />
-                <label class="form-check-label" for="donateInvoice">捐贈發票</label>
-              </div>
-
-              <div class="form-check">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  value="mobile"
-                  v-model="form.invoiceType"
-                  id="mobileInvoice"
-                />
-                <label class="form-check-label" for="mobileInvoice">個人發票（手機條碼）</label>
-              </div>
-
-              <div v-if="form.invoiceType === 'mobile'" class="form-group mt-2">
-                <input
-                  v-model="form.mobileBarcode"
-                  class="form-control"
-                  placeholder="請輸入手機載具條碼"
-                  @input="errors.mobileBarcode = ''"
-                />
-                <p class="text-danger small mt-1" v-if="errors.mobileBarcode">
-                  {{ errors.mobileBarcode }}
-                </p>
+                <label class="form-check-label" for="emailReceipt">
+                  電子收據（寄送到 Email）
+                </label>
               </div>
 
               <div class="form-check mt-2">
@@ -65,24 +44,30 @@
                   class="form-check-input"
                   type="radio"
                   value="paper"
-                  v-model="form.invoiceType"
-                  id="paperInvoice"
+                  v-model="form.receiptType"
+                  id="paperReceipt"
                 />
-                <label class="form-check-label" for="paperInvoice">個人發票（紙本寄送）</label>
+                <label class="form-check-label" for="paperReceipt"> 紙本收據（郵寄到地址） </label>
               </div>
 
-              <div v-if="form.invoiceType === 'paper'" class="form-group mt-2">
-                <input
-                  v-model="form.taxId"
-                  class="form-control"
-                  placeholder="請輸入統一編號（8碼數字，可留空）"
-                  @input="errors.taxId = ''"
-                />
-                <p class="text-danger small mt-1" v-if="errors.taxId">{{ errors.taxId }}</p>
-              </div>
-              <p class="text-danger small mt-2" v-if="errors.invoiceType">
-                {{ errors.invoiceType }}
+              <p class="text-danger small mt-2" v-if="errors.receiptType">
+                {{ errors.receiptType }}
               </p>
+            </section>
+
+            <section class="mb-5">
+              <div class="form-group mt-2">
+                <label class="form-label">身份證字號（用於申報所得稅扣除）</label>
+                <input
+                  v-model="form.idNumber"
+                  class="form-control"
+                  placeholder="例如 A123456789"
+                  @input="errors.idNumber = ''"
+                  maxlength="10"
+                />
+                <p class="text-danger small mt-1" v-if="errors.idNumber">{{ errors.idNumber }}</p>
+                <small class="text-muted"> ※ 僅作為申報所得稅扣除使用，依個資法保護您的隱私 </small>
+              </div>
             </section>
 
             <section class="mb-5">
@@ -233,9 +218,8 @@ const planId = ref(null)
 const form = ref({
   name: '',
   account: '',
-  invoiceType: '',
-  mobileBarcode: '',
-  taxId: '',
+  receiptType: 'email', // 新增，預設電子收據
+  idNumber: '',
   recipient: '',
   phone: '',
   zipcode: '',
@@ -245,9 +229,8 @@ const form = ref({
 })
 
 const errors = ref({
-  invoiceType: '',
-  mobileBarcode: '',
-  taxId: '',
+  receiptType: '',
+  idNumber: '',
   recipient: '',
   phone: '',
   zipcode: '',
@@ -255,6 +238,122 @@ const errors = ref({
   payment: '',
   note: '',
 })
+
+function isValidTaiwanID(id) {
+  if (!/^[A-Z][12]\d{8}$/i.test(id)) return false
+
+  const letters = {
+    A: 10,
+    B: 11,
+    C: 12,
+    D: 13,
+    E: 14,
+    F: 15,
+    G: 16,
+    H: 17,
+    I: 34,
+    J: 18,
+    K: 19,
+    L: 20,
+    M: 21,
+    N: 22,
+    O: 35,
+    P: 23,
+    Q: 24,
+    R: 25,
+    S: 26,
+    T: 27,
+    U: 28,
+    V: 29,
+    W: 32,
+    X: 30,
+    Y: 31,
+    Z: 33,
+  }
+  id = id.toUpperCase()
+  const code = letters[id[0]]
+  const n1 = Math.floor(code / 10)
+  const n2 = code % 10
+  const nums = [n1, n2, ...id.slice(1).split('').map(Number)]
+
+  const weights = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1]
+  const sum = nums.reduce((acc, cur, idx) => acc + cur * weights[idx], 0)
+
+  return sum % 10 === 0
+}
+
+// 驗證收據
+function validateReceiptForm(form) {
+  errors.value.receiptType = ''
+  errors.value.idNumber = ''
+
+  let isValid = true
+
+  if (!form.receiptType) {
+    errors.value.receiptType = '請選擇收據類型'
+    isValid = false
+  }
+
+  if (form.idNumber && !isValidTaiwanID(form.idNumber.trim())) {
+    errors.value.idNumber = '身份證號碼無效（檢碼錯誤）'
+    isValid = false
+  }
+
+  return isValid
+}
+
+// 驗證寄送資料
+function validateOrderForm(form) {
+  errors.value.recipient = ''
+  errors.value.phone = ''
+  errors.value.zipcode = ''
+  errors.value.address = ''
+  errors.value.payment = ''
+
+  let isValid = true
+
+  if (!form.recipient.trim()) {
+    errors.value.recipient = '請填寫收件人姓名'
+    isValid = false
+  }
+
+  if (!/^09\d{8}$/.test(form.phone)) {
+    errors.value.phone = '手機格式錯誤，請輸入 09 開頭的 10 碼號碼'
+    isValid = false
+  }
+
+  if (!form.zipcode.trim()) {
+    errors.value.zipcode = '請填寫郵遞區號'
+    isValid = false
+  } else if (!/^\d{3}$/.test(form.zipcode) || !(form.zipcode in zipcodeMap)) {
+    errors.value.zipcode = '請輸入有效的郵遞區號'
+    isValid = false
+  }
+
+  if (!form.address.trim()) {
+    errors.value.address = '請填寫地址'
+    isValid = false
+  } else if (form.address.length < 6) {
+    errors.value.address = '地址太短，請輸入完整地址'
+    isValid = false
+  } else if (/https?:\/\//i.test(form.address)) {
+    errors.value.address = '地址格式錯誤，請勿輸入網址'
+    isValid = false
+  } else {
+    const district = getDistrictByZipcode(form.zipcode)
+    if (district && !form.address.includes(district)) {
+      errors.value.address = `地址需包含所屬區域名稱：${district}`
+      isValid = false
+    }
+  }
+
+  if (!form.payment) {
+    errors.value.payment = '請選擇付款方式'
+    isValid = false
+  }
+
+  return isValid
+}
 
 // 方案原始金額
 const baseAmount = computed(() => {
@@ -338,93 +437,6 @@ onMounted(() => {
   form.value.account = authStore.user?.account || ''
 })
 
-// 發票驗證：含手機條碼、統一編號格式、完整郵遞區號 + 地址檢查
-function validateInvoiceForm(form) {
-  errors.value.invoiceType = ''
-  errors.value.mobileBarcode = ''
-  errors.value.taxId = ''
-  errors.value.note = ''
-
-  const type = form.invoiceType
-  const carrier = form.mobileBarcode?.trim()
-  const taxId = form.taxId?.trim()
-  let isValid = true
-
-  if (!type) {
-    errors.value.invoiceType = '請選擇發票類型'
-    isValid = false
-  }
-
-  if (type === 'mobile' && !/^\/[A-Z0-9]{7}$/i.test(carrier)) {
-    errors.value.mobileBarcode = '手機條碼格式錯誤，需以 / 開頭並為 8 碼'
-    isValid = false
-  }
-
-  if (type === 'donate' && (carrier || taxId)) {
-    errors.value.invoiceType = '捐贈發票不應填寫手機條碼或統一編號'
-    isValid = false
-  }
-
-  if (type === 'paper' && taxId && !/^\d{8}$/.test(taxId)) {
-    errors.value.taxId = '統一編號應為 8 碼數字'
-    isValid = false
-  }
-
-  return isValid
-}
-
-function validateOrderForm(form) {
-  errors.value.recipient = ''
-  errors.value.phone = ''
-  errors.value.zipcode = ''
-  errors.value.address = ''
-  errors.value.payment = ''
-
-  let isValid = true
-
-  if (!form.recipient.trim()) {
-    errors.value.recipient = '請填寫收件人姓名'
-    isValid = false
-  }
-
-  if (!/^09\d{8}$/.test(form.phone)) {
-    errors.value.phone = '手機格式錯誤，請輸入 09 開頭的 10 碼號碼'
-    isValid = false
-  }
-
-  if (!form.zipcode.trim()) {
-    errors.value.zipcode = '請填寫郵遞區號'
-    isValid = false
-  } else if (!/^\d{3}$/.test(form.zipcode) || !(form.zipcode in zipcodeMap)) {
-    errors.value.zipcode = '請輸入有效的郵遞區號'
-    isValid = false
-  }
-
-  if (!form.address.trim()) {
-    errors.value.address = '請填寫地址'
-    isValid = false
-  } else if (form.address.length < 6) {
-    errors.value.address = '地址太短，請輸入完整地址'
-    isValid = false
-  } else if (/https?:\/\//i.test(form.address)) {
-    errors.value.address = '地址格式錯誤，請勿輸入網址'
-    isValid = false
-  } else {
-    const district = getDistrictByZipcode(form.zipcode)
-    if (district && !form.address.includes(district)) {
-      errors.value.address = `地址需包含所屬區域名稱：${district}`
-      isValid = false
-    }
-  }
-
-  if (!form.payment) {
-    errors.value.payment = '請選擇付款方式'
-    isValid = false
-  }
-
-  return isValid
-}
-
 watchEffect(() => {
   if (authStore.user && authStore.user.account) {
     form.value.name = authStore.user.username || ''
@@ -452,7 +464,7 @@ async function submitOrder() {
     return
   }
 
-  if (!validateInvoiceForm(form.value) || !validateOrderForm(form.value)) {
+  if (!validateReceiptForm(form.value) || !validateOrderForm(form.value)) {
     isSubmitting.value = false
     return
   }
@@ -470,23 +482,16 @@ async function submitOrder() {
       note: sponsorData.value.note || '',
       quantity: 1,
       amount,
+      id_number: form.value.idNumber.trim() || null,
+    },
+    invoice: {
+      type: form.value.receiptType,
     },
     shipping: {
       name: form.value.recipient,
       phone: form.value.phone,
       address: `${form.value.zipcode} ${form.value.address}`,
       note: form.value.note,
-    },
-    invoice: {
-      type: form.value.invoiceType,
-      carrier_code:
-        form.value.invoiceType === 'mobile' && form.value.mobileBarcode?.trim()
-          ? form.value.mobileBarcode.trim()
-          : null,
-      tax_id:
-        form.value.invoiceType === 'paper' && form.value.taxId?.trim()
-          ? form.value.taxId.trim()
-          : null,
     },
   }
 
