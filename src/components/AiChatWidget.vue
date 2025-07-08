@@ -13,6 +13,7 @@
       </div>
 
       <div class="chat-history">
+        <!-- 聊天訊息 -->
         <div v-for="(msg, idx) in chatHistory" :key="idx" class="message-row" :class="msg.sender">
           <div class="bubble-wrapper">
             <img v-if="msg.sender === 'ai'" src="/public/small-logo.png" class="avatar" />
@@ -20,9 +21,25 @@
           </div>
           <div class="chat-time">{{ msg.time }}</div>
         </div>
+
+        <!-- AI 輸出時點點 loading -->
+        <div v-if="isTyping" class="message-row ai">
+          <div class="bubble-wrapper">
+            <img src="/public/small-logo.png" class="avatar" />
+            <div class="bubble loading-dots"><span>.</span><span>.</span><span>.</span></div>
+          </div>
+        </div>
+
+        <!-- AI 逐字顯示 -->
+        <div v-if="currentTypingText" class="message-row ai">
+          <div class="bubble-wrapper">
+            <img src="/public/small-logo.png" class="avatar" />
+            <div class="bubble">{{ currentTypingText }}</div>
+          </div>
+        </div>
       </div>
 
-      <div class="service-time">服務時間：週一至週日 09:00~21:00</div>
+      <div class="service-time">服務時間：週一至週日 09:00~18:00</div>
 
       <div class="input-area">
         <textarea
@@ -40,7 +57,7 @@
 
       <!-- 非服務時間顯示 lock icon 與提示 -->
       <div v-if="!withinServiceHours" class="service-lock-msg">
-        🔒 目前非服務時間（09:00~21:00），請稍後再與我們聯繫
+        🔒 目前非服務時間（09:00~18:00），請稍後再與我們聯繫
       </div>
     </div>
   </div>
@@ -59,70 +76,82 @@ const chatHistory = ref([
   },
 ])
 
+const currentTypingText = ref('')
+const isTyping = ref(false)
 const showChat = ref(false)
 
-// 改為：週一到週日 09:00~18:00
-function isWithinServiceHours() {
-  const now = new Date()
-  const hour = now.getHours()
-  return hour >= 9 && hour < 21
+// 時間顯示
+function timeNow() {
+  return new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })
 }
-const withinServiceHours = computed(() => isWithinServiceHours())
 
+// 服務時間
+const withinServiceHours = computed(() => {
+  const hour = new Date().getHours()
+  return hour >= 9 && hour < 18
+})
+
+// 開關
 function toggleChat() {
   showChat.value = !showChat.value
   scrollToBottom()
 }
 
+// 滾到底
+function scrollToBottom() {
+  nextTick(() => {
+    const el = document.querySelector('.chat-history')
+    if (el) el.scrollTop = el.scrollHeight
+  })
+}
+// 發送訊息
 async function sendMessage() {
   if (!input.value.trim()) return
 
-  const now = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })
-  const userMsg = input.value
+  const userMsg = input.value.trim()
   input.value = ''
-
-  chatHistory.value.push({ sender: 'user', text: userMsg, time: now })
-  await nextTick()
+  chatHistory.value.push({ sender: 'user', text: userMsg, time: timeNow() })
   scrollToBottom()
 
-  console.log('送出的 payload:', {
-    message: `你是 Lovia 募資平台的客服 AI，請用親切簡短的方式回答：${userMsg}`
-  })
-
+  isTyping.value = true
+  currentTypingText.value = ''
   try {
-    const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
-    const res = await axios.post(`${baseURL}/gemini-chat`, {
-      message: `你是 Lovia 募資平台的客服 AI，請用親切簡短的方式回答：${userMsg}`
-    })
-
-    chatHistory.value.push({
-      sender: 'ai',
-      text: res?.data?.message || '抱歉，AI 小幫手暫時沒有回應。',
-      time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
-    })
+    const { data } = await axios.post(
+      'https://lovia-backend-xl4e.onrender.com/api/v1/gemini-chat',
+      { message: `你是 Lovia 募資平台的客服 AI，請用親切簡短的方式回答：${userMsg}` }
+    )
+    isTyping.value = false
+    await typeWriter(data.message || '抱歉，AI 小幫手暫時沒有回應。')
   } catch (err) {
     console.error('AI 聊天錯誤', err)
-    chatHistory.value.push({
-      sender: 'ai',
-      text: '抱歉，AI 小幫手暫時無法回應，請稍後再試試看唷。',
-      time: now,
-    })
+    isTyping.value = false
+    await typeWriter('抱歉，AI 小幫手暫時無法回應，請稍後再試試看唷。')
   }
-
-  await nextTick()
-  scrollToBottom()
 }
 
-function scrollToBottom() {
-  const historyEl = document.querySelector('.chat-history')
-  if (historyEl) historyEl.scrollTop = historyEl.scrollHeight
+// 打字動畫
+async function typeWriter(text) {
+  currentTypingText.value = ''
+  for (let i = 0; i < text.length; i++) {
+    currentTypingText.value += text[i]
+    await new Promise((resolve) => setTimeout(resolve, 25))
+    scrollToBottom()
+  }
+  chatHistory.value.push({ sender: 'ai', text: currentTypingText.value, time: timeNow() })
+  currentTypingText.value = ''
 }
 
-function handleKeydown(e) {
-  if (e.key === 'Escape') showChat.value = false
-}
-onMounted(() => window.addEventListener('keydown', handleKeydown))
-onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
+// Escape 關閉
+onMounted(() =>
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') showChat.value = false
+  })
+)
+onUnmounted(() =>
+  window.removeEventListener('keydown', (e) => {
+    if (e.key === 'Escape') showChat.value = false
+  })
+)
 </script>
 
 <style scoped>
@@ -289,5 +318,28 @@ onUnmounted(() => window.removeEventListener('keydown', handleKeydown))
   color: #db7093;
   font-weight: 600;
   margin-top: 6px;
+}
+
+.loading-dots span {
+  animation: blink 1.4s infinite both;
+  font-size: 20px;
+  color: #db7093;
+}
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0%,
+  80%,
+  100% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
 }
 </style>
