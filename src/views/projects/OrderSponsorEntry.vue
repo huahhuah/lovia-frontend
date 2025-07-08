@@ -482,16 +482,16 @@ async function submitOrder() {
       note: sponsorData.value.note || '',
       quantity: 1,
       amount,
+      id_number: form.value.idNumber.trim() || null,
+    },
+    invoice: {
+      type: form.value.receiptType,
     },
     shipping: {
       name: form.value.recipient,
       phone: form.value.phone,
       address: `${form.value.zipcode} ${form.value.address}`,
       note: form.value.note,
-    },
-    receipt: {
-      type: form.value.receiptType,
-      id_number: form.value.idNumber.trim() || null,
     },
   }
 
