@@ -284,11 +284,11 @@ onMounted(() => {
 
 /* arrows */
 .carousel-control-prev {
-  left: 135px;
+  left: 80px;
   width: 40px;
 }
 .carousel-control-next {
-  right: 135px;
+  right: 80px;
   width: 40px;
 }
 .carousel-control-prev,
@@ -329,6 +329,19 @@ onMounted(() => {
   }
   .hero-illustration {
     display: none;
+  }
+
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 60px; /* 增加可點擊範圍 */
+  }
+
+  .carousel-control-prev {
+    left: 5px; /* 更靠左邊 */
+  }
+
+  .carousel-control-next {
+    right: 5px; /* 更靠右邊 */
   }
 }
 </style>

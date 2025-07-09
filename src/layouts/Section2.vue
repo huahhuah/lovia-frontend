@@ -10,7 +10,7 @@
 
       <div class="container" style="padding-left: 10rem; padding-right: 10rem">
         <!-- 桌機版卡片 -->
-        <div class="row justify-content-center g-4 d-none d-md-flex">
+        <div class="row justify-content-center g-4 d-none d-xl-flex">
           <div class="col-md-4" v-for="(card, index) in visibleCards" :key="index">
             <ProjectCard
               :project="card"
@@ -22,7 +22,7 @@
         </div>
 
         <!-- 手機版滑動卡片 -->
-        <div class="project-scroll-wrapper d-md-none" ref="scrollContainer" @scroll="onScroll">
+        <div class="project-scroll-wrapper d-xl-none" ref="scrollContainer" @scroll="onScroll">
           <div class="project-scroll">
             <div class="card-wrapper" v-for="(card, index) in visibleCards" :key="'mobile-' + index">
               <ProjectCard
@@ -43,6 +43,12 @@
             class="dot"
             :class="{ active: currentIndex === index }"
           ></span>
+        </div>
+
+        <!-- 平板版左右箭頭（僅在平板出現） -->
+        <div class="arrow-nav d-none d-md-flex d-xl-none justify-content-center gap-4 mt-3">
+          <button @click="scrollLeft" class="arrow-btn">&lt;</button>
+          <button @click="scrollRight" class="arrow-btn">&gt;</button>
         </div>
 
         <button
@@ -109,6 +115,14 @@ const onScroll = () => {
 
   // 最多只顯示 0~5 的圓點
   currentIndex.value = Math.min(index, 5)
+}
+
+const scrollLeft = () => {
+  scrollContainer.value?.scrollBy({ left: -300, behavior: 'smooth' })
+}
+
+const scrollRight = () => {
+  scrollContainer.value?.scrollBy({ left: 300, behavior: 'smooth' })
 }
 </script>
 
@@ -336,6 +350,58 @@ const onScroll = () => {
 
 .dot.active {
   background-color: #fc5b53;
+}
+
+.arrow-btn {
+  background-color: transparent;
+  border: none;
+  font-size: 1.3rem;
+  color: #fc5b53;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.arrow-btn:hover {
+  transform: scale(1.2);
+}
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .project-scroll {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .card-wrapper {
+    flex: 0 0 auto;
+    width: 80vw;
+    max-width: 320px;
+  }
+
+  .project-scroll-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 1rem;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    scrollbar-width: none;
+  }
+
+  .project-scroll-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .arrow-btn {
+  background-color: transparent;
+  border: none;
+  font-size: 1.3rem;
+  color: #fc5b53;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.arrow-btn:hover {
+  transform: scale(1.2);
 }
 }
 </style>

@@ -12,9 +12,9 @@
     <div v-else-if="visibleCards.length > 0">
       <h2 class="section-title text-danger fs-4 fw-bold mb-5">長期贊助</h2>
       <div class="container" style="padding-left: 10rem; padding-right: 10rem">
-        <!-- 桌機版 -->
-        <div class="row justify-content-center g-4 d-none d-md-flex">
-          <div class="col-md-4" v-for="(card, index) in visibleCards" :key="'pc-' + index">
+        <!-- 桌機版卡片 -->
+        <div class="row justify-content-center g-4 d-none d-xl-flex">
+          <div class="col-md-4" v-for="(card, index) in visibleCards" :key="index">
             <ProjectCard
               :project="card"
               :is-archived="card.status === '已結束'"
@@ -25,7 +25,7 @@
         </div>
 
         <!-- 手機版 -->
-        <div class="project-scroll-wrapper d-md-none" ref="scrollContainer" @scroll="onScroll">
+        <div class="project-scroll-wrapper d-xl-none" ref="scrollContainer" @scroll="onScroll">
           <div class="project-scroll">
             <div class="card-wrapper" v-for="(card, index) in visibleCards" :key="'mobile-' + index">
               <ProjectCard
@@ -48,6 +48,12 @@
           ></span>
         </div>
       </div>
+
+        <!-- 平板專用的左右箭頭按鈕（768px–1199px） -->
+        <div class="arrow-nav d-none d-md-flex d-xl-none justify-content-center gap-4 mt-3">
+          <button @click="scrollLeft" class="arrow-btn">&lt;</button>
+          <button @click="scrollRight" class="arrow-btn">&gt;</button>
+        </div>
 
       <!-- 查看更多 -->
       <div class="text-center mt-4" v-if="longTermProjects.length > 3">
@@ -132,9 +138,23 @@ const onScroll = () => {
   // 最多只顯示前 5 個圓點
   currentIndex.value = Math.min(index, 4)
 }
+
+const scrollLeft = () => {
+  scrollContainer.value?.scrollBy({ left: -300, behavior: 'smooth' })
+}
+
+const scrollRight = () => {
+  scrollContainer.value?.scrollBy({ left: 300, behavior: 'smooth' })
+}
 </script>
 
 <style scoped>
+.card {
+  height: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
 .funding-section {
   background: linear-gradient(to right, #ffedf2, #fff6e3);
   position: relative;
@@ -281,6 +301,7 @@ const onScroll = () => {
   .card {
     max-width: 100%;
   }
+
   .section2-bg1,
   .section2-bg2,
   .section3-bg1,
@@ -352,6 +373,58 @@ const onScroll = () => {
 
 .project-scroll-wrapper::-webkit-scrollbar {
   display: none; /* Chrome, Safari */
+}
+
+.arrow-btn {
+  background-color: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: #fc5b53;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.arrow-btn:hover {
+  transform: scale(1.2);
+}
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .project-scroll {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .card-wrapper {
+    flex: 0 0 auto;
+    width: 80vw;
+    max-width: 320px;
+  }
+
+  .project-scroll-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 1rem;
+    margin-left: -1rem;
+    margin-right: -1rem;
+    scrollbar-width: none;
+  }
+
+  .project-scroll-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .arrow-btn {
+  background-color: transparent;
+  border: none;
+  font-size: 1.3rem;
+  color: #fc5b53;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.arrow-btn:hover {
+  transform: scale(1.2);
 }
 }
 </style>
