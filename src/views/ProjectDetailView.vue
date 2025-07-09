@@ -1,4 +1,4 @@
-<template>
+6<template>
   <div class="page-wrapper" v-if="project">
     <div class="container py-5">
       <ProjectBanner :project="project" />
@@ -96,10 +96,7 @@
 
       <!-- 操作按鈕 -->
       <div class="text-center mt-5">
-        <!-- <router-link :to="`/edit-proposal/${project.id}`" class="btn btn-outline-dark me-3"
-          >返回修改提案</router-link
-        > -->
-        <router-link to="/my-proposals" class="btn btn-danger">回到提案列表</router-link>
+        <router-link to="/user/projects/mine" class="btn btn-danger">回到提案列表</router-link>
       </div>
     </div>
   </div>
