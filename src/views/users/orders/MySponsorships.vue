@@ -37,7 +37,10 @@
           <div class="card-content">
             <div class="project-header">
               <h3 class="project-title">{{ item.project?.title || '無標題專案' }}</h3>
-              <div class="project-category">{{ item.project?.category || '其他' }}</div>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">訂單編號</span>
+              <span class="detail-value">{{ item.order_uuid }}</span>
             </div>
 
             <div class="sponsorship-details">
@@ -48,12 +51,17 @@
 
               <div class="detail-item">
                 <span class="detail-label">贊助方案</span>
-                <span class="detail-value">{{ item.plan?.title || '基礎方案' }}</span>
+                <span class="detail-value">{{ item.plan?.plan_name || '基礎方案' }}</span>
               </div>
 
               <div class="detail-item">
                 <span class="detail-label">贊助日期</span>
                 <span class="detail-value">{{ formatDate(item.created_at) }}</span>
+              </div>
+
+              <div class="detail-item">
+                <span class="detail-label">付款方式</span>
+                <span class="detail-value">{{ item.payment_method || '未付款' }}</span>
               </div>
 
               <!-- 進度條（如果有的話） -->
@@ -89,7 +97,7 @@
     <div v-if="!loading && filteredSponsorships.length > 0" class="sponsorship-stats">
       <div class="stats-card">
         <div class="stat-item">
-          <span class="stat-number">{{ filteredSponsorships.length }}</span>
+          <span class="stat-number">{{ pagination.total }}</span>
           <span class="stat-label">贊助專案</span>
         </div>
         <div class="stat-item">
@@ -103,13 +111,28 @@
       </div>
     </div>
   </div>
+
+  <div v-if="!loading && pagination.total_pages > 1" class="pagination-container">
+    <button :disabled="currentPage === 1" @click="prevPage">上一頁</button>
+    <span>第 {{ currentPage }} / {{ pagination.total_pages }} 頁</span>
+    <button :disabled="currentPage === pagination.total_pages" @click="nextPage">下一頁</button>
+
+    <div class="jump-container">
+      <input
+        type="number"
+        v-model.number="jumpPage"
+        :min="1"
+        :max="pagination.total_pages"
+        placeholder="頁碼"
+      />
+      <button @click="jumpToPage">Go</button>
+    </div>
+  </div>
 </template>
 
 <script>
 import axios from 'axios'
-import { useRestoreAuth } from '@/composables/useRestoreAuth'
 
-useRestoreAuth()
 const BASE_URL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
 export default {
@@ -117,6 +140,15 @@ export default {
   data() {
     return {
       sponsorships: [],
+      pagination: {
+        total: 0,
+        current_page: 1,
+        per_page: 10,
+        total_pages: 1,
+        has_more: false,
+      },
+      currentPage: null,
+      jumpPage: null,
       loading: false,
       isMounted: true,
       abortController: null,
@@ -126,20 +158,17 @@ export default {
     filteredSponsorships() {
       return this.sponsorships.filter((item) => item && item.project)
     },
-
     totalAmount() {
       return this.filteredSponsorships.reduce((sum, item) => sum + (item.amount || 0), 0)
     },
-
     completedCount() {
       return this.filteredSponsorships.filter(
         (item) => item.status === 'completed' || item.project?.status === 'completed'
       ).length
     },
   },
-
   methods: {
-    async fetchSponsorships() {
+    async fetchSponsorships(page = 1) {
       if (!this.isMounted) return
 
       try {
@@ -147,20 +176,25 @@ export default {
         this.abortController = new AbortController()
 
         const token = localStorage.getItem('token')
-        const res = await axios.get(`${BASE_URL}/users/orders/mine?timestamp=${Date.now()}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          signal: this.abortController.signal,
-        })
+        const res = await axios.get(
+          `${BASE_URL}/users/orders/mine?page=${page}&timestamp=${Date.now()}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            signal: this.abortController.signal,
+          }
+        )
 
         if (!this.isMounted) return
 
         if (res.data.success) {
-          console.log('API 回傳贊助資料:', res.data.data)
           this.sponsorships = res.data.data || []
+          this.pagination = res.data.pagination || { total: 0 }
+          this.currentPage = this.pagination.current_page || page
         } else {
           this.sponsorships = []
+          this.pagination = { total: 0 }
         }
       } catch (error) {
         if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') return
@@ -168,13 +202,30 @@ export default {
 
         console.error('取得贊助資料錯誤:', error)
         this.sponsorships = []
+        this.pagination = { total: 0 }
       } finally {
         if (this.isMounted) {
           this.loading = false
         }
       }
     },
-
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.fetchSponsorships(this.currentPage - 1)
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.pagination.total_pages) {
+        this.fetchSponsorships(this.currentPage + 1)
+      }
+    },
+    jumpToPage() {
+      if (this.jumpPage >= 1 && this.jumpPage <= this.pagination.total_pages) {
+        this.fetchSponsorships(this.jumpPage)
+      } else {
+        alert(`請輸入 1 ~ ${this.pagination.total_pages} 之間的頁碼`)
+      }
+    },
     formatDate(dateStr) {
       if (!dateStr) return '未知日期'
       try {
@@ -189,12 +240,10 @@ export default {
         return '日期錯誤'
       }
     },
-
     formatAmount(amount) {
       if (!amount) return 'NT$ 0'
       return `NT$ ${amount.toLocaleString()}`
     },
-
     getStatusText(status) {
       const statusMap = {
         paid: '已付款',
@@ -205,44 +254,38 @@ export default {
       }
       return statusMap[status] || '未知狀態'
     },
-
     handleImageError(event) {
       event.target.style.display = 'none'
       event.target.nextElementSibling?.classList.remove('hidden')
     },
-
     goToProject(projectId) {
       if (projectId) {
         this.$router.push(`/projects/${projectId}`)
       }
     },
-
     viewProjectDetails(projectId) {
       if (projectId) {
         this.$router.push(`/projects/funding/${projectId}`)
       }
     },
-
     goToExploreProjects() {
       window.location.href = 'https://lovia-frontend.vercel.app/projects/explore-projects'
     },
   },
-
   mounted() {
     this.isMounted = true
     this.fetchSponsorships()
   },
-
   beforeUnmount() {
     this.isMounted = false
     if (this.abortController) {
       this.abortController.abort()
     }
   },
-
   unmounted() {
     this.isMounted = false
     this.sponsorships = []
+    this.pagination = { total: 0 }
   },
 }
 </script>
@@ -283,7 +326,7 @@ export default {
   width: 40px;
   height: 40px;
   border: 4px solid rgba(255, 105, 180, 0.2);
-  border-top: 4px solid #FD7269;
+  border-top: 4px solid #fd7269;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 16px;
@@ -336,7 +379,7 @@ export default {
 }
 
 .explore-button {
-  background: #FC5B53;
+  background: #fc5b53;
   color: white;
   border: none;
   padding: 14px 32px;
@@ -376,7 +419,7 @@ export default {
 .sponsorship-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 20px 50px rgba(255, 105, 180, 0.25);
-  border-color: #FFB6A7;
+  border-color: #ffb6a7;
 }
 
 /* 圖片容器 */
@@ -412,6 +455,7 @@ export default {
   position: absolute;
   top: 12px;
   right: 12px;
+  z-index: 2;
 }
 
 .status-badge {
@@ -452,6 +496,7 @@ export default {
 
 .project-header {
   margin-bottom: 20px;
+  padding-top: 24px;
 }
 
 .project-title {
@@ -495,7 +540,7 @@ export default {
   background-image: linear-gradient(to right, #ffedf2, #fff6e3);
   padding: 16px 20px;
   margin: 0 -8px 16px;
-  border: 1px solid #C4C4C4;
+  border: 1px solid #c4c4c4;
 }
 
 .detail-label {
@@ -562,7 +607,7 @@ export default {
 }
 
 .action-button.primary {
-  background: #FC5B53;
+  background: #fc5b53;
   color: white;
   box-shadow: 0 4px 15px;
   border-radius: 50px;
@@ -598,14 +643,74 @@ export default {
   display: block;
   font-size: 36px;
   font-weight: 700;
-  color: #5F6368;
+  color: #5f6368;
   margin-bottom: 8px;
 }
 
 .stat-label {
   font-size: 16px;
-  color: #5F6368;
+  color: #5f6368;
   font-weight: 500;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.pagination-container button {
+  background: #fc5b53;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pagination-container button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.pagination-container span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.jump-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.jump-container input {
+  width: 60px;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.jump-container button {
+  background: #fc5b53;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.jump-container button:hover {
+  background: #e94a45;
 }
 
 @media (max-width: 768px) {

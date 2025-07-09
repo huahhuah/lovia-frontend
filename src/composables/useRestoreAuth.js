@@ -14,12 +14,10 @@ export async function useRestoreAuth() {
     userStore.setToken(tokenFromUrl)
     localStorage.setItem('token', tokenFromUrl)
     sessionStorage.setItem('token', tokenFromUrl)
-    console.log('🔑 從 URL 還原 token 並寫入 userStore')
   }
 
   // [2] 還原 localStorage 的 token/user
   userStore.restore()
-  console.log('🔁 還原 token:', userStore.token)
 
   // [3] 若有 token → 呼叫後端確認有效性
   if (userStore.token) {
@@ -34,7 +32,7 @@ export async function useRestoreAuth() {
       const localUser = userStore.user
 
       if (!serverUser) {
-        console.warn('❌ 後端未回傳使用者資料，清除登入')
+        console.warn(' 後端未回傳使用者資料，清除登入')
         userStore.clear()
         return
       }
@@ -42,11 +40,11 @@ export async function useRestoreAuth() {
       if (!localUser || localUser.id === serverUser.id) {
         userStore.setUser(serverUser)
       } else {
-        console.warn('⚠️ 使用者 ID 不一致，可能是舊資料，清除登入')
+        console.warn(' 使用者 ID 不一致，可能是舊資料，清除登入')
         userStore.clear()
       }
     } catch (err) {
-      console.warn('🚫 無法驗證使用者身分，清除登入資訊', err)
+      console.warn(' 無法驗證使用者身分，清除登入資訊', err)
       userStore.clear()
     }
   }
