@@ -99,7 +99,7 @@
         <!-- <router-link :to="`/edit-proposal/${project.id}`" class="btn btn-outline-dark me-3"
           >返回修改提案</router-link
         > -->
-        <router-link to="/user/projects/mine" class="btn btn-danger">回到提案列表</router-link>
+        <router-link to="/my-proposals" class="btn btn-danger">回到提案列表</router-link>
       </div>
     </div>
   </div>
