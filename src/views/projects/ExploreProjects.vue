@@ -136,21 +136,22 @@ const filters = [
   { key: 'long', label: '長期贊助' },
 ]
 
-//  按搜尋 icon 或 Enter 時才真正同步到 URL
+// 搜尋
 const searchFromLocalKeyword = () => {
   router.push({
     path: '/projects/explore-projects',
     query: {
       ...route.query,
-      keyword: localKeyword.value || undefined,
+      keyword: localKeyword.value.trim() || undefined,
       page: 1,
     },
   })
 }
 
-// 清除本地輸入框，不會影響 header
+// 清除並重新查詢
 const clearLocalKeyword = () => {
   localKeyword.value = ''
+  searchFromLocalKeyword()
 }
 
 // 分頁
@@ -190,14 +191,14 @@ const onCategoryChange = () => {
   })
 }
 
-//  主 fetch
+// 取得專案
 const fetchProjects = async () => {
   isLoading.value = true
   try {
     const res = await axios.get(`${baseURL}/projects`, {
       headers: { Authorization: `Bearer ${userStore.token}` },
       params: {
-        search: route.query.keyword || undefined,
+        search: route.query.keyword?.trim() || undefined,
         category_id: route.query.category || undefined,
         page: Number(route.query.page) || 1,
         per_page: perPage,
@@ -229,14 +230,14 @@ const fetchProjects = async () => {
   }
 }
 
-//  當 URL query 變化時就自動 fetch，並把當前 URL keyword 更新到 local
+// URL query 變就重新 fetch
 watch(
   () => route.query,
   (newQuery) => {
     selectedCategory.value = newQuery.category || ''
     currentPage.value = Number(newQuery.page) || 1
     currentFilter.value = newQuery.filter || 'all'
-    localKeyword.value = newQuery.keyword || '' // 當跳轉時才把 URL keyword 代入
+    localKeyword.value = newQuery.keyword || ''
     fetchProjects()
   },
   { immediate: true }
@@ -253,6 +254,7 @@ const fetchCategories = async () => {
   }
 }
 
+// Toggle follow
 function onToggleFollow({ projectId, follow }) {
   const target = projects.value.find((p) => p.id === projectId)
   if (target) target.is_followed = follow
