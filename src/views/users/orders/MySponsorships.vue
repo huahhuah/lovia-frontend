@@ -128,6 +128,10 @@
 
 <script>
 import axios from 'axios'
+import { useUserStore } from '@/stores/auth'
+
+const userStore = useUserStore()
+  
 
 const BASE_URL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 
