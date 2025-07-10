@@ -15,7 +15,8 @@
                 <th>目標金額</th>
                 <th>支持金額</th>
                 <th>募資狀態</th>
-                <th>審核狀態</th> <!-- 這邊改成審核狀態 -->
+                <th>審核狀態</th>
+                <!-- 這邊改成審核狀態 -->
                 <th>新增進度</th>
                 <th>操作</th>
               </tr>
@@ -29,12 +30,15 @@
                 <td>{{ formatCurrency(project.supportAmount) }}</td>
                 <td>
                   <span class="status-badge" :class="getStatusClass(project.project_type)">
-  {{ project.project_type }}
-</span>
+                    {{ project.project_type }}
+                  </span>
                 </td>
                 <!-- 審核狀態欄位改用 project.auditStatus（或 project.reviewStatus），如果無此欄位用 project.status 替代 -->
                 <td>
-                  <span class="status-badge" :class="getStatusClass(project.auditStatus || project.status)">
+                  <span
+                    class="status-badge"
+                    :class="getStatusClass(project.auditStatus || project.status)"
+                  >
                     {{ project.auditStatus || project.status || '無' }}
                   </span>
                 </td>
@@ -63,8 +67,10 @@
                   >
                     <img src="/edit.png" alt="edit" width="20" height="20" />
                   </router-link>
+
                   <!-- 刪除按鈕 -->
                   <button
+                    v-if="project.auditStatus !== '提案通過'"
                     @click="handleDelete(project.id)"
                     class="icon-button icon-button--delete"
                     :disabled="deleting === project.id"
@@ -211,7 +217,8 @@ export default {
   text-align: left;
 }
 
-.loading, .no-projects {
+.loading,
+.no-projects {
   text-align: center;
   padding: 40px;
   color: #666;
@@ -245,11 +252,22 @@ export default {
   color: #333;
 }
 
-.project-table th, .project-table td {
+.project-table th,
+.project-table td {
   padding: 12px;
   border-bottom: 1px solid #e9ecef;
   text-align: left;
   vertical-align: middle; /* 確保所有內容垂直居中 */
+}
+
+/* 限制專案名稱顯示一行 */
+.project-table td a {
+  display: inline-block;
+  max-width: 220px; /* 太長就... */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
 }
 
 .progress-cell {
@@ -334,21 +352,22 @@ export default {
 
 /* 現代化漸變效果按鈕 - 粉色系暖漸層 */
 .icon-button--modern {
-  background: transparent;         /* 背景透明 */
-  color: black;                    /* 文字改成黑色 */
-  border: 1px solid black;         /* 加上黑色邊框 */
-  box-shadow: none;               /* 拿掉原本的陰影 */
+  background: transparent; /* 背景透明 */
+  color: black; /* 文字改成黑色 */
+  border: 1px solid black; /* 加上黑色邊框 */
+  box-shadow: none; /* 拿掉原本的陰影 */
   overflow: hidden;
   padding: 6px 10px;
   min-height: 32px;
   vertical-align: middle;
   margin-top: 12px;
-  transition: all 0.3s ease;      /* 增加滑過動畫效果 */
+  transition: all 0.3s ease; /* 增加滑過動畫效果 */
+  white-space: nowrap;
 }
 
 .icon-button--modern:hover {
-  background: black;              /* 滑過變黑底 */
-  color: white;                   /* 文字變白色 */
+  background: black; /* 滑過變黑底 */
+  color: white; /* 文字變白色 */
 }
 
 .icon-button--modern::before {
@@ -464,6 +483,12 @@ export default {
   .icon--enhanced {
     width: 14px;
     height: 14px;
+  }
+
+  .icon-button--modern {
+    white-space: nowrap;
+    padding: 4px 6px;
+    font-size: 12px;
   }
 }
 </style>

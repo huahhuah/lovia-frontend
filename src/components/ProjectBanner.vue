@@ -115,12 +115,20 @@
           </button>
 
           <button
-            v-if="!isMobile"
+            v-if="!isMobile && remainingDays > 0"
             class="btn rounded-pill flex-grow-1 py-2 fw-bold shadow-sm text-white"
             style="background-color: #fc5b53"
             @click="$emit('scrollToSponsor')"
           >
             立刻贊助 >>
+          </button>
+          <button
+            v-else-if="!isMobile"
+            class="btn rounded-pill flex-grow-1 py-2 fw-bold shadow-sm text-secondary"
+            style="background-color: #000000"
+            disabled
+          >
+            募資已結束
           </button>
         </div>
       </div>
@@ -138,11 +146,20 @@
       </button>
 
       <button
+        v-if="remainingDays > 0"
         class="btn rounded-pill flex-grow-1 py-2 fw-bold shadow-sm text-white"
         style="background-color: #fc5b53"
         @click="$emit('scrollToSponsor')"
       >
         立刻贊助 >>
+      </button>
+      <button
+        v-else
+        class="btn rounded-pill flex-grow-1 py-2 fw-bold shadow-sm text-secondary"
+        style="background-color: #000000"
+        disabled
+      >
+        募資已結束
       </button>
     </div>
   </div>
