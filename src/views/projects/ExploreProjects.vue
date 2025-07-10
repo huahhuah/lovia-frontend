@@ -35,11 +35,16 @@
         <!-- 搜尋與分類 -->
         <div class="tools-wrapper mb-2 ms-auto d-flex gap-3 align-items-center">
           <div class="search-input position-relative">
-            <i class="bi bi-search"></i>
-            <input type="text" placeholder="輸入關鍵字搜尋專案" v-model="searchKeyword" />
+            <i class="bi bi-search" @click="searchFromLocalKeyword" style="cursor: pointer"></i>
+            <input
+              type="text"
+              placeholder="輸入關鍵字搜尋專案"
+              v-model="localKeyword"
+              @keydown.enter.prevent="searchFromLocalKeyword"
+            />
             <button
-              v-if="searchKeyword"
-              @click="clearSearch"
+              v-if="localKeyword"
+              @click="clearLocalKeyword"
               class="btn btn-sm position-absolute end-0 top-50 translate-middle-y me-2"
               style="background: none; border: none; font-size: 16px; color: #888"
             >
@@ -51,7 +56,7 @@
             <select
               class="form-select rounded-pill border-0 category-select"
               v-model="selectedCategory"
-              @change="fetchProjects"
+              @change="onCategoryChange"
             >
               <option value="">分類</option>
               <option v-for="cat in categories" :key="cat.id" :value="cat.id">
@@ -101,7 +106,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import ProjectCard from '@/components/ProjectCard.vue'
@@ -112,12 +117,12 @@ const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 
-const searchKeyword = ref(route.query.keyword || '')
 const selectedCategory = ref(route.query.category || '')
 const currentPage = ref(Number(route.query.page) || 1)
 const currentFilter = ref(route.query.filter || 'all')
-const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
+const localKeyword = ref('') // Explore 頁自己的輸入框
 
+const baseURL = 'https://lovia-backend-xl4e.onrender.com/api/v1'
 const projects = ref([])
 const categories = ref([])
 const isLoading = ref(false)
@@ -131,20 +136,72 @@ const filters = [
   { key: 'long', label: '長期贊助' },
 ]
 
-//  fetchProjects 支援 keyword + category + page
+//  按搜尋 icon 或 Enter 時才真正同步到 URL
+const searchFromLocalKeyword = () => {
+  router.push({
+    path: '/projects/explore-projects',
+    query: {
+      ...route.query,
+      keyword: localKeyword.value || undefined,
+      page: 1,
+    },
+  })
+}
+
+// 清除本地輸入框，不會影響 header
+const clearLocalKeyword = () => {
+  localKeyword.value = ''
+}
+
+// 分頁
+const changePage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    router.push({
+      path: '/projects/explore-projects',
+      query: {
+        ...route.query,
+        page,
+      },
+    })
+  }
+}
+
+// 篩選
+const setFilter = (key) => {
+  router.push({
+    path: '/projects/explore-projects',
+    query: {
+      ...route.query,
+      filter: key,
+      page: 1,
+    },
+  })
+}
+
+// 分類
+const onCategoryChange = () => {
+  router.push({
+    path: '/projects/explore-projects',
+    query: {
+      ...route.query,
+      category: selectedCategory.value || undefined,
+      page: 1,
+    },
+  })
+}
+
+//  主 fetch
 const fetchProjects = async () => {
   isLoading.value = true
   try {
     const res = await axios.get(`${baseURL}/projects`, {
-      headers: {
-        Authorization: `Bearer ${userStore.token}`,
-      },
+      headers: { Authorization: `Bearer ${userStore.token}` },
       params: {
-        search: searchKeyword.value || undefined,
-        category_id: selectedCategory.value || undefined,
-        page: currentPage.value,
+        search: route.query.keyword || undefined,
+        category_id: route.query.category || undefined,
+        page: Number(route.query.page) || 1,
         per_page: perPage,
-        filter: currentFilter.value,
+        filter: route.query.filter || 'all',
       },
     })
 
@@ -162,8 +219,7 @@ const fetchProjects = async () => {
     totalPages.value = Math.max(1, Math.ceil(totalCount / perPage))
 
     if (currentPage.value > totalPages.value) {
-      currentPage.value = totalPages.value
-      updateRouteAndSearch()
+      changePage(totalPages.value)
     }
   } catch (err) {
     console.error('搜尋失敗', err)
@@ -173,6 +229,23 @@ const fetchProjects = async () => {
   }
 }
 
+//  當 URL query 變化時就自動 fetch，並把當前 URL keyword 更新到 local
+watch(
+  () => route.query,
+  (newQuery) => {
+    selectedCategory.value = newQuery.category || ''
+    currentPage.value = Number(newQuery.page) || 1
+    currentFilter.value = newQuery.filter || 'all'
+    localKeyword.value = newQuery.keyword || '' // 當跳轉時才把 URL keyword 代入
+    fetchProjects()
+  },
+  { immediate: true }
+)
+
+onMounted(() => {
+  fetchCategories()
+})
+
 const fetchCategories = async () => {
   const res = await getAllCategories()
   if (res.data?.status) {
@@ -180,72 +253,9 @@ const fetchCategories = async () => {
   }
 }
 
-//  同步 URL query + 觸發搜尋
-const updateRouteAndSearch = () => {
-  router.push({
-    path: '/projects/explore-projects',
-    query: {
-      search: searchKeyword.value || undefined,
-      category: selectedCategory.value || undefined,
-      page: currentPage.value,
-      filter: currentFilter.value,
-    },
-  })
-}
-
-//  清除搜尋欄位
-const clearSearch = () => {
-  searchKeyword.value = ''
-  updateRouteAndSearch()
-}
-
-//  分頁切換
-const changePage = (page) => {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page
-    updateRouteAndSearch()
-  }
-}
-
-//  篩選切換
-const setFilter = (key) => {
-  currentFilter.value = key
-  currentPage.value = 1
-  updateRouteAndSearch()
-}
-
-//  監聽路由變化，重新 fetch
-watch(
-  () => route.query,
-  (newQuery) => {
-    searchKeyword.value = newQuery.search || ''
-    selectedCategory.value = newQuery.category || ''
-    currentPage.value = Number(newQuery.page) || 1
-    currentFilter.value = newQuery.filter || 'all'
-    fetchProjects()
-  },
-  { immediate: false }
-)
-
-// debounce 輸入搜尋（使用 setTimeout）
-let debounceTimer = null
-watch(searchKeyword, () => {
-  clearTimeout(debounceTimer)
-  debounceTimer = setTimeout(() => {
-    updateRouteAndSearch()
-  }, 500)
-})
-
-onMounted(() => {
-  fetchCategories()
-  fetchProjects()
-})
-
 function onToggleFollow({ projectId, follow }) {
   const target = projects.value.find((p) => p.id === projectId)
-  if (target) {
-    target.is_followed = follow
-  }
+  if (target) target.is_followed = follow
 }
 </script>
 

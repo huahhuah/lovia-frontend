@@ -104,10 +104,6 @@
           <span class="stat-number">{{ formatAmount(totalAmount) }}</span>
           <span class="stat-label">總贊助金額</span>
         </div>
-        <div class="stat-item">
-          <span class="stat-number">{{ completedCount }}</span>
-          <span class="stat-label">已完成專案</span>
-        </div>
       </div>
     </div>
   </div>
@@ -163,25 +159,22 @@ export default {
     },
     completedCount() {
       return this.filteredSponsorships.filter(
-        (item) => item.status === 'completed' || item.project?.status === 'completed'
+        (item) => (item.project?.progress_percent ?? item.project?.progress ?? 0) >= 100
       ).length
     },
   },
+
   methods: {
     async fetchSponsorships(page = 1) {
       if (!this.isMounted) return
-
       try {
         this.loading = true
         this.abortController = new AbortController()
-
         const token = localStorage.getItem('token')
         const res = await axios.get(
           `${BASE_URL}/users/orders/mine?page=${page}&timestamp=${Date.now()}`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
             signal: this.abortController.signal,
           }
         )
@@ -199,7 +192,6 @@ export default {
       } catch (error) {
         if (error.name === 'CanceledError' || error.code === 'ERR_CANCELED') return
         if (!this.isMounted) return
-
         console.error('取得贊助資料錯誤:', error)
         this.sponsorships = []
         this.pagination = { total: 0 }
@@ -495,6 +487,8 @@ export default {
 }
 
 .project-header {
+  height: 48px;
+  overflow: hidden;
   margin-bottom: 20px;
   padding-top: 24px;
 }
@@ -505,10 +499,11 @@ export default {
   color: #1a1a1a;
   margin: 0 0 8px;
   line-height: 1.3;
+  min-height: 48px;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  line-clamp: 2;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
@@ -681,6 +676,7 @@ export default {
 .pagination-container span {
   font-size: 14px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .jump-container {
@@ -729,6 +725,7 @@ export default {
   }
 
   .sponsorship-card {
+    min-height: 460px;
     padding: 16px;
   }
 
@@ -805,6 +802,47 @@ export default {
   .status-badge {
     font-size: 10px;
     padding: 6px 12px;
+  }
+
+  .detail-value {
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px; /* 視情況調整 */
+    display: inline-block;
+  }
+  .pagination-container {
+    flex-wrap: nowrap; /* 不換行 */
+    justify-content: space-between; /* 均勻分布 */
+    gap: 8px;
+  }
+
+  .pagination-container span {
+    font-size: 12px;
+  }
+
+  .pagination-container button,
+  .pagination-container input,
+  .pagination-container span {
+    flex: 1 1 0;
+    text-align: center;
+    max-width: none;
+  }
+
+  .jump-container {
+    display: flex;
+    flex: 1;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .jump-container input {
+    flex: 2;
+  }
+
+  .jump-container button {
+    flex: 1;
   }
 }
 </style>
