@@ -54,8 +54,8 @@
         <div class="d-flex justify-content-between align-items-center">
           <strong
             :class="{
-              'fs-normal': project.amount.toString().length <= 6,
-              'fs-smaller': project.amount.toString().length > 6,
+              'fs-normal': project.amount.toString().length < 6,
+              'fs-smaller': project.amount.toString().length >= 6,
             }"
           >
             NT$ {{ project.amount.toLocaleString() }}
@@ -166,6 +166,16 @@ const toggleFavorite = async () => {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
+}
+
+.btn-danger,
+.btn-view-project {
+  white-space: nowrap;
+  max-width: 140px;
+  padding: 6px 12px;
+  font-size: 14px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .hover-animate {
@@ -285,6 +295,18 @@ const toggleFavorite = async () => {
   font-size: 1rem; /* 原本大小 */
 }
 .fs-smaller {
-  font-size: 0.9rem; /* 縮小後 */
+  font-size: 0.75rem; /* 縮小後 */
+}
+
+@media (min-width: 1400px) and (max-width: 1600px) {
+  .card .btn-danger,
+  .card .btn-view-project {
+    max-width: 140px;
+    white-space: nowrap;
+    text-align: center;
+    font-size: 14px;
+    padding: 6px 12px;
+    flex-shrink: 0;
+  }
 }
 </style>
