@@ -82,7 +82,7 @@
       <p><strong>完整內容：</strong></p>
       <p v-html="formatMultilineText(selectedProject.full_content)"></p>
       <p><strong>提案團隊：</strong>{{ selectedProject.project_team }}</p>
-      <p><strong>問與答：</strong></p>
+      <p><strong>常見問題：</strong></p>
       <div v-if="selectedProject.parseFaq?.length">
         <ul>
           <li v-for="(item, index) in selectedProject.parseFaq" :key="index">
