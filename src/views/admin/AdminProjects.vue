@@ -30,6 +30,7 @@
                 <option :value=1>審查中</option>
                 <option :value=2>提案通過</option>
                 <option :value=3>提案退回</option>
+                <option :value=4>修改後重送</option>
               </select>
               <input 
                 v-if="project.status === 3" 
@@ -45,7 +46,13 @@
     </div>
 
     <div class="text-center mt-4">
-      <button class="btn btn-primary" @click="submitAllUpdates">送出更新</button>
+      <button class="btn btn-primary" 
+      @click="submitAllUpdates" 
+      :disabled="isSubmitting">送出更新</button>
+    </div>
+    <div v-if="isSubmitting" class="loading-overlay">
+      <div class="spinner"></div>
+      <p>更新中，請稍候...</p>
     </div>
   </div>
 
@@ -107,6 +114,7 @@ import { ref, onMounted } from 'vue'
 import { allProjects as getProjects } from '@/api/admin'
 import axios from 'axios'
 
+const isSubmitting = ref(false)
 const userStore = useUserStore()
 
 const projects = ref([])
@@ -138,7 +146,7 @@ async function getAllProjects( page = 1){
 
     projects.value = result.data.map(project => ({
       ...project,
-      status: project.status?.id || 1,
+      status: project.status_id,
       reason: ''
     }))
     totalPages.value = result.pagination.totalPages
@@ -192,6 +200,8 @@ function statusClass(status) {
       return "status-approved"
     case 3:
       return "status-rejected"
+    case 4:
+      return "status-resubmitted" 
     case 1:
     default:
       return "status-pending"
@@ -200,7 +210,7 @@ function statusClass(status) {
 
 async function submitAllUpdates() {
   const token = userStore.token
-  console.log('submitAllUpdates 被觸發')
+  isSubmitting.value = true // ✅ 開始時設為 true
   try {
     for (const project of projects.value) {
       const status = project.status
@@ -211,6 +221,7 @@ async function submitAllUpdates() {
       if (status === 3) {
         if (!project.reason.trim()) {
           alert(`請填寫提案 ${project.id} 的退回原因`)
+          isSubmitting.value = false // 錯誤時關閉
           return
         }
         payload.reason = project.reason.trim()
@@ -232,6 +243,8 @@ async function submitAllUpdates() {
   } catch (error) {
     console.error('更新失敗', error)
     alert('更新失敗，請稍後再試')
+  } finally {
+    isSubmitting.value = false 
   }
 }
 

@@ -27,6 +27,19 @@
         <p class="text-muted" style="white-space: pre-line">{{ project.project_team }}</p>
       </div>
 
+      <div class="project-content-box p-4 rounded-4 shadow-sm mb-4">
+        <h2 class="fw-bold mb-3">常見問題</h2>
+          <div v-if="project.faq && project.faq.length">
+            <div v-for="(item, index) in project.faq" :key="index" class="mb-3">
+              <p class="mb-1"><strong>Q:</strong> {{ item.question }}</p>
+              <p class="mb-0"><strong>A:</strong> {{ item.answer }}</p>
+            </div>
+          </div>
+          <div v-else>
+            <p class="text-muted">目前沒有常見問題</p>
+        </div>
+      </div>
+
       <!-- 分頁區塊 -->
       <div class="row mt-4">
         <!-- 左側主要內容 -->
