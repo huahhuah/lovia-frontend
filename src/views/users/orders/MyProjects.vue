@@ -440,6 +440,13 @@ export default {
 }
 
 @media (max-width: 768px) {
+/* 讓特定欄位不換行 */
+  .project-table td:nth-child(4),
+  .project-table td:nth-child(5),
+  .project-table td:nth-child(6) {
+    white-space: nowrap;
+  }
+
   .project-table {
     font-size: 14px;
   }
