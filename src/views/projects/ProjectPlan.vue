@@ -73,7 +73,7 @@
         </div>
 
         <div class="text-center">
-          <button type="submit" class="btn btn-danger px-5 py-2" :disabled="isSubmitting">
+          <button type="submit" class="btn btn-danger px-4 py-2" :disabled="isSubmitting">
             {{ isEdit ? '更新回饋方案' : '送出回饋方案' }}
           </button>
         </div>
