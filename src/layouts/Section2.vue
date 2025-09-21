@@ -12,7 +12,7 @@
         <!-- 桌機版卡片 -->
         <!-- 募資中固定不是已結束 -->
         <div class="row justify-content-center g-4 d-none d-xl-flex">
-          <div class="col-md-4" v-for="(card, index) in visibleCards" :key="index">
+          <div class="col-md-4" v-for="card in visibleCards" :key="card.id">
             <ProjectCard
               :project="card"
               :is-archived="false" 
@@ -26,7 +26,7 @@
         <!-- 募資中固定不是已結束 -->
         <div class="project-scroll-wrapper d-xl-none" ref="scrollContainer" @scroll="onScroll">
           <div class="project-scroll">
-            <div class="card-wrapper" v-for="(card, index) in visibleCards" :key="'mobile-' + index">
+           <div class="card-wrapper" v-for="card in visibleCards" :key="'mobile-' + card.id">
               <ProjectCard
                 :project="card"
                 :is-archived="false" 
@@ -69,7 +69,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { getAllProjects } from '@/api/project'
 import ProjectCard from '@/components/ProjectCard.vue'
-import axios from 'axios'
+
 
 const isLoading = ref(true)
 const projects = ref([])
@@ -86,7 +86,7 @@ onMounted(async () => {
 
     console.log('募資中API 回傳：', res.data)
 
-    if (res.data.status && Array.isArray(res.data.data)) {
+  if (res.data && Array.isArray(res.data.data)) {
       projects.value = res.data.data
     }
   } catch (err) {
@@ -96,11 +96,12 @@ onMounted(async () => {
   }
 })
 
-//  新增：過濾掉已結束的專案
+// 過濾掉已結束的專案（用 days_left + is_finished 判斷）
 const filteredProjects = computed(() =>
-  projects.value.filter((p) => p.status !== '已結束')
-)  
-  
+  projects.value.filter((p) => Number(p.days_left) > 0 && !p.is_finished)
+)
+
+
 // 使用過濾後的專案
 const visibleCards = computed(() => 
   showAll.value ? filteredProjects.value : filteredProjects.value.slice(0, 3)
