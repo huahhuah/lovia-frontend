@@ -100,9 +100,12 @@ onMounted(async () => {
 const filteredProjects = computed(() =>
   projects.value.filter((p) => p.status !== '已結束')
 )  
+  
+// 使用過濾後的專案
+const visibleCards = computed(() => 
+  showAll.value ? filteredProjects.value : filteredProjects.value.slice(0, 3)
+)
 
-// 控制顯示數量
-const visibleCards = computed(() => (showAll.value ? projects.value : projects.value.slice(0, 3)))
 
 //  收藏狀態切換  
 function onToggleFollow({ projectId, follow }) {
