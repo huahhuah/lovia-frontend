@@ -10,11 +10,12 @@
 
       <div class="container" style="padding-left: 10rem; padding-right: 10rem">
         <!-- 桌機版卡片 -->
+        <!-- 募資中固定不是已結束 -->
         <div class="row justify-content-center g-4 d-none d-xl-flex">
           <div class="col-md-4" v-for="(card, index) in visibleCards" :key="index">
             <ProjectCard
               :project="card"
-              :is-archived="false" <!-- 募資中固定不是已結束 -->
+              :is-archived="false" 
               :isFollowed="card.is_followed"
               @toggle-follow="onToggleFollow"
             />
@@ -22,12 +23,13 @@
         </div>
 
         <!-- 手機版滑動卡片 -->
+        <!-- 募資中固定不是已結束 -->
         <div class="project-scroll-wrapper d-xl-none" ref="scrollContainer" @scroll="onScroll">
           <div class="project-scroll">
             <div class="card-wrapper" v-for="(card, index) in visibleCards" :key="'mobile-' + index">
               <ProjectCard
                 :project="card"
-                :is-archived="false" <!-- 募資中固定不是已結束 -->
+                :is-archived="false" 
                 :isFollowed="card.is_followed"
                 @toggle-follow="onToggleFollow"
               />
