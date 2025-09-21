@@ -14,7 +14,7 @@
           <div class="col-md-4" v-for="(card, index) in visibleCards" :key="index">
             <ProjectCard
               :project="card"
-              :is-archived="card.status === '已結束'"
+              :is-archived="false" <!-- 募資中固定不是已結束 -->
               :isFollowed="card.is_followed"
               @toggle-follow="onToggleFollow"
             />
@@ -27,7 +27,7 @@
             <div class="card-wrapper" v-for="(card, index) in visibleCards" :key="'mobile-' + index">
               <ProjectCard
                 :project="card"
-                :is-archived="card.status === '已結束'"
+                :is-archived="false" <!-- 募資中固定不是已結束 -->
                 :isFollowed="card.is_followed"
                 @toggle-follow="onToggleFollow"
               />
@@ -72,16 +72,17 @@ import axios from 'axios'
 const isLoading = ref(true)
 const projects = ref([])
 const showAll = ref(false)
-
+  
+//  初始化：取得募資中專案
 onMounted(async () => {
   try {
     const res = await getAllProjects({
-      filter: 'funding',
+      filter: 'funding', // 後端設定：募資中
       page: 1,
       per_page: 6,
     })
 
-    console.log('API 回傳：', res.data)
+    console.log('募資中API 回傳：', res.data)
 
     if (res.data.status && Array.isArray(res.data.data)) {
       projects.value = res.data.data
@@ -93,8 +94,15 @@ onMounted(async () => {
   }
 })
 
+//  新增：過濾掉已結束的專案
+const filteredProjects = computed(() =>
+  projects.value.filter((p) => p.status !== '已結束')
+)  
+
+// 控制顯示數量
 const visibleCards = computed(() => (showAll.value ? projects.value : projects.value.slice(0, 3)))
 
+//  收藏狀態切換  
 function onToggleFollow({ projectId, follow }) {
   const target = projects.value.find((p) => p.id === projectId)
   if (target) {
@@ -102,6 +110,7 @@ function onToggleFollow({ projectId, follow }) {
   }
 }
 
+//  手機版滑動邏輯  
 const currentIndex = ref(0)
 const scrollContainer = ref(null)
 
