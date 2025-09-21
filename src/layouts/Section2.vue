@@ -56,7 +56,7 @@
         <button
           class="btn btn-outline-danger rounded-pill mt-4"
           @click="showAll = !showAll"
-          v-if="projects.length > 3"
+          v-if="filteredProjects.length  > 3"
         >
           {{ showAll ? '收起' : '查看更多' }}
         </button>
